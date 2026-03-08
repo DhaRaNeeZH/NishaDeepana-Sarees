@@ -1,0 +1,2 @@
+﻿src/pages/CartPage.tsx(15,61): error TS6133: 'clearCart' is declared but its value is never read.
+src/pages/TrackOrderPage.tsx(7,1): error TS6133: 'Badge' is declared but its value is never read.
