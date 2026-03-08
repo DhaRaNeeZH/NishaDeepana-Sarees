@@ -25,7 +25,13 @@ const app = express();
 
 // ── Middleware ────────────────────────────────────────────────
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
+    origin: [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'http://127.0.0.1:5173',
+        'https://nishadeepanasarees.vercel.app',
+        'https://nisha-deepana-sarees.vercel.app',
+    ],
     credentials: true,
 }));
 app.use(express.json());
