@@ -56,11 +56,7 @@ export const LoginPage: React.FC = () => {
         <div className="min-h-screen flex">
             {/* Left side — branding panel */}
             <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-maroon via-maroon-dark to-black items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 opacity-10">
-                    <div className="absolute top-10 left-10 w-40 h-40 border-2 border-gold rounded-full" />
-                    <div className="absolute bottom-20 right-20 w-60 h-60 border border-gold/50 rounded-full" />
-                    <div className="absolute top-1/2 left-1/3 w-32 h-32 border border-beige/30 rounded-full" />
-                </div>
+
                 <div className="relative text-center px-12">
                     <ShoppingBag className="h-16 w-16 text-gold mx-auto mb-6" />
                     <h1 className="text-4xl font-bold text-white font-playfair mb-4">
