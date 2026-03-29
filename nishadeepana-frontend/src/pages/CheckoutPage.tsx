@@ -325,7 +325,7 @@ export const CheckoutPage: React.FC = () => {
                                         )}
                                         {form.state && (
                                             <p className="text-xs text-maroon mt-1 font-medium">
-                                                🚚 Delivery charge for {form.state}: {formatCurrency(shipping)}
+                                                🚚 Standard delivery rate: {formatCurrency(shipping)}
                                             </p>
                                         )}
                                     </div>
