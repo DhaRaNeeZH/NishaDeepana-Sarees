@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreditCard, Truck, CheckCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -10,6 +10,7 @@ import { calculateFinalUnitPrice, getBulkDiscountPercentage } from '../utils/pri
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../lib/api';
+import { getShippingCharge, getDeliveryZone, getZoneLabel, type DeliveryCharges } from '../utils/deliveryZone';
 import type { Payment } from '../types/order';
 
 interface FormData {
@@ -40,9 +41,18 @@ export const CheckoutPage: React.FC = () => {
     const [errors, setErrors] = useState<Partial<FormData>>({});
     const [isProcessing, setIsProcessing] = useState(false);
     const [apiError, setApiError] = useState('');
+    const [deliveryCharges, setDeliveryCharges] = useState<DeliveryCharges>({ tamilnadu: 50, nearby: 80, others: 100 });
 
-    const shipping = cartSummary.subtotal >= 2000 ? 0 : 200;
+    // Fetch delivery charges from backend on mount
+    useEffect(() => {
+        api.getDeliveryCharges().then(setDeliveryCharges).catch(() => { });
+    }, []);
+
+    const shipping = form.state.trim()
+        ? getShippingCharge(form.state, deliveryCharges)
+        : deliveryCharges.others;
     const totalWithShipping = cartSummary.total + shipping;
+    const zoneLabel = form.state.trim() ? getZoneLabel(getDeliveryZone(form.state)) : 'Enter state for exact charge';
 
     if (items.length === 0) {
         navigate('/cart', { replace: true });
@@ -361,9 +371,12 @@ export const CheckoutPage: React.FC = () => {
                                         </div>
                                     )}
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-600">Shipping</span>
-                                        <span className={shipping === 0 ? 'text-green-600 font-semibold' : ''}>
-                                            {shipping === 0 ? 'FREE' : formatCurrency(shipping)}
+                                        <span className="text-gray-600">
+                                            Shipping
+                                            <span className="block text-xs text-gray-400">{zoneLabel}</span>
+                                        </span>
+                                        <span className="font-medium text-maroon">
+                                            {formatCurrency(shipping)}
                                         </span>
                                     </div>
                                     <div className="flex justify-between font-bold text-lg pt-2 border-t">

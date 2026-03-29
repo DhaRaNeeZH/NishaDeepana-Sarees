@@ -84,4 +84,13 @@ export const api = {
         }
         return res.json();
     },
+
+    // Delivery Charge Settings
+    getDeliveryCharges: () =>
+        apiFetch<{ tamilnadu: number; nearby: number; others: number }>('/api/settings/delivery'),
+    updateDeliveryCharges: (charges: { tamilnadu: number; nearby: number; others: number }) =>
+        apiFetch<{ message: string; value: { tamilnadu: number; nearby: number; others: number } }>(
+            '/api/settings/delivery',
+            { method: 'PUT', body: JSON.stringify(charges) }
+        ),
 };

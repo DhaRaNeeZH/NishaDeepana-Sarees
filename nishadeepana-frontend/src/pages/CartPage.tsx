@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Trash2, ShoppingBag, ArrowRight, Plus, Minus } from 'lucide-react';
+import { Trash2, ShoppingBag, ArrowRight, Plus, Minus, MapPin } from 'lucide-react';
 import { formatCurrency } from '../lib/utils';
 import { calculateFinalUnitPrice, getBulkDiscountPercentage } from '../utils/pricing';
 import { Button } from '../components/ui/button';
@@ -74,8 +74,10 @@ export const CartPage: React.FC = () => {
         );
     }
 
-    const shipping = cartSummary.subtotal >= 2000 ? 0 : 200;
-    const totalWithShipping = cartSummary.total + shipping;
+    // Shipping is zone-based — exact charge calculated at checkout
+    const shippingEstimateMin = 50; // Tamil Nadu
+    const shippingEstimateMax = 100; // Other states
+    const totalWithShipping = cartSummary.total + shippingEstimateMax; // worst-case estimate
     const discountPct = getBulkDiscountPercentage(cartSummary.totalQuantity);
 
     return (
@@ -256,17 +258,20 @@ export const CartPage: React.FC = () => {
                                             <span className="font-semibold">−{formatCurrency(cartSummary.discount)}</span>
                                         </div>
                                     )}
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-600">Shipping</span>
-                                        <span className={shipping === 0 ? 'text-green-600 font-semibold' : ''}>
-                                            {shipping === 0 ? 'FREE' : formatCurrency(shipping)}
+                                    <div className="flex justify-between items-start">
+                                        <span className="text-gray-600 flex items-center gap-1">
+                                            <MapPin className="h-3.5 w-3.5" /> Shipping
                                         </span>
+                                        <div className="text-right">
+                                            <span className="font-medium text-maroon">
+                                                ₹{shippingEstimateMin}–₹{shippingEstimateMax}
+                                            </span>
+                                            <p className="text-xs text-gray-400">Based on delivery state</p>
+                                        </div>
                                     </div>
-                                    {cartSummary.subtotal < 2000 && cartSummary.subtotal >= 1500 && (
-                                        <p className="text-sm text-orange-600">
-                                            💡 Add {formatCurrency(2000 - cartSummary.subtotal)} more for free shipping!
-                                        </p>
-                                    )}
+                                    <div className="text-xs text-gray-500 bg-amber-50 border border-amber-100 rounded px-3 py-2">
+                                        🚚 Tamil Nadu ₹{shippingEstimateMin} · Nearby States ₹80 · Others ₹{shippingEstimateMax}
+                                    </div>
                                     <div className="border-t border-maroon/20 pt-3">
                                         <div className="flex justify-between text-lg font-bold">
                                             <span className="text-gray-900">Total</span>

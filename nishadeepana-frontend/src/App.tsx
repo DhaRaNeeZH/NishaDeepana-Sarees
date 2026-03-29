@@ -15,6 +15,7 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminProducts } from './pages/admin/AdminProducts';
 import { AdminOrders } from './pages/admin/AdminOrders';
 import { AdminWholesale } from './pages/admin/AdminWholesale';
+import { AdminSettings } from './pages/admin/AdminSettings';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
@@ -59,6 +60,7 @@ function App() {
                                         <Route path="admin/products" element={<AdminGuard><AdminProducts /></AdminGuard>} />
                                         <Route path="admin/orders" element={<AdminGuard><AdminOrders /></AdminGuard>} />
                                         <Route path="admin/wholesale" element={<AdminGuard><AdminWholesale /></AdminGuard>} />
+                                        <Route path="admin/settings" element={<AdminGuard><AdminSettings /></AdminGuard>} />
 
                                         {/* 404 */}
                                         <Route path="*" element={<NotFoundPage />} />
