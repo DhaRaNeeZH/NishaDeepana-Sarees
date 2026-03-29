@@ -285,7 +285,7 @@ export const CheckoutPage: React.FC = () => {
                                                 <option value="Karnataka">Karnataka</option>
                                                 <option value="Kerala">Kerala</option>
                                             </optgroup>
-                                            <optgroup label="Rest of India (₹100)">
+                                            <optgroup label="Other States (₹100)">
                                                 <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
                                                 <option value="Arunachal Pradesh">Arunachal Pradesh</option>
                                                 <option value="Assam">Assam</option>
