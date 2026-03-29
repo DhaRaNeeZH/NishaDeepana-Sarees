@@ -10,17 +10,16 @@ export interface DeliveryCharges {
 }
 
 // Tamil Nadu
-const TAMIL_NADU_STATES = ['tamil nadu', 'tamilnadu'];
+const TAMIL_NADU_STATES = ['Tamil Nadu'];
 
 // Nearby states
-const NEARBY_STATES = ['kerala', 'karnataka', 'andhra pradesh', 'andhrapradesh'];
+const NEARBY_STATES = ['Kerala', 'Karnataka', 'Andhra Pradesh', 'Telangana'];
 
 export type DeliveryZone = 'tamilnadu' | 'nearby' | 'others';
 
 export function getDeliveryZone(state: string): DeliveryZone {
-    const normalized = state.trim().toLowerCase();
-    if (TAMIL_NADU_STATES.includes(normalized)) return 'tamilnadu';
-    if (NEARBY_STATES.includes(normalized)) return 'nearby';
+    if (TAMIL_NADU_STATES.includes(state)) return 'tamilnadu';
+    if (NEARBY_STATES.includes(state)) return 'nearby';
     return 'others';
 }
 
