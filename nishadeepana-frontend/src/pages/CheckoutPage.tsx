@@ -276,16 +276,16 @@ export const CheckoutPage: React.FC = () => {
                                                 }`}
                                         >
                                             <option value="">-- Select State --</option>
-                                            <optgroup label="🏠 Tamil Nadu (₹50)">
+                                            <optgroup label="Tamil Nadu">
                                                 <option value="Tamil Nadu">Tamil Nadu</option>
+                                                <option value="Puducherry">Puducherry</option>
                                             </optgroup>
-                                            <optgroup label="🗺️ Nearby States (₹80)">
+                                            <optgroup label="Bordering States">
                                                 <option value="Andhra Pradesh">Andhra Pradesh</option>
                                                 <option value="Karnataka">Karnataka</option>
                                                 <option value="Kerala">Kerala</option>
-                                                <option value="Telangana">Telangana</option>
                                             </optgroup>
-                                            <optgroup label="🇮🇳 Other States (₹100)">
+                                            <optgroup label="Other States">
                                                 <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
                                                 <option value="Arunachal Pradesh">Arunachal Pradesh</option>
                                                 <option value="Assam">Assam</option>
@@ -313,6 +313,7 @@ export const CheckoutPage: React.FC = () => {
                                                 <option value="Punjab">Punjab</option>
                                                 <option value="Rajasthan">Rajasthan</option>
                                                 <option value="Sikkim">Sikkim</option>
+                                                <option value="Telangana">Telangana</option>
                                                 <option value="Tripura">Tripura</option>
                                                 <option value="Uttar Pradesh">Uttar Pradesh</option>
                                                 <option value="Uttarakhand">Uttarakhand</option>
@@ -324,7 +325,7 @@ export const CheckoutPage: React.FC = () => {
                                         )}
                                         {form.state && (
                                             <p className="text-xs text-maroon mt-1 font-medium">
-                                                🚚 Delivery: {formatCurrency(shipping)} ({form.state === 'Tamil Nadu' ? 'Tamil Nadu rate' : ['Andhra Pradesh', 'Karnataka', 'Kerala', 'Telangana'].includes(form.state) ? 'Nearby state rate' : 'Standard rate'})
+                                                🚚 Delivery: {formatCurrency(shipping)} ({['Tamil Nadu', 'Puducherry'].includes(form.state) ? 'Tamil Nadu rate' : ['Andhra Pradesh', 'Karnataka', 'Kerala'].includes(form.state) ? 'Bordering state rate' : 'Standard rate'})
                                             </p>
                                         )}
                                     </div>

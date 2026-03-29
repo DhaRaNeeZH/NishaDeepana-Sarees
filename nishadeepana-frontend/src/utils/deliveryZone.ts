@@ -9,11 +9,11 @@ export interface DeliveryCharges {
     others: number;
 }
 
-// Tamil Nadu
-const TAMIL_NADU_STATES = ['Tamil Nadu'];
+// Tamil Nadu zone — TN + Puducherry (enclaved within TN)
+const TAMIL_NADU_STATES = ['Tamil Nadu', 'Puducherry'];
 
-// Nearby states
-const NEARBY_STATES = ['Kerala', 'Karnataka', 'Andhra Pradesh', 'Telangana'];
+// Nearby states — shares border with Tamil Nadu
+const NEARBY_STATES = ['Kerala', 'Karnataka', 'Andhra Pradesh'];
 
 export type DeliveryZone = 'tamilnadu' | 'nearby' | 'others';
 
