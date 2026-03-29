@@ -325,7 +325,7 @@ export const CheckoutPage: React.FC = () => {
                                         )}
                                         {form.state && (
                                             <p className="text-xs text-maroon mt-1 font-medium">
-                                                🚚 Delivery: {formatCurrency(shipping)} ({['Tamil Nadu', 'Puducherry'].includes(form.state) ? 'Tamil Nadu rate' : ['Andhra Pradesh', 'Karnataka', 'Kerala'].includes(form.state) ? 'Bordering state rate' : 'Standard rate'})
+                                                🚚 Delivery charge for {form.state}: {formatCurrency(shipping)}
                                             </p>
                                         )}
                                     </div>
