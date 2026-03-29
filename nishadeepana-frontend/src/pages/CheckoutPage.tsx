@@ -276,16 +276,16 @@ export const CheckoutPage: React.FC = () => {
                                                 }`}
                                         >
                                             <option value="">-- Select State --</option>
-                                            <optgroup label="Tamil Nadu">
+                                            <optgroup label="Tamil Nadu (₹50)">
                                                 <option value="Tamil Nadu">Tamil Nadu</option>
                                                 <option value="Puducherry">Puducherry</option>
                                             </optgroup>
-                                            <optgroup label="Bordering States">
+                                            <optgroup label="Neighbouring States (₹80)">
                                                 <option value="Andhra Pradesh">Andhra Pradesh</option>
                                                 <option value="Karnataka">Karnataka</option>
                                                 <option value="Kerala">Kerala</option>
                                             </optgroup>
-                                            <optgroup label="Other States">
+                                            <optgroup label="Rest of India (₹100)">
                                                 <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
                                                 <option value="Arunachal Pradesh">Arunachal Pradesh</option>
                                                 <option value="Assam">Assam</option>
