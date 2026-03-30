@@ -11,9 +11,10 @@ const jwt = require('jsonwebtoken');
 
 // Default delivery charges
 const DEFAULT_DELIVERY = {
-    tamilnadu: 50,   // Tamil Nadu
-    nearby: 80,   // Kerala, Karnataka, Andhra Pradesh
-    others: 100,   // All other Indian states
+    tamilnadu: 50,
+    nearby: 80,
+    others: 100,
+    freeShipping: false,  // festival free delivery toggle
 };
 
 // Helper: ensure settings doc exists
@@ -50,10 +51,10 @@ router.get('/delivery', async (req, res) => {
 });
 
 // PUT /api/settings/delivery — admin only
-// Body: { tamilnadu: 50, nearby: 80, others: 100 }
+// Body: { tamilnadu: 50, nearby: 80, others: 100, freeShipping: false }
 router.put('/delivery', adminOnly, async (req, res) => {
     try {
-        const { tamilnadu, nearby, others } = req.body;
+        const { tamilnadu, nearby, others, freeShipping } = req.body;
         if (
             typeof tamilnadu !== 'number' || tamilnadu < 0 ||
             typeof nearby !== 'number' || nearby < 0 ||
@@ -64,7 +65,7 @@ router.put('/delivery', adminOnly, async (req, res) => {
 
         const doc = await Settings.findOneAndUpdate(
             { key: 'deliveryCharge' },
-            { value: { tamilnadu, nearby, others } },
+            { value: { tamilnadu, nearby, others, freeShipping: !!freeShipping } },
             { upsert: true, new: true }
         );
         res.json({ message: 'Delivery charges updated', value: doc.value });

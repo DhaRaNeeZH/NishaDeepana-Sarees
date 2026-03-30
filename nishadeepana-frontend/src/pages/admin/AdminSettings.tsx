@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Truck, ArrowLeft, Save, RefreshCw, CheckCircle } from 'lucide-react';
+import { Truck, ArrowLeft, Save, RefreshCw, CheckCircle, Gift } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { api } from '../../lib/api';
 
 export const AdminSettings: React.FC = () => {
     const [charges, setCharges] = useState({ tamilnadu: 50, nearby: 80, others: 100 });
+    const [freeShipping, setFreeShipping] = useState(false);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
@@ -23,7 +24,7 @@ export const AdminSettings: React.FC = () => {
         setError('');
         setSaving(true);
         try {
-            await api.updateDeliveryCharges(charges);
+            await api.updateDeliveryCharges({ ...charges, freeShipping } as any);
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
         } catch (err: any) {
@@ -37,15 +38,15 @@ export const AdminSettings: React.FC = () => {
         {
             key: 'tamilnadu' as const,
             label: 'Tamil Nadu',
-            description: 'Home state — lowest delivery rate',
+            description: 'Tamil Nadu & Puducherry',
             emoji: '🏠',
-            states: ['Tamil Nadu'],
+            states: ['Tamil Nadu', 'Puducherry'],
             color: 'border-t-maroon',
             badge: 'bg-maroon/10 text-maroon',
         },
         {
             key: 'nearby' as const,
-            label: 'Nearby States',
+            label: 'Neighbouring States',
             description: 'Kerala, Karnataka, Andhra Pradesh',
             emoji: '🗺️',
             states: ['Kerala', 'Karnataka', 'Andhra Pradesh'],
@@ -76,9 +77,9 @@ export const AdminSettings: React.FC = () => {
                         </Link>
                         <div>
                             <h1 className="text-3xl font-bold flex items-center gap-2">
-                                <Truck className="h-8 w-8" /> Delivery Charge Settings
+                                <Truck className="h-8 w-8" /> Delivery Settings
                             </h1>
-                            <p className="text-beige mt-1">Set delivery charges by customer location zone</p>
+                            <p className="text-beige mt-1">Manage delivery charges and offers</p>
                         </div>
                     </div>
                 </div>
@@ -92,7 +93,8 @@ export const AdminSettings: React.FC = () => {
                 ) : (
                     <>
                         {/* Zone Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <h2 className="text-lg font-bold text-gray-700 mb-4">Zone-Based Delivery Charges</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                             {zones.map((zone) => (
                                 <Card key={zone.key} className={`border-t-4 ${zone.color} hover:shadow-lg transition-shadow`}>
                                     <CardHeader className="pb-3">
@@ -133,11 +135,42 @@ export const AdminSettings: React.FC = () => {
                         </div>
 
                         {/* Summary */}
-                        <Card className="mb-6 bg-amber-50 border-amber-200">
+                        <Card className="mb-8 bg-amber-50 border-amber-200">
                             <CardContent className="py-4">
                                 <p className="text-sm text-amber-800 font-medium text-center">
-                                    🚚 Current: Tamil Nadu <strong>₹{charges.tamilnadu}</strong> · Nearby States <strong>₹{charges.nearby}</strong> · Other States <strong>₹{charges.others}</strong>
+                                    🚚 Current: Tamil Nadu & Puducherry <strong>₹{charges.tamilnadu}</strong> · Neighbouring States <strong>₹{charges.nearby}</strong> · Other States <strong>₹{charges.others}</strong>
                                 </p>
+                            </CardContent>
+                        </Card>
+
+                        {/* Free Shipping Toggle */}
+                        <h2 className="text-lg font-bold text-gray-700 mb-4">Festival / Special Offer</h2>
+                        <Card className={`mb-8 border-2 transition-all ${freeShipping ? 'border-green-400 bg-green-50' : 'border-gray-200'}`}>
+                            <CardContent className="py-5">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`p-2 rounded-xl ${freeShipping ? 'bg-green-100' : 'bg-gray-100'}`}>
+                                            <Gift className={`h-6 w-6 ${freeShipping ? 'text-green-600' : 'text-gray-400'}`} />
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-gray-800">Free Delivery for All Orders</p>
+                                            <p className="text-sm text-gray-500">Enable during festivals or special offers — overrides all zone charges</p>
+                                        </div>
+                                    </div>
+                                    {/* Toggle Switch */}
+                                    <button
+                                        onClick={() => setFreeShipping(prev => !prev)}
+                                        className={`relative w-14 h-7 rounded-full transition-colors duration-300 focus:outline-none ${freeShipping ? 'bg-green-500' : 'bg-gray-300'}`}
+                                        aria-label="Toggle free shipping"
+                                    >
+                                        <span className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform duration-300 ${freeShipping ? 'translate-x-7' : 'translate-x-0'}`} />
+                                    </button>
+                                </div>
+                                {freeShipping && (
+                                    <div className="mt-3 bg-green-100 text-green-700 text-sm px-4 py-2 rounded-lg font-medium">
+                                        🎉 Free delivery is ON — all customers will get FREE shipping regardless of state!
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
 
@@ -163,7 +196,7 @@ export const AdminSettings: React.FC = () => {
                                 {saving ? (
                                     <><RefreshCw className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
                                 ) : (
-                                    <><Save className="h-4 w-4 mr-2" /> Save Delivery Charges</>
+                                    <><Save className="h-4 w-4 mr-2" /> Save Settings</>
                                 )}
                             </Button>
                         </div>

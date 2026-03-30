@@ -42,17 +42,21 @@ export const CheckoutPage: React.FC = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [apiError, setApiError] = useState('');
     const [deliveryCharges, setDeliveryCharges] = useState<DeliveryCharges>({ tamilnadu: 50, nearby: 80, others: 100 });
+    const [freeShipping, setFreeShipping] = useState(false);
 
     // Fetch delivery charges from backend on mount
     useEffect(() => {
-        api.getDeliveryCharges().then(setDeliveryCharges).catch(() => { });
+        api.getDeliveryCharges().then((data) => {
+            setDeliveryCharges(data);
+            setFreeShipping(!!(data as any).freeShipping);
+        }).catch(() => { });
     }, []);
 
-    const shipping = form.state.trim()
+    const shipping = freeShipping ? 0 : (form.state.trim()
         ? getShippingCharge(form.state, deliveryCharges)
-        : deliveryCharges.others;
+        : deliveryCharges.others);
     const totalWithShipping = cartSummary.total + shipping;
-    const zoneLabel = form.state.trim() ? getZoneLabel(getDeliveryZone(form.state)) : 'Enter state for exact charge';
+    const zoneLabel = freeShipping ? 'Festival Free Delivery 🎉' : (form.state.trim() ? getZoneLabel(getDeliveryZone(form.state)) : 'Enter state for exact charge');
 
     if (items.length === 0) {
         navigate('/cart', { replace: true });
