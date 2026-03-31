@@ -24,6 +24,7 @@ export const Navbar: React.FC = () => {
         { path: '/wholesale', label: 'Wholesale' },
         { path: '/about', label: 'About Us' },
         { path: '/contact', label: 'Contact' },
+        { path: '/track-order', label: 'Track Order' },
     ];
 
     const handleLogout = () => {
