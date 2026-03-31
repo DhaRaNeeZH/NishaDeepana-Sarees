@@ -119,11 +119,25 @@ async function notifyCustomerOrderConfirmed(order) {
     const to = customerPhone.startsWith('91') ? customerPhone : `91${customerPhone}`;
 
     // Template 'order_confirmation_customer'
-    // Variables: {{1}} CustomerName, {{2}} OrderID, {{3}} Total
+    // Variables:
+    // {{1}} CustomerName
+    // {{2}} OrderID (Short)
+    // {{3}} Items List
+    // {{4}} Total
+    // {{5}} Tracking Link
+
+    const itemsSummary = order.items.map((item, index) =>
+        `${index + 1}. ${item.name} × ${item.quantity}`
+    ).join('\n');
+
+    const trackingLink = `https://nishadeepanasarees.vercel.app/track-order?orderId=${order._id}`;
+
     const params = [
-        { type: 'text', text: order.shippingAddress.name },
+        { type: 'text', text: order.shippingAddress.name.split(' ')[0] }, // Just first name if possible
         { type: 'text', text: order._id.toString().slice(-6).toUpperCase() },
-        { type: 'text', text: `₹${order.totalAmount}` }
+        { type: 'text', text: itemsSummary.slice(0, 300) },
+        { type: 'text', text: `₹${order.totalAmount}` },
+        { type: 'text', text: trackingLink }
     ];
 
     return await sendWhatsAppTemplate(to, 'order_confirmation_customer', params);
