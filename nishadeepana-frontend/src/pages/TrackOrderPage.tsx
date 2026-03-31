@@ -127,7 +127,7 @@ export const TrackOrderPage: React.FC = () => {
                     <CardContent className="p-6">
                         <div className="flex gap-3">
                             <Input
-                                placeholder="Enter Order ID (MongoDB ID from confirmation)"
+                                placeholder="Enter your Order ID (from confirmation)"
                                 value={orderIdInput}
                                 onChange={e => setOrderIdInput(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && fetchOrder(orderIdInput)}
