@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, Truck, CheckCircle, ArrowLeft } from 'lucide-react';
+import { CreditCard, CheckCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -110,20 +110,7 @@ export const CheckoutPage: React.FC = () => {
         },
     });
 
-    const handleCOD = async () => {
-        if (!validate()) return;
-        setIsProcessing(true);
-        setApiError('');
-        try {
-            const payment: Payment = { method: 'cod', status: 'pending' };
-            const saved = await api.createOrder(buildOrderPayload(payment));
-            clearCart();
-            navigate(`/track-order?orderId=${saved._id}`);
-        } catch (err: any) {
-            setApiError(err.message || 'Failed to place order. Please try again.');
-            setIsProcessing(false);
-        }
-    };
+
 
     const handleRazorpay = async () => {
         if (!validate()) return;
@@ -159,6 +146,18 @@ export const CheckoutPage: React.FC = () => {
                         contact: form.phone,
                     },
                     theme: { color: '#7B1C2E' },
+                    options: {
+                        checkout: {
+                            default_customer_set: true,
+                            method: {
+                                netbanking: "1",
+                                card: "1",
+                                upi: "1",
+                                wallet: "1",
+                                emi: "0" // Explicitly disable EMI
+                            }
+                        }
+                    },
                     handler: async (response: any) => {
                         try {
                             // Verify payment signature on backend
@@ -352,19 +351,7 @@ export const CheckoutPage: React.FC = () => {
 
                                 <Button
                                     size="lg"
-                                    className="w-full bg-maroon hover:bg-maroon-dark text-beige flex items-center justify-center gap-3"
-                                    onClick={handleCOD}
-                                    disabled={isProcessing}
-                                    aria-label="Pay on Delivery"
-                                >
-                                    <Truck className="h-5 w-5" />
-                                    {isProcessing ? 'Placing Order...' : 'Pay on Delivery'}
-                                </Button>
-
-                                <Button
-                                    size="lg"
-                                    variant="outline"
-                                    className="w-full border-gold text-maroon hover:bg-gold hover:text-maroon flex items-center justify-center gap-3"
+                                    className="w-full bg-maroon hover:bg-maroon-dark text-beige flex items-center justify-center gap-3 font-semibold"
                                     onClick={handleRazorpay}
                                     disabled={isProcessing}
                                     aria-label="Pay Online with Razorpay"

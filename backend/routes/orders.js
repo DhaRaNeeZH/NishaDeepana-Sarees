@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
+const { notifyAdminNewOrder, notifyCustomerOrderConfirmed } = require('../utils/whatsapp');
 
 // GET /api/orders — All orders (admin)
 router.get('/', async (req, res) => {
@@ -19,8 +20,14 @@ router.post('/', async (req, res) => {
     try {
         const order = new Order(req.body);
         const saved = await order.save();
+
+        // Trigger WhatsApp notifications (async, don't wait for them to finish)
+        notifyAdminNewOrder(saved).catch(err => console.error('Admin notification failed:', err));
+        notifyCustomerOrderConfirmed(saved).catch(err => console.error('Customer notification failed:', err));
+
         res.status(201).json(saved);
     } catch (err) {
+        console.error('Order saving error:', err);
         res.status(400).json({ error: err.message });
     }
 });
