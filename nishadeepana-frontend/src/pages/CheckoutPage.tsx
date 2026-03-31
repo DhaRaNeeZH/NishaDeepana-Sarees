@@ -146,15 +146,23 @@ export const CheckoutPage: React.FC = () => {
                         contact: form.phone,
                     },
                     theme: { color: '#7B1C2E' },
-                    options: {
-                        checkout: {
-                            default_customer_set: true,
-                            method: {
-                                netbanking: "1",
-                                card: "1",
-                                upi: "1",
-                                wallet: "1",
-                                emi: "0" // Explicitly disable EMI
+                    config: {
+                        display: {
+                            blocks: {
+                                banks: {
+                                    name: 'Online Payment Methods',
+                                    instruments: [
+                                        { method: 'upi' },
+                                        { method: 'card' },
+                                        { method: 'netbanking' },
+                                        { method: 'wallet' }
+                                        // EMI is intentionally omitted here
+                                    ]
+                                }
+                            },
+                            sequence: ['block.banks'],
+                            preferences: {
+                                show_default_blocks: false
                             }
                         }
                     },
