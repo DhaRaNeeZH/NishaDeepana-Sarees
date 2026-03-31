@@ -82,29 +82,28 @@ async function notifyAdminNewOrder(order) {
     // {{10}} Method (Online Paid / COD)
     // {{11}} Txn ID
     // {{12}} Full Address
-
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
     const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
     const itemsList = order.items.map((item, index) =>
-        `${index + 1}. ${item.name} × ${item.quantity} = ₹${item.price * item.quantity}`
+        `${index + 1}. ${item.productName} × ${item.quantity} = ₹${item.totalPrice}`
     ).join('\n');
 
-    const fullAddress = `${order.shippingAddress.address}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.zipCode}`.trim();
+    const fullAddress = `${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}`.trim();
 
     const params = [
         { type: 'text', text: order._id.toString().slice(-6).toUpperCase() },
         { type: 'text', text: dateStr },
         { type: 'text', text: timeStr },
-        { type: 'text', text: order.shippingAddress.name },
-        { type: 'text', text: order.shippingAddress.phone },
+        { type: 'text', text: order.customerName },
+        { type: 'text', text: order.phone },
         { type: 'text', text: itemsList.slice(0, 500) },
-        { type: 'text', text: `₹${order.totalAmount - (order.shippingPrice || 0)}` },
-        { type: 'text', text: `₹${order.shippingPrice || 0}` },
-        { type: 'text', text: `₹${order.totalAmount}` },
-        { type: 'text', text: order.paymentMethod === 'online' ? 'Razorpay ✅ PAID' : 'Cash on Delivery 📄' },
-        { type: 'text', text: order.payment?.id || 'N/A' },
+        { type: 'text', text: `₹${order.subtotal}` },
+        { type: 'text', text: `₹${order.shipping || 0}` },
+        { type: 'text', text: `₹${order.total}` },
+        { type: 'text', text: order.payment?.method === 'razorpay' ? 'Razorpay ✅ PAID' : 'Cash on Delivery 📄' },
+        { type: 'text', text: order.payment?.providerOrderId || order.payment?.id || 'N/A' },
         { type: 'text', text: fullAddress.slice(0, 200) }
     ];
 
@@ -113,44 +112,37 @@ async function notifyAdminNewOrder(order) {
 
     try {
         await Promise.all(promises);
+        console.log(`Admin group notification success for order ${order._id}`);
     } catch (err) {
-        console.error('Error sending to multiple admins:', err);
+        throw err; // Let the caller catch it
     }
 }
 
 /**
- * Notify Customer about their order confirmation
+ * Triggered automatically to notify the customer when an order is successful
  */
 async function notifyCustomerOrderConfirmed(order) {
-    const customerPhone = order.shippingAddress.phone.replace(/\D/g, ''); // Extract only digits
-    if (!customerPhone || customerPhone.length < 10) return;
+    if (!order || !order.phone) return;
 
-    // Ensure it has country code if missing (defaulting to India)
-    const to = customerPhone.startsWith('91') ? customerPhone : `91${customerPhone}`;
+    // customer phone could be string with or without country code. Ensure it starts with 91 for India.
+    let cleanPhone = order.phone.replace(/\D/g, '');
+    if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
 
-    // Template 'order_confirmation_customer'
-    // Variables:
-    // {{1}} CustomerName
-    // {{2}} OrderID (Short)
-    // {{3}} Items List
-    // {{4}} Total
-    // {{5}} Tracking Link
-
-    const itemsSummary = order.items.map((item, index) =>
-        `${index + 1}. ${item.name} × ${item.quantity}`
-    ).join('\n');
-
-    const trackingLink = `https://nishadeepanasarees.vercel.app/track-order?orderId=${order._id}`;
+    const itemsList = order.items.map(item => `${item.quantity}x ${item.productName}`).join(', ');
 
     const params = [
-        { type: 'text', text: order.shippingAddress.name.split(' ')[0] }, // Just first name if possible
+        { type: 'text', text: order.customerName.split(' ')[0] || 'Customer' },
         { type: 'text', text: order._id.toString().slice(-6).toUpperCase() },
-        { type: 'text', text: itemsSummary.slice(0, 300) },
-        { type: 'text', text: `₹${order.totalAmount}` },
-        { type: 'text', text: trackingLink }
+        { type: 'text', text: itemsList.slice(0, 150) },
+        { type: 'text', text: `₹${order.total}` },
+        { type: 'text', text: `https://nishadeepanasarees.vercel.app/track-order` }
     ];
 
-    return await sendWhatsAppTemplate(to, 'order_confirmation_customer', params);
+    try {
+        await sendWhatsAppTemplate(cleanPhone, 'order_confirmation_customer', params);
+    } catch (err) {
+        console.error('Error sending customer confirmation:', err);
+    }
 }
 
 module.exports = {
