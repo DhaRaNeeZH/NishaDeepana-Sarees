@@ -63,8 +63,11 @@ async function sendWhatsAppTemplate(to, templateName, parameters = []) {
  * This matches the requested detailed WhatsApp format
  */
 async function notifyAdminNewOrder(order) {
-    const adminNumber = process.env.ADMIN_WHATSAPP_NUMBER;
-    if (!adminNumber) return;
+    const adminNumbersStr = process.env.ADMIN_WHATSAPP_NUMBER;
+    if (!adminNumbersStr) return;
+
+    // Split by comma to support multiple admin numbers
+    const adminNumbers = adminNumbersStr.split(',').map(num => num.trim()).filter(Boolean);
 
     // Variables:
     // {{1}} Order ID (#ABC123)
@@ -105,7 +108,14 @@ async function notifyAdminNewOrder(order) {
         { type: 'text', text: fullAddress.slice(0, 200) }
     ];
 
-    return await sendWhatsAppTemplate(adminNumber, 'new_order_admin', params);
+    // Send the notification to ALL listed admin numbers concurrently
+    const promises = adminNumbers.map(number => sendWhatsAppTemplate(number, 'new_order_admin', params));
+
+    try {
+        await Promise.all(promises);
+    } catch (err) {
+        console.error('Error sending to multiple admins:', err);
+    }
 }
 
 /**
