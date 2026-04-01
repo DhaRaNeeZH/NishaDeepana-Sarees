@@ -26,6 +26,7 @@ import { WishlistPage } from './pages/WishlistPage';
 import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { SupportRedirect } from './pages/SupportRedirect';
 
 function App() {
     return (
@@ -54,6 +55,7 @@ function App() {
                                         <Route path="contact" element={<ContactPage />} />
                                         <Route path="profile" element={<ProfilePage />} />
                                         <Route path="wholesale" element={<WholesalePage />} />
+                                        <Route path="support" element={<SupportRedirect />} />
 
                                         {/* Admin Routes — protected by AdminGuard */}
                                         <Route path="admin" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
