@@ -92,19 +92,28 @@ async function notifyAdminNewOrder(order) {
 
     const fullAddress = `${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}`.trim();
 
+    const shortId = order._id.toString().slice(-6).toUpperCase();
+    const itemsSummary = order.items.map(item => `${item.quantity}x ${item.productName}`).join(', ');
+    const trackingLink = `https://nishadeepanasarees.vercel.app/track-order?orderId=${order._id}`;
+
+    // Create the "Magic Link" for Mom to send to the customer via her personal WhatsApp
+    // IMPORTANT: Meta Utility templates FORBID new-lines (\n) inside parameters.
+    const message = `Hi ${order.customerName}! Thank you for choosing NishaDeepana Sarees. Your order #${shortId} for ${itemsSummary} is confirmed! Total: ₹${order.total}. Track your saree here: ${trackingLink}. We are preparing your elegant sarees with love!`;
+    const magicLink = `wa.me/${order.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+
     const params = [
-        { type: 'text', text: order._id.toString().slice(-6).toUpperCase() },
+        { type: 'text', text: shortId },
         { type: 'text', text: dateStr },
         { type: 'text', text: timeStr },
         { type: 'text', text: order.customerName },
         { type: 'text', text: order.phone },
-        { type: 'text', text: itemsList.slice(0, 500) },
+        { type: 'text', text: itemsList.slice(0, 500).replace(/\n/g, ' | ') }, // Replace newlines in items list
         { type: 'text', text: `₹${order.subtotal}` },
         { type: 'text', text: `₹${order.shipping || 0}` },
         { type: 'text', text: `₹${order.total}` },
-        { type: 'text', text: order.payment?.method === 'razorpay' ? 'Razorpay ✅ PAID' : 'Cash on Delivery 📄' },
+        { type: 'text', text: order.payment?.method === 'razorpay' ? 'Razorpay PAID' : 'Cash on Delivery' },
         { type: 'text', text: order.payment?.providerOrderId || order.payment?.id || 'N/A' },
-        { type: 'text', text: fullAddress.slice(0, 200) }
+        { type: 'text', text: `${fullAddress.slice(0, 100)} | COPY LINK: ${magicLink}` }
     ];
 
     // Send the notification to ALL listed admin numbers concurrently
@@ -139,7 +148,8 @@ async function notifyCustomerOrderConfirmed(order) {
     ];
 
     try {
-        await sendWhatsAppTemplate(cleanPhone, 'order_confirmation_customer', params);
+        console.log(`[SKIPPED] Automated Customer WhatsApp (Sandbox Restricted) for order ${order._id}`);
+        // await sendWhatsAppTemplate(cleanPhone, 'order_confirmation_customer', params);
     } catch (err) {
         console.error('Error sending customer confirmation:', err);
     }
