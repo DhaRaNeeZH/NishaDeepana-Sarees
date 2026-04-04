@@ -13,8 +13,9 @@ const API_VERSION = 'v22.0';
  * @param {string} to - Recipient phone number with country code (e.g. "919500384237")
  * @param {string} templateName - The name of the approved template in Meta Dashboard
  * @param {Array} parameters - Array of components/parameters for the template
+ * @param {string} languageCode - The language code (default: "en")
  */
-async function sendWhatsAppTemplate(to, templateName, parameters = []) {
+async function sendWhatsAppTemplate(to, templateName, parameters = [], languageCode = 'en') {
     try {
         const url = `https://graph.facebook.com/${API_VERSION}/${PHONE_NUMBER_ID}/messages`;
 
@@ -24,7 +25,7 @@ async function sendWhatsAppTemplate(to, templateName, parameters = []) {
             type: 'template',
             template: {
                 name: templateName,
-                language: { code: 'en' },
+                language: { code: languageCode },
                 components: [
                     {
                         type: 'body',
@@ -140,28 +141,42 @@ async function notifyCustomerOrderConfirmed(order) {
     ];
 
     try {
-        const result = await sendWhatsAppTemplate(cleanPhone, 'order_confirmation_customer', params);
+        // Many templates default to en_US even if listed as English
+        const result = await sendWhatsAppTemplate(cleanPhone, 'order_confirmation_customer', params, 'en_US');
+
+        const adminNumbersStr = process.env.ADMIN_WHATSAPP_NUMBER;
+        const adminNumbers = adminNumbersStr ? adminNumbersStr.split(',').map(num => num.trim()).filter(Boolean) : [];
+
         if (!result.success) {
             const errorDetails = result.error?.error?.message || JSON.stringify(result.error);
             console.error(`Customer notification failed: ${errorDetails}`);
-            // Notify Admin about the failure using the working admin template
-            const adminNumbersStr = process.env.ADMIN_WHATSAPP_NUMBER;
-            if (adminNumbersStr) {
-                const adminNumbers = adminNumbersStr.split(',').map(num => num.trim()).filter(Boolean);
-                const errorParams = [
-                    { type: 'text', text: order._id.toString().slice(-6).toUpperCase() },
-                    { type: 'text', text: new Date().toLocaleDateString() },
-                    { type: 'text', text: new Date().toLocaleTimeString() },
-                    { type: 'text', text: '⚠️ AUTO-SEND FAILED' },
-                    { type: 'text', text: order.phone },
-                    { type: 'text', text: `ERROR: ${errorDetails.slice(0, 200)}` },
-                    { type: 'text', text: '-' }, { type: 'text', text: '-' }, { type: 'text', text: '-' },
-                    { type: 'text', text: '-' }, { type: 'text', text: '-' }, { type: 'text', text: 'Please send message manually' }
-                ];
-                adminNumbers.forEach(num => sendWhatsAppTemplate(num, 'new_order_admin', errorParams));
-            }
+
+            // Notify Admin about the specific failure
+            const errorParams = [
+                { type: 'text', text: order._id.toString().slice(-6).toUpperCase() },
+                { type: 'text', text: new Date().toLocaleDateString('en-IN') },
+                { type: 'text', text: new Date().toLocaleTimeString('en-IN') },
+                { type: 'text', text: '⚠️ AUTO-SEND FAILED' },
+                { type: 'text', text: order.phone },
+                { type: 'text', text: `META ERROR: ${errorDetails.slice(0, 200)}` },
+                { type: 'text', text: '-' }, { type: 'text', text: '-' }, { type: 'text', text: '-' },
+                { type: 'text', text: '-' }, { type: 'text', text: '-' }, { type: 'text', text: 'Template/Params mismatch' }
+            ];
+            adminNumbers.forEach(num => sendWhatsAppTemplate(num, 'new_order_admin', errorParams));
         } else {
             console.log(`Automated Customer WhatsApp sent for order ${order._id}`);
+            // Notify Admin that it was successful!
+            const successParams = [
+                { type: 'text', text: order._id.toString().slice(-6).toUpperCase() },
+                { type: 'text', text: new Date().toLocaleDateString('en-IN') },
+                { type: 'text', text: new Date().toLocaleTimeString('en-IN') },
+                { type: 'text', text: '✅ CUSTOMER AUTO-MSG' },
+                { type: 'text', text: order.phone },
+                { type: 'text', text: 'API accepted the message. Delivery depends on Meta.' },
+                { type: 'text', text: '-' }, { type: 'text', text: '-' }, { type: 'text', text: '-' },
+                { type: 'text', text: '-' }, { type: 'text', text: '-' }, { type: 'text', text: 'Message Sent Successfully!' }
+            ];
+            adminNumbers.forEach(num => sendWhatsAppTemplate(num, 'new_order_admin', successParams));
         }
     } catch (err) {
         console.error('Error sending customer confirmation:', err);
