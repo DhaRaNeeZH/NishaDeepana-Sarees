@@ -106,38 +106,4 @@ router.patch('/:id/notes', async (req, res) => {
     }
 });
 
-// GET /api/orders/debug-whatsapp — Diagnostic tool
-router.get('/debug-whatsapp-check', async (req, res) => {
-    try {
-        const { sendWhatsAppTemplate } = require('../utils/whatsapp');
-        const adminNumber = process.env.ADMIN_WHATSAPP_NUMBER?.split(',')[0];
-
-        if (!adminNumber) return res.json({ error: 'ADMIN_WHATSAPP_NUMBER not set' });
-
-        const testParams = [
-            { type: 'text', text: 'DEBUG123' },
-            { type: 'text', text: 'Diagnostic' },
-            { type: 'text', text: 'Test' },
-            { type: 'text', text: 'ADMIN' },
-            { type: 'text', text: '919500384237' },
-            { type: 'text', text: 'TEST ITEMS' },
-            { type: 'text', text: '0' }, { type: 'text', text: '0' }, { type: 'text', text: '0' },
-            { type: 'text', text: 'TEST' }, { type: 'text', text: 'TEST' }, { type: 'text', text: 'DIAGNOSTIC TEST' }
-        ];
-
-        const result = await sendWhatsAppTemplate(adminNumber, 'new_order_admin', testParams);
-        res.json({
-            message: 'Diagnostic test triggered',
-            config: {
-                token_prefix: process.env.WHATSAPP_ACCESS_TOKEN?.slice(0, 10),
-                phone_id: process.env.WHATSAPP_PHONE_NUMBER_ID,
-                admin_num: adminNumber
-            },
-            result
-        });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
 module.exports = router;
