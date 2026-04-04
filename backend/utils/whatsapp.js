@@ -115,7 +115,7 @@ async function notifyAdminNewOrder(order) {
         { type: 'text', text: `₹${order.total}` },
         { type: 'text', text: order.payment?.method === 'razorpay' ? 'Razorpay PAID' : 'Cash on Delivery' },
         { type: 'text', text: order.payment?.providerOrderId || order.payment?.id || 'N/A' },
-        { type: 'text', text: `SEND TO CUST: ${magicLink}` }
+        { type: 'text', text: `✅ AUTO-MSG SENT | BACKUP LINK: ${magicLink}` }
     ];
 
     // Send the notification to ALL listed admin numbers concurrently
@@ -146,12 +146,12 @@ async function notifyCustomerOrderConfirmed(order) {
         { type: 'text', text: order._id.toString().slice(-6).toUpperCase() },
         { type: 'text', text: itemsList.slice(0, 150) },
         { type: 'text', text: `₹${order.total}` },
-        { type: 'text', text: `https://nishadeepanasarees.vercel.app/track-order` }
+        { type: 'text', text: `https://nishadeepanasarees.vercel.app/track-order?orderId=${order._id}` }
     ];
 
     try {
-        console.log(`[SKIPPED] Automated Customer WhatsApp (Sandbox Restricted) for order ${order._id}`);
-        // await sendWhatsAppTemplate(cleanPhone, 'order_confirmation_customer', params);
+        await sendWhatsAppTemplate(cleanPhone, 'order_confirmation_customer', params);
+        console.log(`Automated Customer WhatsApp sent for order ${order._id}`);
     } catch (err) {
         console.error('Error sending customer confirmation:', err);
     }
