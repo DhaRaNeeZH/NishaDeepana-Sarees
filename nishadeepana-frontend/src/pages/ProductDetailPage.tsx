@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Heart, Share2, Star, Package, Truck, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useProducts } from '../contexts/ProductContext';
 import { formatCurrency } from '../lib/utils';
@@ -15,6 +15,7 @@ import { Input } from '../components/ui/input';
 
 export const ProductDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const { products } = useProducts();
     const saree = products.find(s => s.id === id);
     const [selectedImage, setSelectedImage] = React.useState(0);
@@ -50,6 +51,11 @@ export const ProductDetailPage: React.FC = () => {
 
     const handleAddToCart = () => {
         addItem(saree, quantity);
+    };
+
+    const handleBuyNow = () => {
+        addItem(saree, quantity);
+        navigate('/checkout');
     };
 
     return (
@@ -219,6 +225,13 @@ export const ProductDetailPage: React.FC = () => {
                             >
                                 <ShoppingCart className="mr-2 h-5 w-5 group-hover:animate-bounce" />
                                 Add to Cart
+                            </Button>
+                            <Button
+                                size="lg"
+                                className="flex-1 bg-black hover:bg-gray-900 text-white font-bold transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
+                                onClick={handleBuyNow}
+                            >
+                                Buy Now
                             </Button>
                             <Button
                                 size="lg"

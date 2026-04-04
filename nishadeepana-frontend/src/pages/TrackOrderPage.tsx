@@ -1,6 +1,6 @@
 import React from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Search, CheckCircle, XCircle, Clock, Package, RefreshCw, Star, Truck } from 'lucide-react';
+import { useSearchParams, Link } from 'react-router-dom';
+import { Search, CheckCircle, XCircle, Clock, Package, RefreshCw, Star, Truck, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Card, CardContent } from '../components/ui/card';
@@ -221,18 +221,28 @@ export const TrackOrderPage: React.FC = () => {
                                     <CardContent className="p-0">
                                         <div className="divide-y divide-gray-50">
                                             {trackedOrder.items.map((item: any, i: number) => (
-                                                <div key={i} className="flex gap-4 p-8 items-center bg-white hover:bg-gray-50/50 transition-colors">
-                                                    <img
-                                                        src={item.image || 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=200'}
-                                                        alt={item.productName}
-                                                        className="w-20 h-28 object-cover rounded-xl shadow-lg ring-1 ring-black/5"
-                                                    />
+                                                <Link
+                                                    key={i}
+                                                    to={`/product/${item.productId}`}
+                                                    className="flex gap-4 p-8 items-center bg-white hover:bg-beige/10 transition-all group/item border-b border-gray-50 last:border-0"
+                                                >
+                                                    <div className="relative overflow-hidden rounded-xl shadow-lg ring-1 ring-black/5 flex-shrink-0">
+                                                        <img
+                                                            src={item.image || 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=200'}
+                                                            alt={item.productName}
+                                                            className="w-20 h-28 object-cover group-hover/item:scale-110 transition-transform duration-500"
+                                                        />
+                                                        <div className="absolute inset-0 bg-maroon/0 group-hover/item:bg-maroon/10 transition-colors" />
+                                                    </div>
                                                     <div className="flex-1">
-                                                        <h4 className="text-base font-bold text-gray-900 leading-tight mb-1">{item.productName}</h4>
+                                                        <h4 className="text-base font-bold text-gray-900 leading-tight mb-1 group-hover/item:text-maroon transition-colors">{item.productName}</h4>
                                                         <p className="text-xs text-gray-400 uppercase tracking-widest mb-2">Quantity: {item.quantity}</p>
                                                         <p className="text-maroon font-extrabold text-lg">{formatCurrency(item.totalPrice)}</p>
                                                     </div>
-                                                </div>
+                                                    <div className="opacity-0 group-hover/item:opacity-100 transition-opacity pr-4">
+                                                        <ChevronRight className="h-5 w-5 text-maroon" />
+                                                    </div>
+                                                </Link>
                                             ))}
                                         </div>
 
