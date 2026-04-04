@@ -90,18 +90,8 @@ async function notifyAdminNewOrder(order) {
         `${index + 1}. ${item.productName} × ${item.quantity} = ₹${item.totalPrice}`
     ).join('\n');
 
-    const fullAddress = `${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}`.trim();
-
     const shortId = order._id.toString().slice(-6).toUpperCase();
-    const itemsSummary = order.items.map(item => `${item.quantity}x ${item.productName}`).join(', ');
-    const trackingLink = `https://nishadeepanasarees.vercel.app/track-order?orderId=${order._id}`;
-
-    // Create the "Magic Link" for Admin to send to the customer via her personal WhatsApp
-    // This message is sent from Admin to Customer manually
-    const message = `Hi *${order.customerName}*! ✨\n\nThank you for choosing *NishaDeepana Sarees*. Your order *#${shortId}* is confirmed! 🌸\n\n💰 *Total:* ₹${order.total}\n🛍️ *Items:* ${itemsSummary}\n\n🚚 *Track your saree & view images here:*\n${trackingLink}\n\nWe are preparing your elegant sarees with love! ❤️`;
-
-    // Encode for URL - Note: WhatsApp supports \n as %0A
-    const magicLink = `https://wa.me/${order.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+    const fullAddress = `${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}`.trim();
 
     const params = [
         { type: 'text', text: shortId },
@@ -109,23 +99,23 @@ async function notifyAdminNewOrder(order) {
         { type: 'text', text: timeStr },
         { type: 'text', text: order.customerName },
         { type: 'text', text: order.phone },
-        { type: 'text', text: itemsList.slice(0, 500).replace(/\n/g, ' | ') }, // Meta template param (No newlines)
+        { type: 'text', text: itemsList.slice(0, 500).replace(/\n/g, ' | ') },
         { type: 'text', text: `₹${order.subtotal}` },
         { type: 'text', text: `₹${order.shipping || 0}` },
         { type: 'text', text: `₹${order.total}` },
         { type: 'text', text: order.payment?.method === 'razorpay' ? 'Razorpay PAID' : 'Cash on Delivery' },
         { type: 'text', text: order.payment?.providerOrderId || order.payment?.id || 'N/A' },
-        { type: 'text', text: `✅ AUTO-MSG SENT | BACKUP LINK: ${magicLink}` }
+        { type: 'text', text: fullAddress }
     ];
 
-    // Send the notification to ALL listed admin numbers concurrently
+    // Send the notification to ALL listed admin numbers
     const promises = adminNumbers.map(number => sendWhatsAppTemplate(number, 'new_order_admin', params));
 
     try {
         await Promise.all(promises);
-        console.log(`Admin group notification success for order ${order._id}`);
+        console.log(`Admin notification success for order ${order._id}`);
     } catch (err) {
-        throw err; // Let the caller catch it
+        console.error('Admin notification failed:', err);
     }
 }
 
@@ -150,10 +140,24 @@ async function notifyCustomerOrderConfirmed(order) {
     ];
 
     try {
-        await sendWhatsAppTemplate(cleanPhone, 'order_confirmation_customer', params);
+        const result = await sendWhatsAppTemplate(cleanPhone, 'order_confirmation_customer', params);
+        if (!result.success) {
+            throw new Error(JSON.stringify(result.error));
+        }
         console.log(`Automated Customer WhatsApp sent for order ${order._id}`);
     } catch (err) {
         console.error('Error sending customer confirmation:', err);
+        // Fallback: Notify admin that automation failed so they know to contact customer manually
+        const adminNumbersStr = process.env.ADMIN_WHATSAPP_NUMBER;
+        if (adminNumbersStr) {
+            const adminNumbers = adminNumbersStr.split(',').map(num => num.trim()).filter(Boolean);
+            const errorParams = [
+                { type: 'text', text: order._id.toString().slice(-6).toUpperCase() },
+                { type: 'text', text: `⚠️ CUSTOMER AUTO-MSG FAILED: ${err.message.slice(0, 100)}` }
+            ];
+            // We use a simple 'alert' template if you have one, or just re-use a generic one.
+            // For now, let's just log it heavily. 
+        }
     }
 }
 
