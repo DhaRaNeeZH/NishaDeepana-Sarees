@@ -6,6 +6,8 @@ export interface Saree {
     name: string;
     description: string;
     price: number;
+    originalPrice?: number;
+    freeDelivery?: boolean;
     category: string;
     sareeType: string; // Specific type: South cotton, Soft silk, etc.
     fabric: string;

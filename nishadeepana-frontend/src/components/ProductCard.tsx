@@ -80,10 +80,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ saree }) => {
                     <span>•</span>
                     <span>{saree.fabric}</span>
                 </div>
+                <div className="flex items-center gap-2 mb-4">
+                    <span className="text-xl font-bold text-maroon">{formatCurrency(saree.price)}</span>
+                    {saree.originalPrice && saree.originalPrice > saree.price && (
+                        <span className="text-sm text-gray-400 line-through font-medium leading-none mt-1">
+                            {formatCurrency(saree.originalPrice)}
+                        </span>
+                    )}
+                </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold text-primary">
-                        {formatCurrency(saree.price)}
-                    </span>
                     <span className="text-sm text-gray-500">{saree.color}</span>
                 </div>
             </CardContent>

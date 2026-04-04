@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Heart, Share2, Star, Package, Truck, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShoppingCart, Heart, Share2, Package, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useProducts } from '../contexts/ProductContext';
 import { formatCurrency } from '../lib/utils';
 import { calculateBulkUnitPrice, getBulkDiscountPercentage } from '../utils/pricing';
@@ -122,19 +122,26 @@ export const ProductDetailPage: React.FC = () => {
                         <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">{saree.name}</h1>
 
                         <div className="flex items-center gap-4 mb-6">
-                            <div className="flex">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                                ))}
-                            </div>
-                            <span className="text-gray-600">(124 reviews)</span>
+                            <p className="text-xs text-gray-400 italic">Pre-verified authentic collection</p>
                         </div>
 
                         <div className="mb-6">
-                            <div className="text-4xl font-bold text-maroon mb-2">
-                                {formatCurrency(basePrice)}
+                            <div className="flex items-baseline gap-3 mb-1">
+                                <div className="text-4xl font-bold text-maroon">
+                                    {formatCurrency(basePrice)}
+                                </div>
+                                {saree.originalPrice && saree.originalPrice > basePrice && (
+                                    <div className="text-xl text-gray-400 line-through decoration-maroon/40 font-medium">
+                                        {formatCurrency(saree.originalPrice)}
+                                    </div>
+                                )}
                             </div>
-                            <p className="text-gray-600 text-sm">Base price • Inclusive of all taxes</p>
+                            <div className="flex items-center gap-2">
+                                <p className="text-gray-500 text-xs">Inclusive of all taxes</p>
+                                {saree.freeDelivery && (
+                                    <Badge className="bg-green-100 text-green-700 border-green-200 text-[10px] py-0">FREE DELIVERY</Badge>
+                                )}
+                            </div>
                         </div>
 
                         <p className="text-gray-700 mb-6 leading-relaxed">{saree.description}</p>
@@ -228,7 +235,7 @@ export const ProductDetailPage: React.FC = () => {
                             </Button>
                             <Button
                                 size="lg"
-                                className="flex-1 bg-black hover:bg-gray-900 text-white font-bold transition-all shadow-lg hover:shadow-xl active:scale-[0.98]"
+                                className="flex-1 bg-maroon hover:bg-maroon-dark text-beige font-bold border-2 border-gold shadow-[0_4px_20px_rgba(128,0,0,0.2)] hover:shadow-[0_8px_30px_rgba(128,0,0,0.3)] transition-all active:scale-[0.98]"
                                 onClick={handleBuyNow}
                             >
                                 Buy Now
@@ -252,15 +259,6 @@ export const ProductDetailPage: React.FC = () => {
 
                         {/* Features */}
                         <div className="grid grid-cols-1 gap-4">
-                            <Card className="border-maroon-light/30">
-                                <CardContent className="flex items-center p-4">
-                                    <Truck className="h-8 w-8 text-maroon mr-4" />
-                                    <div>
-                                        <h4 className="font-semibold">Free Shipping</h4>
-                                        <p className="text-sm text-gray-600">On orders above ₹2,000</p>
-                                    </div>
-                                </CardContent>
-                            </Card>
                             <Card className="border-maroon-light/30">
                                 <CardContent className="flex items-center p-4">
                                     <Package className="h-8 w-8 text-maroon mr-4" />

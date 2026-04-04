@@ -212,16 +212,20 @@ export const WholesalePage: React.FC = () => {
                             <Card className="bg-primary text-white">
                                 <CardContent className="pt-6">
                                     <h3 className="font-semibold text-lg mb-4">Get in Touch</h3>
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-3">
-                                            <Phone className="h-5 w-5" />
-                                            <span>+91 98765 43210</span>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <Mail className="h-5 w-5" />
-                                            <span>wholesale@nishadeepana.com</span>
-                                        </div>
-                                    </div>
+                                    <ul className="space-y-4">
+                                        <li className="flex items-center gap-3">
+                                            <div className="bg-maroon/10 p-2 rounded-lg">
+                                                <Phone className="h-5 w-5 text-maroon" />
+                                            </div>
+                                            <p className="text-gray-700 font-medium">+91 95003 84237</p>
+                                        </li>
+                                        <li className="flex items-center gap-3">
+                                            <div className="bg-maroon/10 p-2 rounded-lg">
+                                                <Mail className="h-5 w-5 text-maroon" />
+                                            </div>
+                                            <p className="text-gray-700 font-medium">nishadeepana@gmail.com</p>
+                                        </li>
+                                    </ul>
                                 </CardContent>
                             </Card>
                         </div>

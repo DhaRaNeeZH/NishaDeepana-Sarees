@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Instagram, MessageCircle, Mail, Phone, MapPin } from 'lucide-react';
 
 export const Footer: React.FC = () => {
     return (
@@ -17,14 +17,14 @@ export const Footer: React.FC = () => {
                             Authentic craftsmanship, timeless elegance.
                         </p>
                         <div className="flex space-x-4">
-                            <a href="#" className="hover:text-gold transition-colors">
+                            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
                                 <Facebook className="h-5 w-5" />
                             </a>
-                            <a href="#" className="hover:text-gold transition-colors">
+                            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
                                 <Instagram className="h-5 w-5" />
                             </a>
-                            <a href="#" className="hover:text-gold transition-colors">
-                                <Twitter className="h-5 w-5" />
+                            <a href="https://wa.me/919500384237" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
+                                <MessageCircle className="h-5 w-5" />
                             </a>
                         </div>
                     </div>

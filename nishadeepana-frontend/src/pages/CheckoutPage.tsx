@@ -52,11 +52,16 @@ export const CheckoutPage: React.FC = () => {
         }).catch(() => { });
     }, []);
 
-    const shipping = freeShipping ? 0 : (form.state.trim()
+    const allItemsFreeDelivery = items.length > 0 && items.every(item => item.product.freeDelivery);
+    const isActuallyFreeShipping = freeShipping || allItemsFreeDelivery;
+
+    const shipping = isActuallyFreeShipping ? 0 : (form.state.trim()
         ? getShippingCharge(form.state, deliveryCharges)
         : deliveryCharges.others);
     const totalWithShipping = cartSummary.total + shipping;
-    const zoneLabel = freeShipping ? 'Festival Free Delivery 🎉' : (form.state.trim() ? getZoneLabel(getDeliveryZone(form.state)) : 'Enter state for exact charge');
+    const zoneLabel = isActuallyFreeShipping
+        ? (freeShipping ? 'Festival Free Delivery 🎉' : 'Free Delivery Applied 🚚')
+        : (form.state.trim() ? getZoneLabel(getDeliveryZone(form.state)) : 'Enter state for exact charge');
 
     if (items.length === 0) {
         navigate('/cart', { replace: true });

@@ -16,6 +16,8 @@ interface ProductForm {
     fabric: string;
     color: string;
     price: string;
+    originalPrice: string;
+    freeDelivery: boolean;
     image: string;
     description: string;
     featured: boolean;
@@ -24,7 +26,8 @@ interface ProductForm {
 
 const EMPTY_FORM: ProductForm = {
     name: '', sareeType: '', category: '', fabric: '',
-    color: '', price: '', image: '', description: '',
+    color: '', price: '', originalPrice: '', freeDelivery: false,
+    image: '', description: '',
     featured: false, madeToOrder: false,
 };
 
@@ -43,6 +46,8 @@ const ProductModal: React.FC<{
             fabric: product.fabric ?? '',
             color: product.color ?? '',
             price: String(product.price ?? ''),
+            originalPrice: String(product.originalPrice ?? ''),
+            freeDelivery: product.freeDelivery ?? false,
             image: product.image ?? '',
             description: product.description ?? '',
             featured: product.featured ?? false,
@@ -81,7 +86,11 @@ const ProductModal: React.FC<{
         setSaving(true);
         setError('');
         try {
-            const payload = { ...form, price: parseFloat(form.price) };
+            const payload = {
+                ...form,
+                price: parseFloat(form.price),
+                originalPrice: form.originalPrice ? parseFloat(form.originalPrice) : undefined,
+            };
             let saved;
             if (isEdit) {
                 // Call backend directly; context updateProduct is called in handleSaved
@@ -132,7 +141,8 @@ const ProductModal: React.FC<{
                         {field('Category', 'category', 'text', 'e.g. Silk Cotton')}
                         {field('Fabric', 'fabric', 'text', 'e.g. Pure Silk')}
                         {field('Color', 'color', 'text', 'e.g. Red, Gold')}
-                        {field('Price (₹)', 'price', 'number', '1500')}
+                        {field('Selling Price (₹)', 'price', 'number', 'e.g. 1500')}
+                        {field('Original Price (MRP ₹) - Optional', 'originalPrice', 'number', 'e.g. 1800')}
                     </div>
 
                     <div>
@@ -205,6 +215,15 @@ const ProductModal: React.FC<{
                                 className="w-4 h-4 accent-maroon"
                             />
                             <span className="text-sm font-medium">Made to Order</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={form.freeDelivery}
+                                onChange={e => handleChange('freeDelivery', e.target.checked)}
+                                className="w-4 h-4 accent-green-600"
+                            />
+                            <span className="text-sm font-medium">Free Delivery</span>
                         </label>
                     </div>
                 </div>
