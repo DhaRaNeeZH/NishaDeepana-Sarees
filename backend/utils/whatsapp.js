@@ -165,18 +165,6 @@ async function notifyCustomerOrderConfirmed(order) {
             adminNumbers.forEach(num => sendWhatsAppTemplate(num, 'new_order_admin', errorParams));
         } else {
             console.log(`Automated Customer WhatsApp sent for order ${order._id}`);
-            // Notify Admin that it was successful!
-            const successParams = [
-                { type: 'text', text: order._id.toString().slice(-6).toUpperCase() },
-                { type: 'text', text: new Date().toLocaleDateString('en-IN') },
-                { type: 'text', text: new Date().toLocaleTimeString('en-IN') },
-                { type: 'text', text: '✅ CUSTOMER AUTO-MSG' },
-                { type: 'text', text: order.phone },
-                { type: 'text', text: 'API accepted the message. Delivery depends on Meta.' },
-                { type: 'text', text: '-' }, { type: 'text', text: '-' }, { type: 'text', text: '-' },
-                { type: 'text', text: '-' }, { type: 'text', text: '-' }, { type: 'text', text: 'Message Sent Successfully!' }
-            ];
-            adminNumbers.forEach(num => sendWhatsAppTemplate(num, 'new_order_admin', successParams));
         }
     } catch (err) {
         console.error('Error sending customer confirmation:', err);
