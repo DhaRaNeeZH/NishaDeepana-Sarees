@@ -142,22 +142,29 @@ async function notifyCustomerOrderConfirmed(order) {
     try {
         const result = await sendWhatsAppTemplate(cleanPhone, 'order_confirmation_customer', params);
         if (!result.success) {
-            throw new Error(JSON.stringify(result.error));
+            const errorDetails = result.error?.error?.message || JSON.stringify(result.error);
+            console.error(`Customer notification failed: ${errorDetails}`);
+            // Notify Admin about the failure using the working admin template
+            const adminNumbersStr = process.env.ADMIN_WHATSAPP_NUMBER;
+            if (adminNumbersStr) {
+                const adminNumbers = adminNumbersStr.split(',').map(num => num.trim()).filter(Boolean);
+                const errorParams = [
+                    { type: 'text', text: order._id.toString().slice(-6).toUpperCase() },
+                    { type: 'text', text: new Date().toLocaleDateString() },
+                    { type: 'text', text: new Date().toLocaleTimeString() },
+                    { type: 'text', text: '⚠️ AUTO-SEND FAILED' },
+                    { type: 'text', text: order.phone },
+                    { type: 'text', text: `ERROR: ${errorDetails.slice(0, 200)}` },
+                    { type: 'text', text: '-' }, { type: 'text', text: '-' }, { type: 'text', text: '-' },
+                    { type: 'text', text: '-' }, { type: 'text', text: '-' }, { type: 'text', text: 'Please send message manually' }
+                ];
+                adminNumbers.forEach(num => sendWhatsAppTemplate(num, 'new_order_admin', errorParams));
+            }
+        } else {
+            console.log(`Automated Customer WhatsApp sent for order ${order._id}`);
         }
-        console.log(`Automated Customer WhatsApp sent for order ${order._id}`);
     } catch (err) {
         console.error('Error sending customer confirmation:', err);
-        // Fallback: Notify admin that automation failed so they know to contact customer manually
-        const adminNumbersStr = process.env.ADMIN_WHATSAPP_NUMBER;
-        if (adminNumbersStr) {
-            const adminNumbers = adminNumbersStr.split(',').map(num => num.trim()).filter(Boolean);
-            const errorParams = [
-                { type: 'text', text: order._id.toString().slice(-6).toUpperCase() },
-                { type: 'text', text: `⚠️ CUSTOMER AUTO-MSG FAILED: ${err.message.slice(0, 100)}` }
-            ];
-            // We use a simple 'alert' template if you have one, or just re-use a generic one.
-            // For now, let's just log it heavily. 
-        }
     }
 }
 
