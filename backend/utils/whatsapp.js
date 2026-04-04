@@ -141,8 +141,8 @@ async function notifyCustomerOrderConfirmed(order) {
     ];
 
     try {
-        // Many templates default to en_US even if listed as English
-        const result = await sendWhatsAppTemplate(cleanPhone, 'order_confirmation_customer', params, 'en_US');
+        // Reverting to 'en' as the diagnostic report showed en_US does not exist
+        const result = await sendWhatsAppTemplate(cleanPhone, 'order_confirmation_customer', params, 'en');
 
         const adminNumbersStr = process.env.ADMIN_WHATSAPP_NUMBER;
         const adminNumbers = adminNumbersStr ? adminNumbersStr.split(',').map(num => num.trim()).filter(Boolean) : [];
