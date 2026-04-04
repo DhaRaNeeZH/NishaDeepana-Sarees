@@ -72,7 +72,7 @@ export const CheckoutPage: React.FC = () => {
         const errs: Partial<FormData> = {};
         if (!form.name.trim()) errs.name = 'Name is required';
         if (!form.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) errs.email = 'Valid email required';
-        if (!form.phone.match(/^[+\d\s-]{10,15}$/)) errs.phone = 'Valid phone required';
+        if (!form.phone.replace(/\D/g, '').match(/^\d{10}$/)) errs.phone = '10-digit mobile number required';
         if (!form.street.trim()) errs.street = 'Street address is required';
         if (!form.city.trim()) errs.city = 'City is required';
         if (!form.state.trim()) errs.state = 'State is required';
@@ -222,16 +222,33 @@ export const CheckoutPage: React.FC = () => {
             <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
                 {label} <span className="text-red-500">*</span>
             </label>
-            <Input
-                id={id}
-                type={type}
-                placeholder={placeholder}
-                value={form[id]}
-                onChange={e => setForm(prev => ({ ...prev, [id]: e.target.value }))}
-                className={errors[id] ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:border-maroon'}
-                aria-invalid={!!errors[id]}
-                aria-describedby={errors[id] ? `${id}-error` : undefined}
-            />
+            <div className="relative">
+                {id === 'phone' && (
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold border-r pr-2 h-6 flex items-center">
+                        +91
+                    </div>
+                )}
+                <Input
+                    id={id}
+                    type={type}
+                    placeholder={placeholder}
+                    value={form[id]}
+                    onChange={e => {
+                        let val = e.target.value;
+                        if (id === 'phone') {
+                            // Strip anything that isn't a digit if they are typing in the phone box
+                            val = val.replace(/\D/g, '').slice(0, 10);
+                        }
+                        setForm(prev => ({ ...prev, [id]: val }));
+                    }}
+                    className={`
+                    ${errors[id] ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:border-maroon'}
+                    ${id === 'phone' ? 'pl-16' : ''}
+                `}
+                    aria-invalid={!!errors[id]}
+                    aria-describedby={errors[id] ? `${id}-error` : undefined}
+                />
+            </div>
             {errors[id] && (
                 <p id={`${id}-error`} className="text-red-500 text-xs mt-1">{errors[id]}</p>
             )}
@@ -265,8 +282,8 @@ export const CheckoutPage: React.FC = () => {
                                 {field('name', 'Full Name', 'text', 'Your name')}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {field('email', 'Email', 'email', 'you@example.com')}
-                                    {field('phone', 'Phone', 'tel', '+91 98765 43210')}
-                                </div>
+                                    {field('phone', 'Mobile Number (10 digits)', 'tel', '93457 04134')}
+                                </div> activity
                             </CardContent>
                         </Card>
 
