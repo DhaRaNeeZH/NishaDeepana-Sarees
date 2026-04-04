@@ -8,16 +8,11 @@ const WHATSAPP_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
 const PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
 const API_VERSION = 'v22.0';
 
-/**
- * Sends a WhatsApp message using a defined template
- * @param {string} to - Recipient phone number with country code (e.g. "919500384237")
- * @param {string} templateName - The name of the approved template in Meta Dashboard
- * @param {Array} parameters - Array of components/parameters for the template
- * @param {string} languageCode - The language code (default: "en")
- */
 async function sendWhatsAppTemplate(to, templateName, parameters = [], languageCode = 'en') {
     try {
         const url = `https://graph.facebook.com/${API_VERSION}/${PHONE_NUMBER_ID}/messages`;
+
+        console.log(`[WhatsApp] Sending ${templateName} to ${to}...`);
 
         const data = {
             messaging_product: 'whatsapp',
@@ -35,27 +30,19 @@ async function sendWhatsAppTemplate(to, templateName, parameters = [], languageC
             }
         };
 
-        const response = await fetch(url, {
-            method: 'POST',
+        const response = await axios.post(url, data, {
             headers: {
                 'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+            }
         });
 
-        const result = await response.json();
-
-        if (!response.ok) {
-            console.error('WhatsApp API Error:', result);
-            return { success: false, error: result };
-        }
-
-        console.log(`WhatsApp message sent to ${to} using template ${templateName}`);
-        return { success: true, data: result };
+        console.log(`[WhatsApp] Message Sent! ID: ${response.data.messages?.[0]?.id}`);
+        return { success: true, data: response.data };
     } catch (err) {
-        console.error('WhatsApp Service Error:', err);
-        return { success: false, error: err.message };
+        const errorData = err.response?.data || err.message;
+        console.error('[WhatsApp] Send Failed:', JSON.stringify(errorData, null, 2));
+        return { success: false, error: errorData };
     }
 }
 
