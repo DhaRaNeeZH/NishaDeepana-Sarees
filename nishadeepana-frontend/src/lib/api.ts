@@ -43,6 +43,7 @@ export const api = {
 
     // Orders
     getOrders: (email?: string) => apiFetch<any[]>(email ? `/api/orders?email=${encodeURIComponent(email)}` : '/api/orders'),
+    trackOrder: (id: string) => apiFetch<any>(`/api/orders/track/${id}`),
     createOrder: (data: any) => apiFetch<any>('/api/orders', { method: 'POST', body: JSON.stringify(data) }),
     updateOrderStatus: (id: string, status: string) => apiFetch<any>(`/api/orders/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
     cancelOrder: (id: string) => apiFetch<any>(`/api/orders/${id}/cancel`, { method: 'POST' }),

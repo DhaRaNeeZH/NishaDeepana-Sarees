@@ -86,6 +86,7 @@ export const CheckoutPage: React.FC = () => {
             return {
                 productId: item.productId,
                 productName: item.product.name,
+                image: item.product.image, // Add image snapshot
                 quantity: item.quantity,
                 basePrice: item.product.price,
                 selectedBlouse: item.selectedBlouse,

@@ -15,6 +15,19 @@ router.get('/', async (req, res) => {
     }
 });
 
+// GET /api/orders/track/:id — Public tracking (Limited fields)
+router.get('/track/:id', async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id)
+            .select('items subtotal discount shipping total status customerName phone shippingAddress payment.method payment.status createdAt');
+
+        if (!order) return res.status(404).json({ error: 'Order not found' });
+        res.json(order);
+    } catch (err) {
+        res.status(400).json({ error: 'Invalid Order ID format' });
+    }
+});
+
 // POST /api/orders — Create order (checkout)
 router.post('/', async (req, res) => {
     try {

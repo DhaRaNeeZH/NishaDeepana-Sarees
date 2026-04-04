@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const orderItemSchema = new mongoose.Schema({
     productId: { type: String, required: true },
     productName: { type: String, required: true },
+    image: { type: String }, // Snapshot of product image at time of purchase
     quantity: { type: Number, required: true },
     basePrice: { type: Number, required: true },
     unitPrice: { type: Number, required: true },

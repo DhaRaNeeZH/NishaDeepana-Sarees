@@ -96,10 +96,12 @@ async function notifyAdminNewOrder(order) {
     const itemsSummary = order.items.map(item => `${item.quantity}x ${item.productName}`).join(', ');
     const trackingLink = `https://nishadeepanasarees.vercel.app/track-order?orderId=${order._id}`;
 
-    // Create the "Magic Link" for Mom to send to the customer via her personal WhatsApp
-    // IMPORTANT: Meta Utility templates FORBID new-lines (\n) inside parameters.
-    const message = `Hi ${order.customerName}! Thank you for choosing NishaDeepana Sarees. Your order #${shortId} for ${itemsSummary} is confirmed! Total: ₹${order.total}. Track your saree here: ${trackingLink}. We are preparing your elegant sarees with love!`;
-    const magicLink = `wa.me/${order.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+    // Create the "Magic Link" for Admin to send to the customer via her personal WhatsApp
+    // This message is sent from Admin to Customer manually
+    const message = `Hi *${order.customerName}*! ✨\n\nThank you for choosing *NishaDeepana Sarees*. Your order *#${shortId}* is confirmed! 🌸\n\n💰 *Total:* ₹${order.total}\n🛍️ *Items:* ${itemsSummary}\n\n🚚 *Track your saree & view images here:*\n${trackingLink}\n\nWe are preparing your elegant sarees with love! ❤️`;
+
+    // Encode for URL - Note: WhatsApp supports \n as %0A
+    const magicLink = `https://wa.me/${order.phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
 
     const params = [
         { type: 'text', text: shortId },
@@ -107,13 +109,13 @@ async function notifyAdminNewOrder(order) {
         { type: 'text', text: timeStr },
         { type: 'text', text: order.customerName },
         { type: 'text', text: order.phone },
-        { type: 'text', text: itemsList.slice(0, 500).replace(/\n/g, ' | ') }, // Replace newlines in items list
+        { type: 'text', text: itemsList.slice(0, 500).replace(/\n/g, ' | ') }, // Meta template param (No newlines)
         { type: 'text', text: `₹${order.subtotal}` },
         { type: 'text', text: `₹${order.shipping || 0}` },
         { type: 'text', text: `₹${order.total}` },
         { type: 'text', text: order.payment?.method === 'razorpay' ? 'Razorpay PAID' : 'Cash on Delivery' },
         { type: 'text', text: order.payment?.providerOrderId || order.payment?.id || 'N/A' },
-        { type: 'text', text: `${fullAddress.slice(0, 100)} | COPY LINK: ${magicLink}` }
+        { type: 'text', text: `SEND TO CUST: ${magicLink}` }
     ];
 
     // Send the notification to ALL listed admin numbers concurrently
