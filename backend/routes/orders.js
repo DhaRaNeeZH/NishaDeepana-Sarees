@@ -34,13 +34,22 @@ router.post('/', async (req, res) => {
         const order = new Order(req.body);
         const saved = await order.save();
 
-        // Trigger WhatsApp notifications (async, don't wait for them to finish)
-        notifyAdminNewOrder(saved).catch(err => console.error('Admin notification failed:', err));
-        notifyCustomerOrderConfirmed(saved).catch(err => console.error('Customer notification failed:', err));
-
+        // Respond immediately, don't block the customer
         res.status(201).json(saved);
+
+        // Send notifications after responding (non-blocking)
+        console.log(`[ORDER] New order saved: ${saved._id}. Triggering WhatsApp notifications...`);
+        try {
+            await Promise.all([
+                notifyAdminNewOrder(saved),
+                notifyCustomerOrderConfirmed(saved)
+            ]);
+            console.log(`[ORDER] WhatsApp notifications complete for order ${saved._id}`);
+        } catch (notifyErr) {
+            console.error(`[ORDER] WhatsApp notification error for order ${saved._id}:`, notifyErr?.message || notifyErr);
+        }
     } catch (err) {
-        console.error('Order saving error:', err);
+        console.error('[ORDER] Order saving error:', err);
         res.status(400).json({ error: err.message });
     }
 });
