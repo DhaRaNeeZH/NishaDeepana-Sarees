@@ -74,26 +74,29 @@ async function notifyAdminNewOrder(order) {
     const dateStr = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
     const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-    const itemsList = order.items.map((item, index) =>
-        `${index + 1}. ${item.productName} × ${item.quantity} = ₹${item.totalPrice}`
-    ).join('\n');
+    const itemsList = (order.items || []).map((item, index) =>
+        `${index + 1}. ${item?.productName || 'Item'} × ${item?.quantity || 1} = ₹${item?.totalPrice || 0}`
+    ).join('\n') || 'N/A';
 
     const shortId = order._id.toString().slice(-6).toUpperCase();
-    const fullAddress = `${order.shippingAddress.street}, ${order.shippingAddress.city}, ${order.shippingAddress.state} - ${order.shippingAddress.pincode}`.trim();
+    const addr = order.shippingAddress || {};
+    const fullAddress = `${addr.street || ''}, ${addr.city || ''}, ${addr.state || ''} - ${addr.pincode || ''}`.trim();
+
+    console.log(`[WA-ADMIN] Building notification for order ${shortId}`);
 
     const params = [
         { type: 'text', text: shortId },
         { type: 'text', text: dateStr },
         { type: 'text', text: timeStr },
-        { type: 'text', text: order.customerName },
-        { type: 'text', text: order.phone },
+        { type: 'text', text: order.customerName || 'Unknown' },
+        { type: 'text', text: order.phone || 'N/A' },
         { type: 'text', text: itemsList.slice(0, 500).replace(/\n/g, ' | ') },
-        { type: 'text', text: `₹${order.subtotal}` },
+        { type: 'text', text: `₹${order.subtotal || 0}` },
         { type: 'text', text: `₹${order.shipping || 0}` },
-        { type: 'text', text: `₹${order.total}` },
+        { type: 'text', text: `₹${order.total || 0}` },
         { type: 'text', text: order.payment?.method === 'razorpay' ? 'Razorpay PAID' : 'Cash on Delivery' },
-        { type: 'text', text: order.payment?.providerOrderId || order.payment?.id || 'N/A' },
-        { type: 'text', text: fullAddress }
+        { type: 'text', text: order.payment?.providerOrderId || order.payment?.transactionId || 'N/A' },
+        { type: 'text', text: fullAddress || 'No address' }
     ];
 
     // Send the notification to ALL listed admin numbers
@@ -117,10 +120,11 @@ async function notifyCustomerOrderConfirmed(order) {
     let cleanPhone = order.phone.replace(/\D/g, '');
     if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
 
-    const itemsList = order.items.map(item => `${item.quantity}x ${item.productName}`).join(', ');
+    const itemsList = (order.items || []).map(item => `${item?.quantity || 1}x ${item?.productName || 'Item'}`).join(', ') || 'Your order';
+    console.log(`[WA-CUSTOMER] Building notification for ${cleanPhone}`);
 
     const params = [
-        { type: 'text', text: order.customerName.split(' ')[0] || 'Customer' },
+        { type: 'text', text: (order.customerName || 'Customer').split(' ')[0] },
         { type: 'text', text: order._id.toString().slice(-6).toUpperCase() },
         { type: 'text', text: itemsList.slice(0, 150) },
         { type: 'text', text: `₹${order.total}` },

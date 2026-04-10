@@ -30,27 +30,29 @@ router.get('/track/:id', async (req, res) => {
 
 // POST /api/orders — Create order (checkout)
 router.post('/', async (req, res) => {
+    console.log('[ORDER] POST /api/orders called');
     try {
         const order = new Order(req.body);
         const saved = await order.save();
+        console.log(`[ORDER] Saved to DB: ${saved._id}`);
 
         // Respond immediately, don't block the customer
         res.status(201).json(saved);
 
-        // Send notifications after responding (non-blocking)
-        console.log(`[ORDER] New order saved: ${saved._id}. Triggering WhatsApp notifications...`);
+        // Send notifications after responding
+        console.log(`[ORDER] Triggering WhatsApp for order ${saved._id}...`);
         try {
             await Promise.all([
                 notifyAdminNewOrder(saved),
                 notifyCustomerOrderConfirmed(saved)
             ]);
-            console.log(`[ORDER] WhatsApp notifications complete for order ${saved._id}`);
+            console.log(`[ORDER] WhatsApp DONE for order ${saved._id}`);
         } catch (notifyErr) {
-            console.error(`[ORDER] WhatsApp notification error for order ${saved._id}:`, notifyErr?.message || notifyErr);
+            console.error(`[ORDER] WhatsApp FAILED for order ${saved._id}:`, notifyErr?.message || notifyErr);
         }
     } catch (err) {
-        console.error('[ORDER] Order saving error:', err);
-        res.status(400).json({ error: err.message });
+        console.error('[ORDER] Save error:', err);
+        if (!res.headersSent) res.status(400).json({ error: err.message });
     }
 });
 
