@@ -36,20 +36,23 @@ router.post('/', async (req, res) => {
         const saved = await order.save();
         console.log(`[ORDER] Saved to DB: ${saved._id}`);
 
-        // Respond immediately, don't block the customer
-        res.status(201).json(saved);
-
-        // Send notifications after responding
+        // Send notifications BEFORE responding to ensure Render free tier
+        // does not kill the process right after res.json()
         console.log(`[ORDER] Triggering WhatsApp for order ${saved._id}...`);
         try {
-            await Promise.all([
-                notifyAdminNewOrder(saved),
-                notifyCustomerOrderConfirmed(saved)
+            await Promise.race([
+                Promise.all([
+                    notifyAdminNewOrder(saved),
+                    notifyCustomerOrderConfirmed(saved)
+                ]),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('WhatsApp timeout after 10s')), 10000))
             ]);
             console.log(`[ORDER] WhatsApp DONE for order ${saved._id}`);
         } catch (notifyErr) {
-            console.error(`[ORDER] WhatsApp FAILED for order ${saved._id}:`, notifyErr?.message || notifyErr);
+            console.error(`[ORDER] WhatsApp FAILED:`, notifyErr?.message || notifyErr);
         }
+
+        res.status(201).json(saved);
     } catch (err) {
         console.error('[ORDER] Save error:', err);
         if (!res.headersSent) res.status(400).json({ error: err.message });
