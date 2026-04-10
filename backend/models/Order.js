@@ -42,6 +42,7 @@ const orderSchema = new mongoose.Schema({
     },
     notes: { type: String, default: '' },
     cancelledAt: { type: Date },
+    notificationLog: { type: String, default: '' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);

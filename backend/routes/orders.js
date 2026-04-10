@@ -36,21 +36,25 @@ router.post('/', async (req, res) => {
         const saved = await order.save();
         console.log(`[ORDER] Saved to DB: ${saved._id}`);
 
-        // Send notifications BEFORE responding to ensure Render free tier
-        // does not kill the process right after res.json()
-        console.log(`[ORDER] Triggering WhatsApp for order ${saved._id}...`);
+        // Send WhatsApp notifications and write result to DB
+        let notifLog = `Triggered at ${new Date().toISOString()}. `;
         try {
             await Promise.race([
                 Promise.all([
                     notifyAdminNewOrder(saved),
                     notifyCustomerOrderConfirmed(saved)
                 ]),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('WhatsApp timeout after 10s')), 10000))
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout after 10s')), 10000))
             ]);
+            notifLog += 'WhatsApp: SUCCESS';
             console.log(`[ORDER] WhatsApp DONE for order ${saved._id}`);
         } catch (notifyErr) {
+            notifLog += `WhatsApp: FAILED — ${notifyErr?.message || notifyErr}`;
             console.error(`[ORDER] WhatsApp FAILED:`, notifyErr?.message || notifyErr);
         }
+
+        // Write notification result to the order in MongoDB
+        await Order.findByIdAndUpdate(saved._id, { notificationLog: notifLog });
 
         res.status(201).json(saved);
     } catch (err) {
