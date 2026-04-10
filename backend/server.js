@@ -25,13 +25,24 @@ const app = express();
 
 // ── Middleware ────────────────────────────────────────────────
 app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        'http://localhost:3000',
-        'http://127.0.0.1:5173',
-        'https://nishadeepanasarees.vercel.app',
-        'https://nisha-deepana-sarees.vercel.app',
-    ],
+    origin: function (origin, callback) {
+        // Allow requests with no origin (mobile apps, curl, etc.)
+        if (!origin) return callback(null, true);
+
+        const allowed = [
+            'http://localhost:5173',
+            'http://localhost:3000',
+            'http://127.0.0.1:5173',
+        ];
+
+        // Allow any Vercel deployment URL for NishaDeepana
+        if (origin.includes('.vercel.app') || allowed.includes(origin)) {
+            return callback(null, true);
+        }
+
+        console.warn(`[CORS] Blocked origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
 }));
 app.use(express.json());
