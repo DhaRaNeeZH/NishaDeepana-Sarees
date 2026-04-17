@@ -129,27 +129,31 @@ router.get('/debug-latest', async (req, res) => {
     }
 });
 
-// GET /api/orders/debug-hello — Send hello_world template to admin to test delivery
-router.get('/debug-hello', async (req, res) => {
+// GET /api/orders/debug-template — Test actual new_order_admin template delivery to admin
+router.get('/debug-template', async (req, res) => {
     try {
-        const token = process.env.WHATSAPP_ACCESS_TOKEN;
-        const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+        const { sendWhatsAppTemplate } = require('../utils/whatsapp');
         const adminNum = process.env.ADMIN_WHATSAPP_NUMBER?.split(',')[0];
-        const axios = require('axios');
 
-        const result = await axios.post(
-            `https://graph.facebook.com/v22.0/${phoneId}/messages`,
-            {
-                messaging_product: 'whatsapp',
-                to: adminNum,
-                type: 'template',
-                template: { name: 'hello_world', language: { code: 'en_US' } }
-            },
-            { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
-        );
-        res.json({ sent_to: adminNum, meta_response: result.data });
+        const testParams = [
+            { type: 'text', text: 'TEST01' },
+            { type: 'text', text: '17 Apr 2026' },
+            { type: 'text', text: '4:00 PM' },
+            { type: 'text', text: 'Test Customer' },
+            { type: 'text', text: '9345704134' },
+            { type: 'text', text: '1. Test Saree x1 = Rs.1' },
+            { type: 'text', text: 'Rs.1' },
+            { type: 'text', text: 'Rs.0' },
+            { type: 'text', text: 'Rs.1' },
+            { type: 'text', text: 'Razorpay PAID' },
+            { type: 'text', text: 'TEST_TXN' },
+            { type: 'text', text: '123 Test St, Chennai, Tamil Nadu - 600001' }
+        ];
+
+        const result = await sendWhatsAppTemplate(adminNum, 'new_order_admin', testParams);
+        res.json({ sent_to: adminNum, result });
     } catch (err) {
-        res.json({ error: err.response?.data || err.message });
+        res.json({ error: err.message });
     }
 });
 
