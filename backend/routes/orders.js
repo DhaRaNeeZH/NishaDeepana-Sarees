@@ -129,4 +129,28 @@ router.get('/debug-latest', async (req, res) => {
     }
 });
 
+// GET /api/orders/debug-hello — Send hello_world template to admin to test delivery
+router.get('/debug-hello', async (req, res) => {
+    try {
+        const token = process.env.WHATSAPP_ACCESS_TOKEN;
+        const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
+        const adminNum = process.env.ADMIN_WHATSAPP_NUMBER?.split(',')[0];
+        const axios = require('axios');
+
+        const result = await axios.post(
+            `https://graph.facebook.com/v22.0/${phoneId}/messages`,
+            {
+                messaging_product: 'whatsapp',
+                to: adminNum,
+                type: 'template',
+                template: { name: 'hello_world', language: { code: 'en_US' } }
+            },
+            { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } }
+        );
+        res.json({ sent_to: adminNum, meta_response: result.data });
+    } catch (err) {
+        res.json({ error: err.response?.data || err.message });
+    }
+});
+
 module.exports = router;
