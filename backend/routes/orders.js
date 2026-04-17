@@ -119,38 +119,5 @@ router.patch('/:id/notes', async (req, res) => {
     }
 });
 
-// GET /api/orders/debug-latest — Show notification status of last order
-router.get('/debug-latest', async (req, res) => {
-    try {
-        const latest = await Order.findOne().sort({ createdAt: -1 }).select('customerName phone createdAt notificationLog');
-        res.json(latest || { message: 'No orders found' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// GET /api/orders/debug-customer — Test customer template to BOTH numbers
-router.get('/debug-customer', async (req, res) => {
-    try {
-        const { sendWhatsAppTemplate } = require('../utils/whatsapp');
-
-        const params = [
-            { type: 'text', text: 'Test' },
-            { type: 'text', text: 'TEST01' },
-            { type: 'text', text: '1x Test Saree' },
-            { type: 'text', text: 'Rs.1' },
-            { type: 'text', text: 'https://nishadeepanasarees.vercel.app/track-order?orderId=test' }
-        ];
-
-        const [momResult, userResult] = await Promise.all([
-            sendWhatsAppTemplate('919500384237', 'order_confirmation_customer', params, 'en'),
-            sendWhatsAppTemplate('919345704134', 'order_confirmation_customer', params, 'en')
-        ]);
-
-        res.json({ mom_919500384237: momResult, you_919345704134: userResult });
-    } catch (err) {
-        res.json({ error: err.message });
-    }
-});
-
 module.exports = router;
+
