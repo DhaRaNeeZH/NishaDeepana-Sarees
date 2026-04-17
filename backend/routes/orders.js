@@ -129,29 +129,22 @@ router.get('/debug-latest', async (req, res) => {
     }
 });
 
-// GET /api/orders/debug-template — Test actual new_order_admin template delivery to admin
-router.get('/debug-template', async (req, res) => {
+// GET /api/orders/debug-customer — Test customer template to user's/customer's number
+router.get('/debug-customer', async (req, res) => {
     try {
         const { sendWhatsAppTemplate } = require('../utils/whatsapp');
-        const adminNum = process.env.ADMIN_WHATSAPP_NUMBER?.split(',')[0];
+        const testPhone = '919345704134'; // Your number
 
-        const testParams = [
+        const params = [
+            { type: 'text', text: 'Dharaneesh' },
             { type: 'text', text: 'TEST01' },
-            { type: 'text', text: '17 Apr 2026' },
-            { type: 'text', text: '4:00 PM' },
-            { type: 'text', text: 'Test Customer' },
-            { type: 'text', text: '9345704134' },
-            { type: 'text', text: '1. Test Saree x1 = Rs.1' },
+            { type: 'text', text: '1x Test Saree' },
             { type: 'text', text: 'Rs.1' },
-            { type: 'text', text: 'Rs.0' },
-            { type: 'text', text: 'Rs.1' },
-            { type: 'text', text: 'Razorpay PAID' },
-            { type: 'text', text: 'TEST_TXN' },
-            { type: 'text', text: '123 Test St, Chennai, Tamil Nadu - 600001' }
+            { type: 'text', text: 'https://nishadeepanasarees.vercel.app/track-order?orderId=test' }
         ];
 
-        const result = await sendWhatsAppTemplate(adminNum, 'new_order_admin', testParams);
-        res.json({ sent_to: adminNum, result });
+        const result = await sendWhatsAppTemplate(testPhone, 'order_confirmation_customer', params, 'en');
+        res.json({ sent_to: testPhone, result });
     } catch (err) {
         res.json({ error: err.message });
     }
