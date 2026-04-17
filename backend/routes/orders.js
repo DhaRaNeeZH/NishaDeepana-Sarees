@@ -129,22 +129,25 @@ router.get('/debug-latest', async (req, res) => {
     }
 });
 
-// GET /api/orders/debug-customer — Test customer template to user's/customer's number
+// GET /api/orders/debug-customer — Test customer template to BOTH numbers
 router.get('/debug-customer', async (req, res) => {
     try {
         const { sendWhatsAppTemplate } = require('../utils/whatsapp');
-        const testPhone = '919345704134'; // Your number
 
         const params = [
-            { type: 'text', text: 'Dharaneesh' },
+            { type: 'text', text: 'Test' },
             { type: 'text', text: 'TEST01' },
             { type: 'text', text: '1x Test Saree' },
             { type: 'text', text: 'Rs.1' },
             { type: 'text', text: 'https://nishadeepanasarees.vercel.app/track-order?orderId=test' }
         ];
 
-        const result = await sendWhatsAppTemplate(testPhone, 'order_confirmation_customer', params, 'en');
-        res.json({ sent_to: testPhone, result });
+        const [momResult, userResult] = await Promise.all([
+            sendWhatsAppTemplate('919500384237', 'order_confirmation_customer', params, 'en'),
+            sendWhatsAppTemplate('919345704134', 'order_confirmation_customer', params, 'en')
+        ]);
+
+        res.json({ mom_919500384237: momResult, you_919345704134: userResult });
     } catch (err) {
         res.json({ error: err.message });
     }
