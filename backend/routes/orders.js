@@ -36,24 +36,19 @@ router.post('/', async (req, res) => {
         const saved = await order.save();
         console.log(`[ORDER] Saved to DB: ${saved._id}`);
 
-        // Send WhatsApp notifications and write result to DB
-        let notifLog = `Triggered at ${new Date().toISOString()}. `;
+        // Send WhatsApp notifications and capture actual results
+        let notifLog = `at ${new Date().toISOString()} | `;
         try {
-            await Promise.race([
-                Promise.all([
-                    notifyAdminNewOrder(saved),
-                    notifyCustomerOrderConfirmed(saved)
-                ]),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout after 10s')), 10000))
+            const [adminResult, customerResult] = await Promise.race([
+                Promise.all([notifyAdminNewOrder(saved), notifyCustomerOrderConfirmed(saved)]),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT_10s')), 10000))
             ]);
-            notifLog += 'WhatsApp: SUCCESS';
-            console.log(`[ORDER] WhatsApp DONE for order ${saved._id}`);
-        } catch (notifyErr) {
-            notifLog += `WhatsApp: FAILED — ${notifyErr?.message || notifyErr}`;
-            console.error(`[ORDER] WhatsApp FAILED:`, notifyErr?.message || notifyErr);
+            notifLog += `Admin:${adminResult} | Customer:${customerResult}`;
+        } catch (e) {
+            notifLog += `ERROR:${e?.message || e}`;
         }
 
-        // Write notification result to the order in MongoDB
+        console.log(`[ORDER] notifLog: ${notifLog}`);
         await Order.findByIdAndUpdate(saved._id, { notificationLog: notifLog });
 
         res.status(201).json(saved);
