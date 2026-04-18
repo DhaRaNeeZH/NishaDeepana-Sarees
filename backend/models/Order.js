@@ -28,7 +28,8 @@ const orderSchema = new mongoose.Schema({
     payment: {
         method: { type: String, enum: ['cod', 'mock_pay', 'razorpay'], default: 'cod' },
         status: { type: String, enum: ['pending', 'paid', 'refunded'], default: 'pending' },
-        providerOrderId: { type: String }, // Razorpay order ID
+        providerOrderId: { type: String }, // Razorpay order ID (order_xxx)
+        transactionId: { type: String },   // Razorpay payment ID (pay_xxx)
         paidAt: { type: Date },
     },
     customerName: { type: String, required: true },
