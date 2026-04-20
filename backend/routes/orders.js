@@ -119,5 +119,15 @@ router.patch('/:id/notes', async (req, res) => {
     }
 });
 
+// GET /api/orders/debug-latest — Check last order notification status
+router.get('/debug-latest', async (req, res) => {
+    try {
+        const latest = await Order.findOne().sort({ createdAt: -1 }).select('customerName phone createdAt notificationLog');
+        res.json(latest || { message: 'No orders found' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 module.exports = router;
 
