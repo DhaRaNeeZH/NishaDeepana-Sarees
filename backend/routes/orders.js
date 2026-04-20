@@ -41,7 +41,7 @@ router.post('/', async (req, res) => {
         try {
             const [adminResult, customerResult] = await Promise.race([
                 Promise.all([notifyAdminNewOrder(saved), notifyCustomerOrderConfirmed(saved)]),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT_10s')), 10000))
+                new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT_18s')), 18000))
             ]);
             notifLog += `Admin:${adminResult} | Customer:${customerResult}`;
         } catch (e) {

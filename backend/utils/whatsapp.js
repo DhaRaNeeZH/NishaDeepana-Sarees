@@ -33,7 +33,7 @@ async function sendWhatsAppTemplate(to, templateName, parameters = [], languageC
         console.log(`[WhatsApp] Sending "${templateName}" to ${to}`);
         const res = await axios.post(url, body, {
             headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-            timeout: 8000
+            timeout: 15000
         });
         const msgId = res.data?.messages?.[0]?.id || 'no-id';
         console.log(`[WhatsApp] ✅ Accepted by Meta. msgId=${msgId}`);
