@@ -67,6 +67,38 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// WhatsApp Webhook - Verification
+app.get('/api/webhook', (req, res) => {
+    const mode = req.query['hub.mode'];
+    const token = req.query['hub.verify_token'];
+    const challenge = req.query['hub.challenge'];
+
+    if (mode === 'subscribe' && token === 'nishadeepana123') {
+        console.log('[Webhook] Verified by Meta');
+        res.status(200).send(challenge);
+    } else {
+        res.sendStatus(403);
+    }
+});
+
+// WhatsApp Webhook - Incoming events
+app.post('/api/webhook', (req, res) => {
+    const body = req.body;
+    if (body.object) {
+        if (body.entry && body.entry[0].changes && body.entry[0].changes[0].value.statuses) {
+            const status = body.entry[0].changes[0].value.statuses[0];
+            if (status.status === 'failed') {
+                console.error('❌ [Meta Error]', JSON.stringify(status.errors, null, 2));
+            } else {
+                console.log(`[Webhook Status] ${status.status} for ${status.recipient_id}`);
+            }
+        }
+        res.sendStatus(200);
+    } else {
+        res.sendStatus(404);
+    }
+});
+
 // Products
 app.use('/api/products', require('./routes/products'));
 
