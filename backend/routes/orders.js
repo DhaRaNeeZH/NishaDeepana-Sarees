@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Order = require('../models/Order');
-const { notifyAdminNewOrder, notifyCustomerOrderConfirmed } = require('../utils/whatsapp');
+const { sendMomAlert, sendCustomerSMS } = require('../utils/sms');
+const { sendMomOrderEmail } = require('../utils/email');
 
 // GET /api/orders — All orders (admin)
 router.get('/', async (req, res) => {
@@ -36,16 +37,18 @@ router.post('/', async (req, res) => {
         const saved = await order.save();
         console.log(`[ORDER] Saved to DB: ${saved._id}`);
 
-        // Send WhatsApp notifications and capture actual results
+        // Send notifications (Email to mom + SMS to customer)
+        const baseUrl = process.env.FRONTEND_URL || 'https://nishadeepanasarees.vercel.app';
+        const trackingUrl = `${baseUrl}/track-order?orderId=${saved._id}`;
         let notifLog = `at ${new Date().toISOString()} | `;
         try {
-            const [adminResult, customerResult] = await Promise.race([
-                Promise.all([notifyAdminNewOrder(saved), notifyCustomerOrderConfirmed(saved)]),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT_18s')), 18000))
+            await Promise.all([
+                sendMomOrderEmail({ order: saved, customerPhone: saved.phone, trackingUrl }),
+                sendCustomerSMS({ order: saved, trackingUrl }),
             ]);
-            notifLog += `Admin:${adminResult} | Customer:${customerResult}`;
+            notifLog += 'Email+SMS:sent';
         } catch (e) {
-            notifLog += `ERROR:${e?.message || e}`;
+            notifLog += `NOTIF_ERROR:${e?.message || e}`;
         }
 
         console.log(`[ORDER] notifLog: ${notifLog}`);
