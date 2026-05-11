@@ -1,13 +1,19 @@
 const nodemailer = require('nodemailer');
+const dns = require('dns');
+
+// Force IPv4 for outgoing internet requests (fixes Render ENETUNREACH IPv6 bug)
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 function createTransporter() {
-    return nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.GMAIL_USER,
-            pass: process.env.GMAIL_APP_PASSWORD,
-        },
-    });
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  });
 }
 
 /**
@@ -15,34 +21,34 @@ function createTransporter() {
  * Includes full order details + WhatsApp magic link button
  */
 async function sendMomOrderEmail({ order, customerPhone, trackingUrl }) {
-    const momEmail = process.env.MOM_EMAIL;
-    if (!momEmail) {
-        console.error('[EMAIL] MOM_EMAIL not set in .env');
-        return;
-    }
+  const momEmail = process.env.MOM_EMAIL;
+  if (!momEmail) {
+    console.error('[EMAIL] MOM_EMAIL not set in .env');
+    return;
+  }
 
-    const itemsList = order.items
-        .map(i => `<tr>
+  const itemsList = order.items
+    .map(i => `<tr>
             <td style="padding:6px 12px;border-bottom:1px solid #eee;">${i.productName}</td>
             <td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:center;">${i.quantity}</td>
             <td style="padding:6px 12px;border-bottom:1px solid #eee;text-align:right;">₹${i.totalPrice}</td>
         </tr>`)
-        .join('');
+    .join('');
 
-    const itemsText = order.items.map(i => `${i.productName} x${i.quantity}`).join(', ');
+  const itemsText = order.items.map(i => `${i.productName} x${i.quantity}`).join(', ');
 
-    // WhatsApp magic link — clicking this opens WhatsApp with pre-written message to customer
-    const waMessage = encodeURIComponent(
-        `🎉 *NishaDeepana Sarees*\n\nDear ${order.customerName},\n\nYour order has been confirmed! ✅\n\nOrder ID: ${order._id}\nItems: ${itemsText}\nTotal: ₹${order.total}\n\n📦 Track your order:\n${trackingUrl}\n\nThank you for shopping with us! 🙏\n- NishaDeepana Sarees`
-    );
-    const cleanPhone = String(customerPhone).replace(/\D/g, '').slice(-10);
-    const magicLink = `https://wa.me/91${cleanPhone}?text=${waMessage}`;
+  // WhatsApp magic link — clicking this opens WhatsApp with pre-written message to customer
+  const waMessage = encodeURIComponent(
+    `🎉 *NishaDeepana Sarees*\n\nDear ${order.customerName},\n\nYour order has been confirmed! ✅\n\nOrder ID: ${order._id}\nItems: ${itemsText}\nTotal: ₹${order.total}\n\n📦 Track your order:\n${trackingUrl}\n\nThank you for shopping with us! 🙏\n- NishaDeepana Sarees`
+  );
+  const cleanPhone = String(customerPhone).replace(/\D/g, '').slice(-10);
+  const magicLink = `https://wa.me/91${cleanPhone}?text=${waMessage}`;
 
-    const paymentBadge = order.payment?.status === 'paid'
-        ? `<span style="background:#22c55e;color:#fff;padding:3px 10px;border-radius:20px;font-size:13px;">PAID ✅</span>`
-        : `<span style="background:#f59e0b;color:#fff;padding:3px 10px;border-radius:20px;font-size:13px;">COD 💵</span>`;
+  const paymentBadge = order.payment?.status === 'paid'
+    ? `<span style="background:#22c55e;color:#fff;padding:3px 10px;border-radius:20px;font-size:13px;">PAID ✅</span>`
+    : `<span style="background:#f59e0b;color:#fff;padding:3px 10px;border-radius:20px;font-size:13px;">COD 💵</span>`;
 
-    const html = `
+  const html = `
 <!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
@@ -115,16 +121,16 @@ async function sendMomOrderEmail({ order, customerPhone, trackingUrl }) {
 </body>
 </html>`;
 
-    const transporter = createTransporter();
-    const info = await transporter.sendMail({
-        from: `"NishaDeepana Sarees Orders" <${process.env.GMAIL_USER}>`,
-        to: momEmail,
-        subject: `🛒 NEW ORDER — ${order.customerName} · ₹${order.total}`,
-        html,
-    });
+  const transporter = createTransporter();
+  const info = await transporter.sendMail({
+    from: `"NishaDeepana Sarees Orders" <${process.env.GMAIL_USER}>`,
+    to: momEmail,
+    subject: `🛒 NEW ORDER — ${order.customerName} · ₹${order.total}`,
+    html,
+  });
 
-    console.log(`[EMAIL] Order alert sent to mom: ${info.messageId}`);
-    return info.messageId;
+  console.log(`[EMAIL] Order alert sent to mom: ${info.messageId}`);
+  return info.messageId;
 }
 
 module.exports = { sendMomOrderEmail };
