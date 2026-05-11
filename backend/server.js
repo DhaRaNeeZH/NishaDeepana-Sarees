@@ -128,7 +128,7 @@ app.use('*', (req, res) => {
 
 // ── Start Server ──────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running at http://localhost:${PORT}`);
-    console.log(`📦 Health check: http://localhost:${PORT}/api/health`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running at http://0.0.0.0:${PORT}`);
+    console.log(`📦 Health check: http://0.0.0.0:${PORT}/api/health`);
 });
