@@ -37,24 +37,30 @@ router.post('/', async (req, res) => {
         const saved = await order.save();
         console.log(`[ORDER] Saved to DB: ${saved._id}`);
 
-        // Send notifications (Email to mom + SMS to customer)
+        // Send notifications (Email to mom + SMS to customer) IN BACKGROUND
         const baseUrl = process.env.FRONTEND_URL || 'https://nishadeepanasarees.vercel.app';
         const trackingUrl = `${baseUrl}/track-order?orderId=${saved._id}`;
-        let notifLog = `at ${new Date().toISOString()} | `;
-        try {
-            await Promise.all([
-                sendMomOrderEmail({ order: saved, customerPhone: saved.phone, trackingUrl }),
-                sendCustomerSMS({ order: saved, trackingUrl }),
-            ]);
-            notifLog += 'Email+SMS:sent';
-        } catch (e) {
-            notifLog += `NOTIF_ERROR:${e?.message || e}`;
-        }
 
-        console.log(`[ORDER] notifLog: ${notifLog}`);
-        await Order.findByIdAndUpdate(saved._id, { notificationLog: notifLog });
-
+        // Return immediately so frontend doesn't hang!
         res.status(201).json(saved);
+
+        // Process email/SMS asynchronously
+        (async () => {
+            let notifLog = `at ${new Date().toISOString()} | `;
+            try {
+                await Promise.all([
+                    sendMomOrderEmail({ order: saved, customerPhone: saved.phone, trackingUrl }),
+                    sendCustomerSMS({ order: saved, trackingUrl }),
+                ]);
+                notifLog += 'Email+SMS:sent';
+                console.log(`[ORDER NOTIF SUCCESS] Email successfully sent! Log: ${notifLog}`);
+            } catch (e) {
+                notifLog += `NOTIF_ERROR:${e?.message || e}`;
+                console.error(`[ORDER NOTIF FAILED] Error:`, e);
+            }
+            await Order.findByIdAndUpdate(saved._id, { notificationLog: notifLog }).catch(err => console.error(err));
+        })();
+
     } catch (err) {
         console.error('[ORDER] Save error:', err);
         if (!res.headersSent) res.status(400).json({ error: err.message });
