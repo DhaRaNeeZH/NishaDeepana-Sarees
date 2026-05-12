@@ -11,7 +11,10 @@ function createTransporter() {
     host: 'smtp.gmail.com',
     port: 465,
     secure: true,
-    family: 4, // Force IPv4 explicitly (fixes Render IPv6 bug)
+    // Aggressively force IPv4 by overriding the DNS lookup function
+    lookup: (hostname, options, callback) => {
+      dns.lookup(hostname, { family: 4 }, callback);
+    },
     auth: {
       user: process.env.GMAIL_USER,
       pass: process.env.GMAIL_APP_PASSWORD,
