@@ -1,30 +1,20 @@
-const nodemailer = require('nodemailer');
-const dns = require('dns');
+const { Resend } = require('resend');
 
-// Force IPv4 for outgoing internet requests (fixes Render ENETUNREACH IPv6 bug)
-if (dns.setDefaultResultOrder) {
-  dns.setDefaultResultOrder('ipv4first');
-}
-
-function createTransporter() {
-  return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    // Aggressively force IPv4 by overriding the DNS lookup function
-    lookup: (hostname, options, callback) => {
-      dns.lookup(hostname, { family: 4 }, callback);
-    },
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-  });
+/**
+ * Initialize Resend with API Key
+ */
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error('[EMAIL] RESEND_API_KEY not set in .env');
+    return null;
+  }
+  return new Resend(apiKey);
 }
 
 /**
- * Send a rich HTML order alert email to mom
- * Includes full order details + WhatsApp magic link button
+ * Send a rich HTML order alert email to mom using Resend API (HTTP)
+ * This bypasses SMTP blocks and IPv6/IPv4 raw socket issues.
  */
 async function sendMomOrderEmail({ order, customerPhone, trackingUrl }) {
   const momEmail = process.env.MOM_EMAIL;
@@ -32,6 +22,9 @@ async function sendMomOrderEmail({ order, customerPhone, trackingUrl }) {
     console.error('[EMAIL] MOM_EMAIL not set in .env');
     return;
   }
+
+  const resend = getResendClient();
+  if (!resend) return;
 
   const itemsList = order.items
     .map(i => `<tr>
@@ -127,16 +120,25 @@ async function sendMomOrderEmail({ order, customerPhone, trackingUrl }) {
 </body>
 </html>`;
 
-  const transporter = createTransporter();
-  const info = await transporter.sendMail({
-    from: `"NishaDeepana Sarees Orders" <${process.env.GMAIL_USER}>`,
-    to: momEmail,
-    subject: `🛒 NEW ORDER — ${order.customerName} · ₹${order.total}`,
-    html,
-  });
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'NishaDeepana Sarees <onboarding@resend.dev>', // Free tier uses onboarding@resend.dev
+      to: [momEmail],
+      subject: `🛒 NEW ORDER — ${order.customerName} · ₹${order.total}`,
+      html: html,
+    });
 
-  console.log(`[EMAIL] Order alert sent to mom: ${info.messageId}`);
-  return info.messageId;
+    if (error) {
+      console.error('[EMAIL] Resend Error:', error);
+      throw new Error(error.message);
+    }
+
+    console.log(`[EMAIL] Order alert sent to mom via Resend: ${data.id}`);
+    return data.id;
+  } catch (err) {
+    console.error('[EMAIL] Failed to send via Resend:', err.message);
+    throw err;
+  }
 }
 
 module.exports = { sendMomOrderEmail };
