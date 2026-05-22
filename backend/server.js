@@ -35,8 +35,8 @@ app.use(cors({
             'http://127.0.0.1:5173',
         ];
 
-        // Allow any Vercel deployment URL for NishaDeepana
-        if (origin.includes('.vercel.app') || allowed.includes(origin)) {
+        // Allow any Vercel deployment URL or custom domain for NishaDeepana
+        if (origin.includes('.vercel.app') || origin.includes('nishadeepanasarees.in') || allowed.includes(origin)) {
             return callback(null, true);
         }
 
