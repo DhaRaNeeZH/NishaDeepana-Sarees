@@ -122,7 +122,7 @@ async function sendMomOrderEmail({ order, customerPhone, trackingUrl }) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: 'NishaDeepana Sarees <onboarding@resend.dev>', // Free tier uses onboarding@resend.dev
+      from: 'NishaDeepana Sarees <orders@nishadeepanasarees.in>',
       to: [momEmail],
       subject: `🛒 NEW ORDER — ${order.customerName} · ₹${order.total}`,
       html: html,
