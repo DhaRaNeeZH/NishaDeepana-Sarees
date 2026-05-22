@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
         console.log(`[ORDER] Saved to DB: ${saved._id}`);
 
         // Send notifications (Email to mom + SMS to customer) IN BACKGROUND
-        const baseUrl = process.env.FRONTEND_URL || 'https://nishadeepanasarees.vercel.app';
+        const baseUrl = process.env.FRONTEND_URL || 'https://nishadeepanasarees.in';
         const trackingUrl = `${baseUrl}/track-order?orderId=${saved._id}`;
 
         // Return immediately so frontend doesn't hang!

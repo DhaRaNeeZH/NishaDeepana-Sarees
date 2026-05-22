@@ -76,7 +76,7 @@ async function notifyAdminNewOrder(order) {
         { type: 'text', text: order.payment?.method === 'razorpay' ? 'Razorpay PAID' : 'Cash on Delivery' },
         { type: 'text', text: order.payment?.transactionId || order.payment?.providerOrderId || 'N/A' },
         { type: 'text', text: fullAddress },
-        { type: 'text', text: `https://nishadeepanasarees.vercel.app/track-order?orderId=${order._id}` }
+        { type: 'text', text: `https://nishadeepanasarees.in/track-order?orderId=${order._id}` }
     ];
 
     const numbers = adminNum.split(',').map(n => n.trim()).filter(Boolean);
@@ -107,7 +107,7 @@ async function notifyCustomerOrderConfirmed(order) {
         { type: 'text', text: shortId },
         { type: 'text', text: itemsList.slice(0, 150) },
         { type: 'text', text: `₹${order.total || 0}` },
-        { type: 'text', text: `https://nishadeepanasarees.vercel.app/track-order?orderId=${order._id}` }
+        { type: 'text', text: `https://nishadeepanasarees.in/track-order?orderId=${order._id}` }
     ];
 
     const result = await sendWhatsAppTemplate(cleanPhone, 'order_confirmation_customer', params, 'en');
