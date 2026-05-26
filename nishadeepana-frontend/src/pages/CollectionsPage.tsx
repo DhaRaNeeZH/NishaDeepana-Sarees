@@ -8,10 +8,10 @@ import { Badge } from '../components/ui/badge';
 
 const PRICE_RANGES = [
     { label: 'All Prices', value: 'all' },
-    { label: 'Under ₹2,000', value: 'under-2000' },
+    { label: 'Under ₹750', value: 'under-750' },
+    { label: '₹750 – ₹2,000', value: '750-2000' },
     { label: '₹2,000 – ₹5,000', value: '2000-5000' },
-    { label: '₹5,000 – ₹10,000', value: '5000-10000' },
-    { label: 'Above ₹10,000', value: 'above-10000' },
+    { label: 'Above ₹5,000', value: 'above-5000' },
 ];
 
 const SORT_OPTIONS = [
@@ -79,17 +79,17 @@ export const CollectionsPage: React.FC = () => {
 
         // Price filter
         switch (priceRange) {
-            case 'under-2000':
-                result = result.filter(s => s.price < 2000);
+            case 'under-750':
+                result = result.filter(s => s.price < 750);
+                break;
+            case '750-2000':
+                result = result.filter(s => s.price >= 750 && s.price < 2000);
                 break;
             case '2000-5000':
                 result = result.filter(s => s.price >= 2000 && s.price < 5000);
                 break;
-            case '5000-10000':
-                result = result.filter(s => s.price >= 5000 && s.price < 10000);
-                break;
-            case 'above-10000':
-                result = result.filter(s => s.price >= 10000);
+            case 'above-5000':
+                result = result.filter(s => s.price >= 5000);
                 break;
         }
 
@@ -260,7 +260,7 @@ export const CollectionsPage: React.FC = () => {
 
                         {/* Products */}
                         {filteredSarees.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
                                 {filteredSarees.map(saree => (
                                     <ProductCard key={saree.id} saree={saree} />
                                 ))}

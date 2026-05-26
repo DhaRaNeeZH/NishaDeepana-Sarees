@@ -37,7 +37,7 @@ export const ContactPage: React.FC = () => {
                                 </div>
                                 <div>
                                     <h3 className="font-semibold text-maroon mb-1">Phone / WhatsApp</h3>
-                                    <p className="text-gray-700 font-medium">+91 95003 84237</p>
+                                    <a href="tel:+919500384237" className="text-gray-700 font-medium hover:text-maroon transition-colors">+91 95003 84237</a>
                                     <p className="text-gray-500 text-sm mt-1">Call or WhatsApp us anytime during business hours</p>
                                 </div>
                             </CardContent>
@@ -50,7 +50,7 @@ export const ContactPage: React.FC = () => {
                                 </div>
                                 <div>
                                     <h3 className="font-semibold text-maroon mb-1">Email</h3>
-                                    <p className="text-gray-700 font-medium">nishadeepana@gmail.com</p>
+                                    <a href="mailto:nishadeepana@gmail.com" className="text-gray-700 font-medium hover:text-maroon transition-colors">nishadeepana@gmail.com</a>
                                     <p className="text-gray-500 text-sm mt-1">We'll respond within 24 hours</p>
                                 </div>
                             </CardContent>

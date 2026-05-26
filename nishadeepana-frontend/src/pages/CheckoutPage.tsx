@@ -71,7 +71,8 @@ export const CheckoutPage: React.FC = () => {
     const validate = (): boolean => {
         const errs: Partial<FormData> = {};
         if (!form.name.trim()) errs.name = 'Name is required';
-        if (!form.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) errs.email = 'Valid email required';
+        // Email is optional — many customers don't have one
+        if (form.email && !form.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) errs.email = 'Please enter a valid email';
         if (!form.phone.replace(/\D/g, '').match(/^\d{10}$/)) errs.phone = '10-digit mobile number required';
         if (!form.street.trim()) errs.street = 'Street address is required';
         if (!form.city.trim()) errs.city = 'City is required';
@@ -281,9 +282,26 @@ export const CheckoutPage: React.FC = () => {
                             <CardContent className="space-y-4">
                                 {field('name', 'Full Name', 'text', 'Your name')}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {field('email', 'Email', 'email', 'you@example.com')}
+                                    <div>
+                                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Email <span className="text-gray-400 text-xs font-normal">(Optional)</span>
+                                        </label>
+                                        <div className="relative">
+                                            <Input
+                                                id="email"
+                                                type="email"
+                                                placeholder="you@example.com"
+                                                value={form.email}
+                                                onChange={e => setForm(prev => ({ ...prev, email: e.target.value }))}
+                                                className={errors.email ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:border-maroon'}
+                                            />
+                                        </div>
+                                        {errors.email && (
+                                            <p id="email-error" className="text-red-500 text-xs mt-1">{errors.email}</p>
+                                        )}
+                                    </div>
                                     {field('phone', 'Mobile Number (10 digits)', 'tel', '93457 04134')}
-                                </div> activity
+                                </div>
                             </CardContent>
                         </Card>
 

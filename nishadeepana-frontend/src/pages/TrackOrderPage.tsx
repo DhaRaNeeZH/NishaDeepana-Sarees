@@ -310,12 +310,15 @@ export const TrackOrderPage: React.FC = () => {
 
                                 {canCancel(trackedOrder.status as OrderStatus) && (
                                     <div className="pt-4 px-8 text-center">
-                                        <button
-                                            onClick={() => handleCancel(trackedOrder._id)}
-                                            className="text-xs font-bold text-red-300 hover:text-red-500 transition-colors uppercase tracking-widest"
+                                        <p className="text-xs text-gray-400 mb-2">Need to cancel your order?</p>
+                                        <a
+                                            href={`https://wa.me/919500384237?text=Hi%2C%20I%20want%20to%20cancel%20my%20order%20ID%3A%20${trackedOrder._id}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-xs font-bold text-[#075E54] hover:text-green-700 transition-colors uppercase tracking-widest"
                                         >
-                                            Request Order Cancellation
-                                        </button>
+                                            📲 Contact us on WhatsApp to Cancel
+                                        </a>
                                     </div>
                                 )}
                             </div>

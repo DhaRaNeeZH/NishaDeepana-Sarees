@@ -17,7 +17,9 @@ export const WholesalePage: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        alert('Thank you for your interest! We will contact you shortly.');
+        // Send wholesale inquiry via WhatsApp to mom
+        const msg = `*New Wholesale Inquiry!* 🛍️%0A%0A*Name:* ${formData.name}%0A*Phone:* ${formData.phone}%0A*Email:* ${formData.email || 'Not provided'}%0A*Business:* ${formData.businessName || 'Not provided'}%0A*Quantity:* ${formData.quantity} pieces%0A*Message:* ${formData.message || 'None'}`;
+        window.open(`https://wa.me/919500384237?text=${msg}`, '_blank');
     };
 
     const bulkPricingTiers = [
@@ -103,17 +105,16 @@ export const WholesalePage: React.FC = () => {
                                             required
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            placeholder="John Doe"
+                                            placeholder="Your name"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-2">Email *</label>
+                                        <label className="block text-sm font-medium mb-2">Email</label>
                                         <Input
-                                            required
                                             type="email"
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            placeholder="john@example.com"
+                                            placeholder="your@email.com (optional)"
                                         />
                                     </div>
                                     <div>
@@ -191,9 +192,9 @@ export const WholesalePage: React.FC = () => {
                                 <CardContent className="pt-6">
                                     <h3 className="font-semibold text-lg mb-3">Payment Terms</h3>
                                     <p className="text-gray-600">
-                                        Flexible payment options available. We accept advance payment,
-                                        COD (for orders below ₹50,000), and credit terms for regular
-                                        wholesale partners.
+                                        Flexible payment options available. We accept advance payment
+                                        and credit terms for regular wholesale partners.
+                                        Contact us to discuss the best option for your business.
                                     </p>
                                 </CardContent>
                             </Card>
@@ -209,21 +210,21 @@ export const WholesalePage: React.FC = () => {
                             </Card>
 
                             {/* Contact Info */}
-                            <Card className="bg-primary text-white">
+                            <Card className="bg-white border-2 border-primary/20">
                                 <CardContent className="pt-6">
-                                    <h3 className="font-semibold text-lg mb-4">Get in Touch</h3>
+                                    <h3 className="font-semibold text-lg mb-4 text-primary">Get in Touch</h3>
                                     <ul className="space-y-4">
                                         <li className="flex items-center gap-3">
-                                            <div className="bg-maroon/10 p-2 rounded-lg">
-                                                <Phone className="h-5 w-5 text-maroon" />
+                                            <div className="bg-primary/10 p-2 rounded-lg">
+                                                <Phone className="h-5 w-5 text-primary" />
                                             </div>
-                                            <p className="text-gray-700 font-medium">+91 95003 84237</p>
+                                            <a href="tel:+919500384237" className="text-primary font-semibold hover:underline">+91 95003 84237</a>
                                         </li>
                                         <li className="flex items-center gap-3">
-                                            <div className="bg-maroon/10 p-2 rounded-lg">
-                                                <Mail className="h-5 w-5 text-maroon" />
+                                            <div className="bg-primary/10 p-2 rounded-lg">
+                                                <Mail className="h-5 w-5 text-primary" />
                                             </div>
-                                            <p className="text-gray-700 font-medium">nishadeepana@gmail.com</p>
+                                            <a href="mailto:nishadeepana@gmail.com" className="text-primary font-semibold hover:underline">nishadeepana@gmail.com</a>
                                         </li>
                                     </ul>
                                 </CardContent>
