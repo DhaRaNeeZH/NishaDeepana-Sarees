@@ -14,10 +14,26 @@ export const AdminCategories: React.FC = () => {
 
     const [form, setForm] = React.useState({ name: '', image: '' });
     const [adding, setAdding] = React.useState(false);
+    const [uploading, setUploading] = React.useState(false);
     const [savingId, setSavingId] = React.useState<string | null>(null);
     const [editId, setEditId] = React.useState<string | null>(null);
     const [editForm, setEditForm] = React.useState({ name: '', image: '' });
     const [error, setError] = React.useState('');
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    const handleImageUpload = async (file: File, target: 'add' | 'edit') => {
+        setUploading(true);
+        try {
+            const { api } = await import('../../lib/api');
+            const result = await api.uploadImage(file);
+            if (target === 'add') setForm(p => ({ ...p, image: result.url }));
+            else setEditForm(p => ({ ...p, image: result.url }));
+        } catch (err: any) {
+            setError('Image upload failed: ' + (err.message || 'Try again'));
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const handleAdd = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -131,13 +147,36 @@ export const AdminCategories: React.FC = () => {
 
                                     <div>
                                         <label className="block text-sm font-medium mb-1 text-gray-700">
-                                            Image URL <span className="text-gray-400">(optional)</span>
+                                            Category Image <span className="text-gray-400">(optional)</span>
                                         </label>
+                                        {/* Upload from device */}
+                                        <div className="flex gap-2 mb-2">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                ref={fileInputRef}
+                                                onChange={e => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) handleImageUpload(file, 'add');
+                                                }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => fileInputRef.current?.click()}
+                                                disabled={uploading}
+                                                className="flex-1 flex items-center justify-center gap-2 border-2 border-dashed border-maroon/30 rounded-lg py-2 text-sm text-maroon hover:border-maroon hover:bg-maroon/5 transition-colors"
+                                            >
+                                                <Image className="h-4 w-4" />
+                                                {uploading ? 'Uploading...' : 'Upload from Device'}
+                                            </button>
+                                        </div>
+                                        {/* Or paste URL */}
                                         <Input
                                             value={form.image}
                                             onChange={e => setForm(p => ({ ...p, image: e.target.value }))}
-                                            placeholder="https://..."
-                                            className="border-maroon/30 focus:border-maroon"
+                                            placeholder="Or paste image URL https://..."
+                                            className="border-maroon/30 focus:border-maroon text-xs"
                                         />
                                         {form.image && (
                                             <img

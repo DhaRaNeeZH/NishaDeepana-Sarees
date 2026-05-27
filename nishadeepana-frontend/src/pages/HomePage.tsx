@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Star, TrendingUp, Package, Shield } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -11,8 +11,27 @@ import heroImage from '../images/hero-saree.jpg';
 
 export const HomePage: React.FC = () => {
     const { products } = useProducts();
-    const { visibleCategories, loading: catsLoading } = useCategories();
+    const { visibleCategories } = useCategories();
     const featuredSarees = products.filter(s => s.featured).slice(0, 6);
+
+    // If no admin categories set up yet, fall back to unique categories from products
+    const fallbackCategories = useMemo(() =>
+        Array.from(new Set(products.map(p => p.category)))
+            .filter(Boolean)
+            .slice(0, 6)
+            .map(name => ({
+                _id: name,
+                name,
+                image: '',
+                visible: true,
+                order: 0,
+                count: products.filter(p => p.category === name).length,
+            })),
+        [products]
+    );
+
+    // Use admin-managed visible categories if available, otherwise fallback
+    const displayCategories = visibleCategories.length > 0 ? visibleCategories : fallbackCategories;
 
     return (
         <div className="min-h-screen">
@@ -25,12 +44,11 @@ export const HomePage: React.FC = () => {
                         alt="Luxury Saree"
                         className="w-full h-full object-cover"
                     />
-                    {/* Darker overlay */}
                     <div className="absolute inset-0 bg-gradient-to-r from-[#2C0A12]/95 via-[#4A0E1A]/90 to-[#4A0E1A]/60"></div>
                 </div>
 
-                {/* Content - moved higher */}
-                <div className="relative w-full px-8 xl:px-16 h-full flex items-start pt-20 md:pt-28">
+                {/* Content — pushed to very top of hero */}
+                <div className="relative w-full px-8 xl:px-16 h-full flex items-start pt-8 md:pt-10">
                     <div className="w-full lg:w-2/3 xl:w-1/2 text-white">
 
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-black leading-tight mb-6">
@@ -72,7 +90,7 @@ export const HomePage: React.FC = () => {
                         <div className="mt-12 flex flex-wrap gap-6 text-sm text-white/80">
                             <span>🧵 Made on Order</span>
                             <span>♾ Unlimited Availability</span>
-                            <span>👗 Optional Blouse Customization</span>
+                            <span>👗 Running / Contrast Blouses</span>
                             <span>📦 Wholesale Friendly</span>
                         </div>
                     </div>
@@ -103,8 +121,8 @@ export const HomePage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Categories — dynamic from admin panel */}
-            {!catsLoading && visibleCategories.length > 0 && (
+            {/* Shop by Category — always shows (admin-managed or auto from products) */}
+            {displayCategories.length > 0 && (
                 <section className="py-16 bg-gray-50">
                     <div className="w-full px-8 xl:px-16">
                         <div className="text-center mb-12">
@@ -112,7 +130,7 @@ export const HomePage: React.FC = () => {
                             <p className="text-gray-600">Explore our diverse collection of traditional and contemporary sarees</p>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                            {visibleCategories.map((category) => (
+                            {displayCategories.map((category) => (
                                 <Link
                                     key={category._id}
                                     to={`/collections?category=${encodeURIComponent(category.name)}`}

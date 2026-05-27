@@ -85,10 +85,10 @@ export const AdminDashboard: React.FC = () => {
     const quickActions = [
         { icon: Plus, title: 'Add New Product', description: 'Add a new saree to inventory', link: '/admin/products', color: 'text-maroon', bgColor: 'bg-maroon/10', hoverColor: 'hover:bg-maroon/20' },
         { icon: ShoppingCart, title: 'Process Orders', description: `${pendingOrders} pending orders`, link: '/admin/orders', color: 'text-yellow-700', bgColor: 'bg-gold/10', hoverColor: 'hover:bg-gold/20' },
-        { icon: TrendingUp, title: 'Wholesale', description: 'WhatsApp inquiry links', link: '/admin/wholesale', color: 'text-green-600', bgColor: 'bg-green-100', hoverColor: 'hover:bg-green-200' },
+        { icon: Settings, title: 'Delivery Settings', description: 'Set zone-based delivery charges', link: '/admin/settings', color: 'text-gray-600', bgColor: 'bg-gray-100', hoverColor: 'hover:bg-gray-200' },
         { icon: FileText, title: 'View Products', description: 'Edit, delete, manage products', link: '/admin/products', color: 'text-blue-600', bgColor: 'bg-blue-100', hoverColor: 'hover:bg-blue-200' },
         { icon: Bell, title: 'All Orders', description: 'See all customer orders', link: '/admin/orders', color: 'text-purple-600', bgColor: 'bg-purple-100', hoverColor: 'hover:bg-purple-200' },
-        { icon: Settings, title: 'Manage Categories', description: 'Add/edit Home & filter categories', link: '/admin/categories', color: 'text-orange-600', bgColor: 'bg-orange-100', hoverColor: 'hover:bg-orange-200' },
+        { icon: TrendingUp, title: 'Manage Categories', description: 'Add/edit Home & filter categories', link: '/admin/categories', color: 'text-orange-600', bgColor: 'bg-orange-100', hoverColor: 'hover:bg-orange-200' },
     ];
 
     const recentOrders = orders.slice(0, 5);

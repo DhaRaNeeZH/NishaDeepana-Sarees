@@ -31,8 +31,8 @@ export const CollectionsPage: React.FC = () => {
     const sortBy = searchParams.get('sort') ?? 'featured';
     const searchText = searchParams.get('search') ?? '';
     const [showFilters, setShowFilters] = React.useState(false);
-    // Grid toggle: 2 cols = comfortable, 3 cols = compact
-    const [gridCols, setGridCols] = React.useState<2 | 3>(2);
+    // Grid toggle: 1 col = single/comfortable, 2 cols = compact grid (works on mobile & PC)
+    const [gridCols, setGridCols] = React.useState<1 | 2>(2);
 
     // Derive categories dynamically from actual product data (fixes category mismatch bug)
     const categories = useMemo(() => {
@@ -219,21 +219,21 @@ export const CollectionsPage: React.FC = () => {
                             </Button>
 
                             <div className="flex items-center gap-3 ml-auto">
-                                {/* Grid toggle */}
+                                {/* Grid toggle: 1 col vs 2 col, works on mobile + desktop */}
                                 <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
+                                    <button
+                                        onClick={() => setGridCols(1)}
+                                        className={`p-2 transition-colors ${gridCols === 1 ? 'bg-maroon text-white' : 'text-gray-400 hover:text-maroon hover:bg-gray-50'}`}
+                                        title="Single column view"
+                                        aria-label="1 column grid"
+                                    >
+                                        <LayoutGrid className="h-4 w-4" />
+                                    </button>
                                     <button
                                         onClick={() => setGridCols(2)}
                                         className={`p-2 transition-colors ${gridCols === 2 ? 'bg-maroon text-white' : 'text-gray-400 hover:text-maroon hover:bg-gray-50'}`}
                                         title="2-column view"
                                         aria-label="2 column grid"
-                                    >
-                                        <LayoutGrid className="h-4 w-4" />
-                                    </button>
-                                    <button
-                                        onClick={() => setGridCols(3)}
-                                        className={`p-2 transition-colors ${gridCols === 3 ? 'bg-maroon text-white' : 'text-gray-400 hover:text-maroon hover:bg-gray-50'}`}
-                                        title="3-column view"
-                                        aria-label="3 column grid"
                                     >
                                         <Grid3X3 className="h-4 w-4" />
                                     </button>
@@ -282,9 +282,9 @@ export const CollectionsPage: React.FC = () => {
 
                         {/* Products */}
                         {filteredSarees.length > 0 ? (
-                            <div className={`grid gap-3 sm:gap-6 ${
-                                gridCols === 3
-                                    ? 'grid-cols-2 sm:grid-cols-3 xl:grid-cols-3'
+                            <div className={`grid gap-4 ${
+                                gridCols === 1
+                                    ? 'grid-cols-1'
                                     : 'grid-cols-2 sm:grid-cols-2 xl:grid-cols-2'
                             }`}>
                                 {filteredSarees.map(saree => (
