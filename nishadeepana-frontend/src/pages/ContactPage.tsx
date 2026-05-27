@@ -12,6 +12,20 @@ export const ContactPage: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        // Build WhatsApp message with form data
+        const lines = [
+            `*New Message from Website* 📩`,
+            ``,
+            `*Name:* ${formData.name}`,
+            `*Phone:* ${formData.phone || 'Not provided'}`,
+            `*Email:* ${formData.email || 'Not provided'}`,
+            `*Subject:* ${formData.subject}`,
+            ``,
+            `*Message:*`,
+            formData.message,
+        ].join('\n');
+        const encoded = encodeURIComponent(lines);
+        window.open(`https://wa.me/919500384237?text=${encoded}`, '_blank');
         setSubmitted(true);
         setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
     };

@@ -120,6 +120,9 @@ app.use('/api/payments', require('./routes/payments'));
 // Settings (delivery charges etc.)
 app.use('/api/settings', require('./routes/settings'));
 
+// Categories (admin-managed, drives home page + collection filter)
+app.use('/api/categories', require('./routes/categories'));
+
 
 // 404 handler
 app.use('*', (req, res) => {

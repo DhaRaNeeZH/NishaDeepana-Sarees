@@ -5,12 +5,13 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { ProductCard } from '../components/ProductCard';
 import { useProducts } from '../contexts/ProductContext';
-import { categories } from '../data/categories';
+import { useCategories } from '../contexts/CategoryContext';
 import { testimonials } from '../data/testimonials';
 import heroImage from '../images/hero-saree.jpg';
 
 export const HomePage: React.FC = () => {
     const { products } = useProducts();
+    const { visibleCategories, loading: catsLoading } = useCategories();
     const featuredSarees = products.filter(s => s.featured).slice(0, 6);
 
     return (
@@ -24,15 +25,14 @@ export const HomePage: React.FC = () => {
                         alt="Luxury Saree"
                         className="w-full h-full object-cover"
                     />
-                    {/* Darker overlay to match reference */}
+                    {/* Darker overlay */}
                     <div className="absolute inset-0 bg-gradient-to-r from-[#2C0A12]/95 via-[#4A0E1A]/90 to-[#4A0E1A]/60"></div>
                 </div>
 
-                {/* Content - Full width with edge padding */}
-                <div className="relative w-full px-8 xl:px-16 h-full flex items-start pt-32 md:pt-40">
+                {/* Content - moved higher */}
+                <div className="relative w-full px-8 xl:px-16 h-full flex items-start pt-20 md:pt-28">
                     <div className="w-full lg:w-2/3 xl:w-1/2 text-white">
 
-                        {/* Heading - Bolder and darker */}
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-black leading-tight mb-6">
                             Nisha Deepana Sarees
                             <br />
@@ -41,7 +41,6 @@ export const HomePage: React.FC = () => {
                             </span>
                         </h1>
 
-                        {/* Subtext */}
                         <p className="text-base md:text-lg lg:text-xl text-white/90 mb-8 leading-relaxed">
                             Authentic South Indian cotton and silk sarees, thoughtfully curated and
                             tailored with elegance. Designed for timeless beauty.
@@ -79,6 +78,7 @@ export const HomePage: React.FC = () => {
                     </div>
                 </div>
             </section>
+
             {/* Features */}
             <section className="py-16 bg-white">
                 <div className="w-full px-8 xl:px-16">
@@ -103,45 +103,51 @@ export const HomePage: React.FC = () => {
                 </div>
             </section>
 
-            {/* Categories */}
-            <section className="py-16 bg-gray-50">
-                <div className="w-full px-8 xl:px-16">
-                    <div className="text-center mb-12">
-                        <h2 className="text-4xl font-bold mb-4">Shop by Category</h2>
-                        <p className="text-gray-600">Explore our diverse collection of traditional and contemporary sarees</p>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                        {categories.map((category) => (
-                            <Link
-                                key={category.id}
-                                to={`/collections?category=${category.name}`}
-                                className="group"
-                            >
-                                <div className="relative aspect-square rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
-                                    <img
-                                        src={category.image}
-                                        alt={category.name}
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4">
-                                        <h3 className="text-white font-semibold text-lg">{category.name}</h3>
-                                        <p className="text-white/80 text-sm">{category.count} items</p>
+            {/* Categories — dynamic from admin panel */}
+            {!catsLoading && visibleCategories.length > 0 && (
+                <section className="py-16 bg-gray-50">
+                    <div className="w-full px-8 xl:px-16">
+                        <div className="text-center mb-12">
+                            <h2 className="text-4xl font-bold mb-4">Shop by Category</h2>
+                            <p className="text-gray-600">Explore our diverse collection of traditional and contemporary sarees</p>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                            {visibleCategories.map((category) => (
+                                <Link
+                                    key={category._id}
+                                    to={`/collections?category=${encodeURIComponent(category.name)}`}
+                                    className="group"
+                                >
+                                    <div className="relative aspect-square rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-all">
+                                        {category.image ? (
+                                            <img
+                                                src={category.image}
+                                                alt={category.name}
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full bg-gradient-to-br from-maroon/20 to-gold/20 group-hover:scale-110 transition-transform duration-500" />
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4">
+                                            <h3 className="text-white font-semibold text-base leading-tight">{category.name}</h3>
+                                            <p className="text-white/80 text-xs mt-0.5">{category.count} items</p>
+                                        </div>
                                     </div>
-                                </div>
-                            </Link>
-                        ))}
+                                </Link>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
 
-            {/* Featured Products */}
+            {/* Featured Products — 2-col grid on mobile */}
             <section className="py-16 bg-white">
                 <div className="w-full px-8 xl:px-16">
                     <div className="text-center mb-12">
                         <h2 className="text-4xl font-bold mb-4">Featured Sarees</h2>
                         <p className="text-gray-600">Our handpicked selection of premium sarees</p>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
                         {featuredSarees.map((saree) => (
                             <ProductCard key={saree.id} saree={saree} />
                         ))}

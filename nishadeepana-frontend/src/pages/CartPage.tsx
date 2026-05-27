@@ -19,14 +19,13 @@ export const CartPage: React.FC = () => {
     // Debounced quantity input state — keyed by productId
     const [inputValues, setInputValues] = React.useState<Record<string, string>>({});
 
-    // Sync input values when items change
+    // Sync input values when items change (always overwrite to match actual quantity)
     React.useEffect(() => {
         setInputValues(prev => {
             const next = { ...prev };
             items.forEach(item => {
-                if (!(item.productId in next)) {
-                    next[item.productId] = String(item.quantity);
-                }
+                // Always sync to actual quantity so +/- buttons update the displayed number
+                next[item.productId] = String(item.quantity);
             });
             return next;
         });

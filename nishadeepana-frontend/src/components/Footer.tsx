@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, MessageCircle, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, MessageCircle, Mail, Phone, MapPin, Users } from 'lucide-react';
 
 export const Footer: React.FC = () => {
     return (
@@ -16,17 +16,39 @@ export const Footer: React.FC = () => {
                             Premium handloom and silk sarees for every occasion.
                             Authentic craftsmanship, timeless elegance.
                         </p>
+                        {/* Social Icons: Facebook + WhatsApp Group */}
                         <div className="flex space-x-4">
-                            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
+                            <a
+                                href="https://www.facebook.com/profile.php?id=100007146435328"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-gold transition-colors"
+                                title="Follow us on Facebook"
+                            >
                                 <Facebook className="h-5 w-5" />
                             </a>
-                            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
-                                <Instagram className="h-5 w-5" />
+                            <a
+                                href="https://chat.whatsapp.com/KugIbeE8Ou4FkfvuCMsIsn"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-gold transition-colors"
+                                title="Join our WhatsApp Community"
+                            >
+                                <Users className="h-5 w-5" />
                             </a>
-                            <a href="https://wa.me/919500384237" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">
+                            <a
+                                href="https://wa.me/919500384237"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:text-gold transition-colors"
+                                title="Chat with us on WhatsApp"
+                            >
                                 <MessageCircle className="h-5 w-5" />
                             </a>
                         </div>
+                        <p className="text-xs text-beige/50 mt-2">
+                            👥 Group &nbsp;|&nbsp; 💬 Chat
+                        </p>
                     </div>
 
                     {/* Quick Links */}

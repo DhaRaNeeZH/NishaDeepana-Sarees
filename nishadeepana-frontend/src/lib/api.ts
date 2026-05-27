@@ -94,4 +94,10 @@ export const api = {
             '/api/settings/delivery',
             { method: 'PUT', body: JSON.stringify(charges) }
         ),
+
+    // Categories (admin-managed)
+    getCategories: () => apiFetch<any[]>('/api/categories'),
+    createCategory: (data: any) => apiFetch<any>('/api/categories', { method: 'POST', body: JSON.stringify(data) }),
+    updateCategory: (id: string, data: any) => apiFetch<any>(`/api/categories/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    deleteCategory: (id: string) => apiFetch<any>(`/api/categories/${id}`, { method: 'DELETE' }),
 };

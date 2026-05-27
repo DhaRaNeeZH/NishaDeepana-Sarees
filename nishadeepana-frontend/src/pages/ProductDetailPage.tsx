@@ -223,38 +223,56 @@ export const ProductDetailPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Action Buttons */}
-                        <div className="flex gap-4 mb-8">
-                            <Button
-                                size="lg"
-                                className="flex-1 group bg-maroon hover:bg-maroon-dark text-beige"
-                                onClick={handleAddToCart}
-                            >
-                                <ShoppingCart className="mr-2 h-5 w-5 group-hover:animate-bounce" />
-                                Add to Cart
-                            </Button>
-                            <Button
-                                size="lg"
-                                className="flex-1 bg-maroon hover:bg-maroon-dark text-beige font-bold border-2 border-gold shadow-[0_4px_20px_rgba(128,0,0,0.2)] hover:shadow-[0_8px_30px_rgba(128,0,0,0.3)] transition-all active:scale-[0.98]"
-                                onClick={handleBuyNow}
-                            >
-                                Buy Now
-                            </Button>
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                onClick={() => id && toggleWishlist(id)}
-                                className={`border-maroon ${isLiked ? 'bg-red-50 text-red-500 border-red-300' : 'text-maroon'} hover:bg-maroon hover:text-beige`}
-                            >
-                                <Heart className={`h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-                            </Button>
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                className="border-maroon text-maroon hover:bg-maroon hover:text-beige"
-                            >
-                                <Share2 className="h-5 w-5" />
-                            </Button>
+                        {/* Action Buttons — 2×2 grid so all buttons visible on mobile */}
+                        <div className="mb-8 space-y-3">
+                            <div className="grid grid-cols-2 gap-3">
+                                <Button
+                                    size="lg"
+                                    className="group bg-maroon hover:bg-maroon-dark text-beige"
+                                    onClick={handleAddToCart}
+                                    id="add-to-cart-btn"
+                                >
+                                    <ShoppingCart className="mr-2 h-5 w-5 group-hover:animate-bounce" />
+                                    Add to Cart
+                                </Button>
+                                <Button
+                                    size="lg"
+                                    className="bg-maroon hover:bg-maroon-dark text-beige font-bold border-2 border-gold shadow-[0_4px_20px_rgba(128,0,0,0.2)] hover:shadow-[0_8px_30px_rgba(128,0,0,0.3)] transition-all active:scale-[0.98]"
+                                    onClick={handleBuyNow}
+                                    id="buy-now-btn"
+                                >
+                                    Buy Now
+                                </Button>
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    onClick={() => id && toggleWishlist(id)}
+                                    className={`border-maroon ${isLiked ? 'bg-red-50 text-red-500 border-red-300' : 'text-maroon'} hover:bg-maroon hover:text-beige`}
+                                    id="wishlist-btn"
+                                >
+                                    <Heart className={`mr-2 h-5 w-5 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+                                    {isLiked ? 'Wishlisted' : 'Wishlist'}
+                                </Button>
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    className="border-maroon text-maroon hover:bg-maroon hover:text-beige"
+                                    id="share-btn"
+                                    onClick={() => {
+                                        if (navigator.share) {
+                                            navigator.share({ title: saree.name, url: window.location.href });
+                                        } else {
+                                            navigator.clipboard.writeText(window.location.href);
+                                            alert('Link copied!');
+                                        }
+                                    }}
+                                >
+                                    <Share2 className="mr-2 h-4 w-4" />
+                                    Share
+                                </Button>
+                            </div>
                         </div>
 
                         {/* Features */}

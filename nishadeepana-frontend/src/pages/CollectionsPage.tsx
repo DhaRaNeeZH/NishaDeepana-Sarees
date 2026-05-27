@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Filter, SlidersHorizontal, X } from 'lucide-react';
+import { Filter, SlidersHorizontal, X, LayoutGrid, Grid3X3 } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { Button } from '../components/ui/button';
 import { useProducts } from '../contexts/ProductContext';
@@ -31,6 +31,8 @@ export const CollectionsPage: React.FC = () => {
     const sortBy = searchParams.get('sort') ?? 'featured';
     const searchText = searchParams.get('search') ?? '';
     const [showFilters, setShowFilters] = React.useState(false);
+    // Grid toggle: 2 cols = comfortable, 3 cols = compact
+    const [gridCols, setGridCols] = React.useState<2 | 3>(2);
 
     // Derive categories dynamically from actual product data (fixes category mismatch bug)
     const categories = useMemo(() => {
@@ -203,8 +205,8 @@ export const CollectionsPage: React.FC = () => {
 
                     {/* Products Grid */}
                     <div className="flex-1 min-w-0">
-                        {/* Mobile filter toggle & Sort */}
-                        <div className="flex items-center justify-between mb-5 gap-3">
+                        {/* Mobile filter toggle, Sort & Grid toggle */}
+                        <div className="flex items-center justify-between mb-5 gap-3 flex-wrap">
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -216,7 +218,27 @@ export const CollectionsPage: React.FC = () => {
                                 Filters {hasActiveFilters && <span className="ml-1 bg-maroon text-white text-xs px-1.5 py-0.5 rounded-full">✓</span>}
                             </Button>
 
-                            <div className="flex items-center gap-2 ml-auto">
+                            <div className="flex items-center gap-3 ml-auto">
+                                {/* Grid toggle */}
+                                <div className="flex items-center border border-gray-200 rounded-md overflow-hidden">
+                                    <button
+                                        onClick={() => setGridCols(2)}
+                                        className={`p-2 transition-colors ${gridCols === 2 ? 'bg-maroon text-white' : 'text-gray-400 hover:text-maroon hover:bg-gray-50'}`}
+                                        title="2-column view"
+                                        aria-label="2 column grid"
+                                    >
+                                        <LayoutGrid className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                        onClick={() => setGridCols(3)}
+                                        className={`p-2 transition-colors ${gridCols === 3 ? 'bg-maroon text-white' : 'text-gray-400 hover:text-maroon hover:bg-gray-50'}`}
+                                        title="3-column view"
+                                        aria-label="3 column grid"
+                                    >
+                                        <Grid3X3 className="h-4 w-4" />
+                                    </button>
+                                </div>
+
                                 <label htmlFor="sort-select" className="text-sm text-gray-500 whitespace-nowrap">Sort by:</label>
                                 <select
                                     id="sort-select"
@@ -260,7 +282,11 @@ export const CollectionsPage: React.FC = () => {
 
                         {/* Products */}
                         {filteredSarees.length > 0 ? (
-                            <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
+                            <div className={`grid gap-3 sm:gap-6 ${
+                                gridCols === 3
+                                    ? 'grid-cols-2 sm:grid-cols-3 xl:grid-cols-3'
+                                    : 'grid-cols-2 sm:grid-cols-2 xl:grid-cols-2'
+                            }`}>
                                 {filteredSarees.map(saree => (
                                     <ProductCard key={saree.id} saree={saree} />
                                 ))}
