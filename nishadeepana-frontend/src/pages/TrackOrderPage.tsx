@@ -70,17 +70,9 @@ export const TrackOrderPage: React.FC = () => {
         }
     }, [searchParams]);
 
-    const handleCancel = async (orderId: string) => {
-        if (!confirm('Cancel this order? This cannot be undone.')) return;
-        try {
-            await api.cancelOrder(orderId);
-            setTrackedOrder((prev: any) => prev ? { ...prev, status: 'cancelled', cancelledAt: new Date().toISOString() } : null);
-        } catch (err: any) {
-            alert(err.message || 'Failed to cancel order');
-        }
-    };
 
     const canCancel = (status: OrderStatus) => status === 'pending' || status === 'paid';
+
 
     const getTimelineSteps = (currentStatus: OrderStatus): TimelineStep[] => {
         if (currentStatus === 'cancelled' || currentStatus === 'refunded') {
