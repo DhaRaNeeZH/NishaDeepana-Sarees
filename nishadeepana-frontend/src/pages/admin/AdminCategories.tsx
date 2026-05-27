@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
     Layers, Plus, Trash2, Eye, EyeOff, RefreshCw, Image, GripVertical, Tag
 } from 'lucide-react';
@@ -11,7 +11,6 @@ import { useCategories, Category } from '../../contexts/CategoryContext';
 
 export const AdminCategories: React.FC = () => {
     const { categories, loading, refetch, addCategory, updateCategory, deleteCategory } = useCategories();
-    const navigate = useNavigate();
 
     const [form, setForm] = React.useState({ name: '', image: '' });
     const [adding, setAdding] = React.useState(false);
