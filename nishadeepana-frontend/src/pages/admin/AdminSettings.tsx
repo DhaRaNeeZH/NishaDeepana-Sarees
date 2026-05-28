@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Truck, ArrowLeft, Save, RefreshCw, CheckCircle, Gift } from 'lucide-react';
+import { Truck, ArrowLeft, Save, RefreshCw, CheckCircle, Gift, Tag, Plus, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
 import { api } from '../../lib/api';
+
+type PriceRange = { label: string; min: number; max: number };
 
 export const AdminSettings: React.FC = () => {
     const [charges, setCharges] = useState({ tamilnadu: 50, nearby: 80, others: 100 });
@@ -13,11 +16,21 @@ export const AdminSettings: React.FC = () => {
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState('');
 
+    // Price ranges state
+    const [priceRanges, setPriceRanges] = useState<PriceRange[]>([]);
+    const [savingRanges, setSavingRanges] = useState(false);
+    const [savedRanges, setSavedRanges] = useState(false);
+    const [newRange, setNewRange] = useState({ label: '', min: '', max: '' });
+
     useEffect(() => {
         api.getDeliveryCharges()
-            .then(setCharges)
+            .then(data => { setCharges(data); setFreeShipping(data.freeShipping ?? false); })
             .catch(() => setError('Failed to load delivery charges'))
             .finally(() => setLoading(false));
+
+        api.getPriceRanges()
+            .then(ranges => { if (ranges && ranges.length) setPriceRanges(ranges); })
+            .catch(() => {});
     }, []);
 
     const handleSave = async () => {
@@ -32,6 +45,31 @@ export const AdminSettings: React.FC = () => {
         } finally {
             setSaving(false);
         }
+    };
+
+    const handleSaveRanges = async () => {
+        setSavingRanges(true);
+        try {
+            await api.updatePriceRanges(priceRanges);
+            setSavedRanges(true);
+            setTimeout(() => setSavedRanges(false), 3000);
+        } catch (err: any) {
+            setError(err.message || 'Failed to save price ranges');
+        } finally {
+            setSavingRanges(false);
+        }
+    };
+
+    const addPriceRange = () => {
+        const min = Number(newRange.min);
+        const max = Number(newRange.max);
+        if (!newRange.label.trim() || isNaN(min) || isNaN(max)) return;
+        setPriceRanges(prev => [...prev, { label: newRange.label.trim(), min, max }]);
+        setNewRange({ label: '', min: '', max: '' });
+    };
+
+    const removePriceRange = (idx: number) => {
+        setPriceRanges(prev => prev.filter((_, i) => i !== idx));
     };
 
     const zones = [
@@ -181,8 +219,8 @@ export const AdminSettings: React.FC = () => {
                             </div>
                         )}
 
-                        {/* Save Button */}
-                        <div className="flex justify-end gap-3">
+                        {/* Save Delivery Button */}
+                        <div className="flex justify-end gap-3 mb-12">
                             {saved && (
                                 <div className="flex items-center gap-2 text-green-600 font-medium">
                                     <CheckCircle className="h-5 w-5" /> Saved successfully!
@@ -196,7 +234,98 @@ export const AdminSettings: React.FC = () => {
                                 {saving ? (
                                     <><RefreshCw className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
                                 ) : (
-                                    <><Save className="h-4 w-4 mr-2" /> Save Settings</>
+                                    <><Save className="h-4 w-4 mr-2" /> Save Delivery Settings</>
+                                )}
+                            </Button>
+                        </div>
+
+                        {/* ─── Price Range Editor ─── */}
+                        <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                            <Tag className="h-5 w-5 text-maroon" /> Collection Filter — Price Ranges
+                        </h2>
+                        <p className="text-sm text-gray-500 mb-4">
+                            These ranges appear in the Collections page filter sidebar. Customers use them to narrow by budget.
+                        </p>
+
+                        <Card className="mb-6 border-t-4 border-t-maroon">
+                            <CardHeader className="pb-2 bg-maroon/5">
+                                <CardTitle className="text-base text-maroon">Current Price Ranges</CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-4">
+                                {priceRanges.length === 0 ? (
+                                    <p className="text-gray-400 text-sm text-center py-4">No price ranges set. Add one below.</p>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {priceRanges.map((range, idx) => (
+                                            <div key={idx} className="flex items-center gap-3 bg-gray-50 border rounded-lg px-4 py-2">
+                                                <span className="flex-1 font-medium text-sm text-gray-800">{range.label}</span>
+                                                <span className="text-xs text-gray-500 bg-white border rounded px-2 py-0.5">₹{range.min.toLocaleString()} – {range.max >= 999999 ? '∞' : '₹' + range.max.toLocaleString()}</span>
+                                                <button
+                                                    onClick={() => removePriceRange(idx)}
+                                                    className="text-red-400 hover:text-red-600 transition-colors"
+                                                    title="Remove"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Add new range */}
+                                <div className="mt-4 border-t pt-4">
+                                    <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Add New Range</p>
+                                    <div className="grid grid-cols-3 gap-2 mb-2">
+                                        <Input
+                                            placeholder="Label e.g. Under ₹1,000"
+                                            value={newRange.label}
+                                            onChange={e => setNewRange(p => ({ ...p, label: e.target.value }))}
+                                            className="col-span-3 h-9 text-sm"
+                                        />
+                                        <Input
+                                            placeholder="Min ₹"
+                                            type="number"
+                                            min={0}
+                                            value={newRange.min}
+                                            onChange={e => setNewRange(p => ({ ...p, min: e.target.value }))}
+                                            className="h-9 text-sm"
+                                        />
+                                        <Input
+                                            placeholder="Max ₹"
+                                            type="number"
+                                            min={0}
+                                            value={newRange.max}
+                                            onChange={e => setNewRange(p => ({ ...p, max: e.target.value }))}
+                                            className="h-9 text-sm"
+                                        />
+                                        <Button
+                                            type="button"
+                                            onClick={addPriceRange}
+                                            className="bg-maroon hover:bg-maroon-dark text-beige h-9 text-sm"
+                                        >
+                                            <Plus className="h-4 w-4 mr-1" /> Add
+                                        </Button>
+                                    </div>
+                                    <p className="text-xs text-gray-400">For "Above ₹X", set Max to 999999</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <div className="flex justify-end gap-3">
+                            {savedRanges && (
+                                <div className="flex items-center gap-2 text-green-600 font-medium">
+                                    <CheckCircle className="h-5 w-5" /> Price ranges saved!
+                                </div>
+                            )}
+                            <Button
+                                onClick={handleSaveRanges}
+                                disabled={savingRanges || priceRanges.length === 0}
+                                className="bg-maroon hover:bg-maroon-dark text-beige px-8 py-3 text-base font-semibold"
+                            >
+                                {savingRanges ? (
+                                    <><RefreshCw className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
+                                ) : (
+                                    <><Save className="h-4 w-4 mr-2" /> Save Price Ranges</>
                                 )}
                             </Button>
                         </div>

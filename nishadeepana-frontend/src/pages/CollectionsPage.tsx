@@ -1,17 +1,20 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Filter, SlidersHorizontal, X, LayoutGrid, Grid3X3 } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { Button } from '../components/ui/button';
 import { useProducts } from '../contexts/ProductContext';
+import { useCategories } from '../contexts/CategoryContext';
 import { Badge } from '../components/ui/badge';
+import { api } from '../lib/api';
 
-const PRICE_RANGES = [
-    { label: 'All Prices', value: 'all' },
-    { label: 'Under ₹750', value: 'under-750' },
-    { label: '₹750 – ₹2,000', value: '750-2000' },
-    { label: '₹2,000 – ₹5,000', value: '2000-5000' },
-    { label: 'Above ₹5,000', value: 'above-5000' },
+// Default price ranges (used while loading from API)
+const DEFAULT_PRICE_RANGES = [
+    { label: 'Under ₹1,000', min: 0, max: 1000 },
+    { label: '₹1,000 – ₹2,500', min: 1000, max: 2500 },
+    { label: '₹2,500 – ₹5,000', min: 2500, max: 5000 },
+    { label: '₹5,000 – ₹10,000', min: 5000, max: 10000 },
+    { label: 'Above ₹10,000', min: 10000, max: 999999 },
 ];
 
 const SORT_OPTIONS = [
@@ -23,7 +26,16 @@ const SORT_OPTIONS = [
 
 export const CollectionsPage: React.FC = () => {
     const { products } = useProducts();
+    const { categories: adminCategories } = useCategories();
     const [searchParams, setSearchParams] = useSearchParams();
+    const [priceRanges, setPriceRanges] = useState(DEFAULT_PRICE_RANGES);
+
+    // Load admin price ranges from backend
+    useEffect(() => {
+        api.getPriceRanges().then(ranges => {
+            if (ranges && ranges.length > 0) setPriceRanges(ranges);
+        }).catch(() => {}); // silently fallback to defaults
+    }, []);
 
     // Read filter state exclusively from URL — single source of truth
     const selectedCategory = searchParams.get('category') ?? 'all';
@@ -34,11 +46,14 @@ export const CollectionsPage: React.FC = () => {
     // Grid toggle: 1 col = single/comfortable, 2 cols = compact grid (works on mobile & PC)
     const [gridCols, setGridCols] = React.useState<1 | 2>(2);
 
-    // Derive categories dynamically from actual product data (fixes category mismatch bug)
-    const categories = useMemo(() => {
-        const cats = Array.from(new Set(products.map(p => p.category))).sort();
-        return cats;
-    }, [products]);
+    // Categories for filter: use admin-managed if any exist, else derive from products
+    const productCategories = useMemo(() =>
+        Array.from(new Set(products.map(p => p.category))).sort(),
+        [products]
+    );
+    const categories = adminCategories.length > 0
+        ? adminCategories.map(c => c.name).sort()
+        : productCategories;
 
     // Write filter changes to URL params
     const setFilter = useCallback((key: string, value: string) => {
@@ -79,20 +94,13 @@ export const CollectionsPage: React.FC = () => {
             result = result.filter(s => s.category === selectedCategory);
         }
 
-        // Price filter
-        switch (priceRange) {
-            case 'under-750':
-                result = result.filter(s => s.price < 750);
-                break;
-            case '750-2000':
-                result = result.filter(s => s.price >= 750 && s.price < 2000);
-                break;
-            case '2000-5000':
-                result = result.filter(s => s.price >= 2000 && s.price < 5000);
-                break;
-            case 'above-5000':
-                result = result.filter(s => s.price >= 5000);
-                break;
+        // Price filter — uses dynamic ranges loaded from admin settings
+        if (priceRange !== 'all') {
+            const idx = parseInt(priceRange, 10);
+            const range = priceRanges[idx];
+            if (range) {
+                result = result.filter(s => s.price >= range.min && s.price < range.max);
+            }
         }
 
         // Sort
@@ -188,12 +196,19 @@ export const CollectionsPage: React.FC = () => {
                             <div className="mb-4">
                                 <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Price Range</h3>
                                 <div className="space-y-1">
-                                    {PRICE_RANGES.map(range => (
+                                    <button
+                                        onClick={() => setFilter('price', 'all')}
+                                        className={filterBtnCls(priceRange === 'all')}
+                                        aria-pressed={priceRange === 'all'}
+                                    >
+                                        All Prices
+                                    </button>
+                                    {priceRanges.map((range, idx) => (
                                         <button
-                                            key={range.value}
-                                            onClick={() => setFilter('price', range.value)}
-                                            className={filterBtnCls(priceRange === range.value)}
-                                            aria-pressed={priceRange === range.value}
+                                            key={idx}
+                                            onClick={() => setFilter('price', String(idx))}
+                                            className={filterBtnCls(priceRange === String(idx))}
+                                            aria-pressed={priceRange === String(idx)}
                                         >
                                             {range.label}
                                         </button>

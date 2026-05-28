@@ -74,4 +74,50 @@ router.put('/delivery', adminOnly, async (req, res) => {
     }
 });
 
+// Default price ranges for collection filter
+const DEFAULT_PRICE_RANGES = [
+    { label: 'Under ₹1,000', min: 0, max: 1000 },
+    { label: '₹1,000 - ₹2,500', min: 1000, max: 2500 },
+    { label: '₹2,500 - ₹5,000', min: 2500, max: 5000 },
+    { label: '₹5,000 - ₹10,000', min: 5000, max: 10000 },
+    { label: 'Above ₹10,000', min: 10000, max: 999999 },
+];
+
+async function getPriceRangesDoc() {
+    let doc = await Settings.findOne({ key: 'priceRanges' });
+    if (!doc) {
+        doc = await Settings.create({ key: 'priceRanges', value: DEFAULT_PRICE_RANGES });
+    }
+    return doc;
+}
+
+// GET /api/settings/price-ranges — public (used by collections page)
+router.get('/price-ranges', async (req, res) => {
+    try {
+        const doc = await getPriceRangesDoc();
+        res.json(doc.value);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// PUT /api/settings/price-ranges — admin only
+// Body: [{ label: string, min: number, max: number }, ...]
+router.put('/price-ranges', adminOnly, async (req, res) => {
+    try {
+        const ranges = req.body;
+        if (!Array.isArray(ranges) || ranges.length === 0) {
+            return res.status(400).json({ error: 'Provide an array of price ranges' });
+        }
+        const doc = await Settings.findOneAndUpdate(
+            { key: 'priceRanges' },
+            { value: ranges },
+            { upsert: true, new: true }
+        );
+        res.json({ message: 'Price ranges updated', value: doc.value });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 module.exports = router;

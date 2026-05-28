@@ -11,10 +11,10 @@ import heroImage from '../images/hero-saree.jpg';
 
 export const HomePage: React.FC = () => {
     const { products } = useProducts();
-    const { visibleCategories } = useCategories();
+    const { categories: allAdminCats, visibleCategories } = useCategories();
     const featuredSarees = products.filter(s => s.featured).slice(0, 6);
 
-    // If no admin categories set up yet, fall back to unique categories from products
+    // Auto-fallback from products — ONLY used when admin hasn't set up any categories yet
     const fallbackCategories = useMemo(() =>
         Array.from(new Set(products.map(p => p.category)))
             .filter(Boolean)
@@ -30,8 +30,9 @@ export const HomePage: React.FC = () => {
         [products]
     );
 
-    // Use admin-managed visible categories if available, otherwise fallback
-    const displayCategories = visibleCategories.length > 0 ? visibleCategories : fallbackCategories;
+    // If admin has added ANY category to the panel, respect only the visible ones.
+    // Fallback to product-derived only when the admin panel is completely empty.
+    const displayCategories = allAdminCats.length > 0 ? visibleCategories : fallbackCategories;
 
     return (
         <div className="min-h-screen">

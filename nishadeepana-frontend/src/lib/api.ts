@@ -100,4 +100,9 @@ export const api = {
     createCategory: (data: any) => apiFetch<any>('/api/categories', { method: 'POST', body: JSON.stringify(data) }),
     updateCategory: (id: string, data: any) => apiFetch<any>(`/api/categories/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     deleteCategory: (id: string) => apiFetch<any>(`/api/categories/${id}`, { method: 'DELETE' }),
+
+    // Price Ranges (admin-managed, used by collections filter)
+    getPriceRanges: () => apiFetch<{ label: string; min: number; max: number }[]>('/api/settings/price-ranges'),
+    updatePriceRanges: (ranges: { label: string; min: number; max: number }[]) =>
+        apiFetch<any>('/api/settings/price-ranges', { method: 'PUT', body: JSON.stringify(ranges) }),
 };
