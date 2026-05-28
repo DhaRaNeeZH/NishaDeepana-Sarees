@@ -288,7 +288,7 @@ export const CollectionsPage: React.FC = () => {
                                         onClick={() => setFilter('price', 'all')}
                                         role="listitem"
                                     >
-                                        {PRICE_RANGES.find(r => r.value === priceRange)?.label}
+                                        {priceRanges[parseInt(priceRange, 10)]?.label}
                                         <X className="h-3 w-3" />
                                     </Badge>
                                 )}
