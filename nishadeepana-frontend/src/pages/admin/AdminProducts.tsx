@@ -207,7 +207,7 @@ const ProductModal: React.FC<{
                             className="border-maroon/30 focus:border-maroon"
                         />
                         {form.image && (
-                            <img src={form.image} alt="preview" className="mt-2 h-24 w-24 object-cover rounded-lg border" />
+                            <img src={form.image} alt="preview" className="mt-2 h-24 w-24 object-contain bg-gray-50 rounded-lg border" />
                         )}
                     </div>
 
@@ -236,7 +236,7 @@ const ProductModal: React.FC<{
                             <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 mt-4">
                                 {form.images.map((img, idx) => (
                                     <div key={idx} className="relative aspect-square">
-                                        <img src={img} alt={`gallery-${idx}`} className="w-full h-full object-cover rounded-lg border border-maroon/20" />
+                                        <img src={img} alt={`gallery-${idx}`} className="w-full h-full object-contain bg-gray-50 rounded-lg border border-maroon/20" />
                                         <button
                                             type="button"
                                             onClick={() => removeAdditionalImage(idx)}
@@ -444,7 +444,7 @@ export const AdminProducts: React.FC = () => {
                                                         <img
                                                             src={saree.image}
                                                             alt={saree.name}
-                                                            className="h-14 w-14 rounded-lg object-cover border-2 border-gold/30"
+                                                            className="h-14 w-14 rounded-lg object-contain bg-gray-50 border-2 border-gold/30"
                                                         />
                                                         {saree.featured && (
                                                             <div className="absolute -top-1 -right-1 bg-gold text-white text-xs px-1 rounded-full font-bold">★</div>

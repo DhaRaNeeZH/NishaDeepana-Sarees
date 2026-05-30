@@ -38,7 +38,6 @@ router.post('/', upload.single('image'), async (req, res) => {
             const stream = cloudinary.uploader.upload_stream(
                 {
                     folder: 'nishadeepana-sarees',
-                    transformation: [{ width: 800, crop: 'limit', quality: 'auto' }],
                 },
                 (error, result) => {
                     if (error) reject(error);

@@ -31,7 +31,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ saree }) => {
                     <img
                         src={saree.image}
                         alt={saree.name}
-                        className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'
+                        className={`w-full h-full object-contain bg-gray-50 group-hover:scale-105 transition-transform duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'
                             }`}
                         onLoad={() => setImageLoaded(true)}
                         loading="lazy"

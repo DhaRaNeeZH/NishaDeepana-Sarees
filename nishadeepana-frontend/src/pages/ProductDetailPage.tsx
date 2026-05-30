@@ -39,7 +39,7 @@ export const ProductDetailPage: React.FC = () => {
         .filter(s => s.category === saree.category && s.id !== saree.id)
         .slice(0, 4);
 
-    const images = saree.images && saree.images.length > 0 ? saree.images : [saree.image];
+    const images = saree.images && saree.images.length > 0 ? [saree.image, ...saree.images] : [saree.image];
 
     // Calculate pricing using new pricing engine
     const basePrice = saree.price;
@@ -77,7 +77,7 @@ export const ProductDetailPage: React.FC = () => {
                             <img
                                 src={images[selectedImage]}
                                 alt={saree.name}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-contain bg-gray-50"
                             />
                             {images.length > 1 && (
                                 <>
@@ -105,7 +105,7 @@ export const ProductDetailPage: React.FC = () => {
                                         className={`aspect-square rounded-md overflow-hidden border-2 ${selectedImage === idx ? 'border-maroon' : 'border-transparent'
                                             }`}
                                     >
-                                        <img src={img} alt={`${saree.name} ${idx + 1}`} className="w-full h-full object-cover" />
+                                        <img src={img} alt={`${saree.name} ${idx + 1}`} className="w-full h-full object-contain bg-gray-50" />
                                     </button>
                                 ))}
                             </div>
