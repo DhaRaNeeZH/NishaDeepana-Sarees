@@ -19,6 +19,7 @@ interface ProductForm {
     originalPrice: string;
     freeDelivery: boolean;
     image: string;
+    images: string[];
     description: string;
     featured: boolean;
     madeToOrder: boolean;
@@ -27,7 +28,7 @@ interface ProductForm {
 const EMPTY_FORM: ProductForm = {
     name: '', sareeType: '', category: '', fabric: '',
     color: '', price: '', originalPrice: '', freeDelivery: false,
-    image: '', description: '',
+    image: '', images: [], description: '',
     featured: false, madeToOrder: false,
 };
 
@@ -49,6 +50,7 @@ const ProductModal: React.FC<{
             originalPrice: String(product.originalPrice ?? ''),
             freeDelivery: product.freeDelivery ?? false,
             image: product.image ?? '',
+            images: product.images ?? [],
             description: product.description ?? '',
             featured: product.featured ?? false,
             madeToOrder: product.madeToOrder ?? false,
@@ -72,6 +74,29 @@ const ProductModal: React.FC<{
         } finally {
             setUploading(false);
         }
+    };
+
+    const handleAdditionalImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        setError('');
+        try {
+            const result = await api.uploadImage(file);
+            setForm(prev => ({ ...prev, images: [...prev.images, result.url] }));
+        } catch (err: any) {
+            setError(err.message || 'Additional image upload failed');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const removeAdditionalImage = (index: number) => {
+        setForm(prev => {
+            const newImages = [...prev.images];
+            newImages.splice(index, 1);
+            return { ...prev, images: newImages };
+        });
     };
 
     const handleChange = (field: keyof ProductForm, value: string | boolean) => {
@@ -183,6 +208,46 @@ const ProductModal: React.FC<{
                         />
                         {form.image && (
                             <img src={form.image} alt="preview" className="mt-2 h-24 w-24 object-cover rounded-lg border" />
+                        )}
+                    </div>
+
+                    {/* Additional Images (Gallery) */}
+                    <div>
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Additional Images (Gallery)</label>
+                        <div className="flex gap-2 mb-2">
+                            <input
+                                id="additional-image-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleAdditionalImageUpload}
+                                className="hidden"
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="flex items-center gap-2 border-maroon/40 text-maroon hover:bg-maroon/5"
+                                onClick={() => document.getElementById('additional-image-upload')?.click()}
+                                disabled={uploading}
+                            >
+                                <Upload className="h-4 w-4" /> Upload Additional Photo
+                            </Button>
+                        </div>
+                        {form.images.length > 0 && (
+                            <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 mt-4">
+                                {form.images.map((img, idx) => (
+                                    <div key={idx} className="relative aspect-square">
+                                        <img src={img} alt={`gallery-${idx}`} className="w-full h-full object-cover rounded-lg border border-maroon/20" />
+                                        <button
+                                            type="button"
+                                            onClick={() => removeAdditionalImage(idx)}
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 shadow-md transition-colors"
+                                            title="Remove image"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         )}
                     </div>
 
