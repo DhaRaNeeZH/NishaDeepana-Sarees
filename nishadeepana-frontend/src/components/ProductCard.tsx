@@ -74,6 +74,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ saree }) => {
                         {saree.name}
                     </h3>
                 </Link>
+                <div className="text-[11px] text-gray-500 mb-1 sm:hidden">
+                    {saree.fabric}
+                </div>
                 <div className="hidden sm:flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
                     <span className="font-medium text-maroon">{saree.sareeType}</span>
                     <span>•</span>
