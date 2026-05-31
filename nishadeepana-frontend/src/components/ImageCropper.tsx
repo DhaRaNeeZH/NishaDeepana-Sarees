@@ -146,7 +146,7 @@ export const ImageCropper: React.FC<CropperProps> = ({
                         onTouchEnd={stopDrag}
                         onWheel={(e) => {
                             e.preventDefault();
-                            setScale(s => Math.max(0.2, Math.min(5, s - e.deltaY * 0.001)));
+                            setScale(s => Math.max(0.2, Math.min(5, s - e.deltaY * 0.0002)));
                         }}
                     >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -179,7 +179,7 @@ export const ImageCropper: React.FC<CropperProps> = ({
                             type="range"
                             min="0.2"
                             max="4"
-                            step="0.05"
+                            step="0.01"
                             value={scale}
                             onChange={e => setScale(parseFloat(e.target.value))}
                             className="w-36 accent-maroon"
