@@ -70,7 +70,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ saree }) => {
 
             <CardContent className="p-3 sm:p-4">
                 <Link to={`/product/${saree.id}`}>
-                    <h3 className="font-semibold text-sm sm:text-lg mb-0.5 sm:mb-1 line-clamp-1 hover:text-primary transition-colors">
+                    <h3 className="font-semibold text-sm sm:text-lg mb-0.5 sm:mb-1 line-clamp-2 hover:text-primary transition-colors">
                         {saree.name}
                     </h3>
                 </Link>

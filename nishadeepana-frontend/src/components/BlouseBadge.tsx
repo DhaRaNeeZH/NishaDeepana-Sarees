@@ -25,7 +25,7 @@ export const BlouseBadge: React.FC<BlouseBadgeProps> = ({ blouseType, className 
                 };
             case 'both':
                 return {
-                    text: compact ? '🧵✨ Both' : '🧵✨ Running + Contrast Blouse',
+                    text: compact ? '🧵✨ Running + Contrast' : '🧵✨ Running + Contrast Blouse',
                     variant: 'default' as const,
                     className: 'bg-gradient-to-r from-maroon to-gold text-white hover:opacity-90 border-0',
                 };
