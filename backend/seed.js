@@ -102,7 +102,7 @@ const products = [
         price: 2600, category: 'Cotton', sareeType: 'Madurai Sungudi Cotton', fabric: 'Sungudi Cotton',
         color: 'Maroon, Gold Dots',
         image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800',
-        featured: false, inStock: true, madeToOrder: false, blouseIncluded: 'matching',
+        featured: false, inStock: true, madeToOrder: false, blouseIncluded: 'both',
     },
     {
         name: 'Chettinad Cotton Saree - Pure Tradition',

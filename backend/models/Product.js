@@ -9,7 +9,7 @@ const productSchema = new mongoose.Schema({
     sareeType: { type: String, required: true },
     fabric: { type: String, required: true },
     color: { type: String, default: '' },
-    blouseIncluded: { type: String, enum: ['running', 'contrast', 'matching', 'none'], default: 'running' },
+    blouseIncluded: { type: String, enum: ['running', 'contrast', 'both', 'none'], default: 'running' },
     image: { type: String, required: true },
     images: { type: [String], default: [] },
     description: { type: String, default: '' },
