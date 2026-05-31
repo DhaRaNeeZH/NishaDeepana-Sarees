@@ -45,6 +45,8 @@ export const CollectionsPage: React.FC = () => {
     const [showFilters, setShowFilters] = React.useState(false);
     // Grid toggle: 1 col = single/comfortable, 2 cols = compact grid (works on mobile & PC)
     const [gridCols, setGridCols] = React.useState<1 | 2>(2);
+    // Load-more pagination
+    const [visibleCount, setVisibleCount] = React.useState(24);
 
     // Categories for filter: use admin-managed if any exist, else derive from products
     const productCategories = useMemo(() =>
@@ -70,6 +72,7 @@ export const CollectionsPage: React.FC = () => {
 
     const clearAllFilters = useCallback(() => {
         setSearchParams({}, { replace: true });
+        setVisibleCount(24);
     }, [setSearchParams]);
 
     // Apply filters
@@ -123,6 +126,14 @@ export const CollectionsPage: React.FC = () => {
     }, [products, selectedCategory, priceRange, sortBy, searchText]);
 
     const hasActiveFilters = selectedCategory !== 'all' || priceRange !== 'all' || searchText !== '';
+
+    // Reset visible count when filters change
+    React.useEffect(() => {
+        setVisibleCount(24);
+    }, [selectedCategory, priceRange, sortBy, searchText]);
+
+    const visibleSarees = filteredSarees.slice(0, visibleCount);
+    const hasMore = visibleCount < filteredSarees.length;
 
     const filterBtnCls = (active: boolean) =>
         `block w-full text-left px-3 py-2 rounded-md text-sm transition-colors font-medium ${active
@@ -297,15 +308,27 @@ export const CollectionsPage: React.FC = () => {
 
                         {/* Products */}
                         {filteredSarees.length > 0 ? (
-                            <div className={`grid gap-4 ${
-                                gridCols === 1
-                                    ? 'grid-cols-1'
-                                    : 'grid-cols-2 sm:grid-cols-2 xl:grid-cols-2'
-                            }`}>
-                                {filteredSarees.map(saree => (
-                                    <ProductCard key={saree.id} saree={saree} />
-                                ))}
-                            </div>
+                            <>
+                                <div className={`grid gap-4 ${
+                                    gridCols === 1
+                                        ? 'grid-cols-1'
+                                        : 'grid-cols-2 sm:grid-cols-2 xl:grid-cols-2'
+                                }`}>
+                                    {visibleSarees.map(saree => (
+                                        <ProductCard key={saree.id} saree={saree} />
+                                    ))}
+                                </div>
+                                {hasMore && (
+                                    <div className="text-center mt-10">
+                                        <button
+                                            onClick={() => setVisibleCount(v => v + 24)}
+                                            className="px-8 py-3 border-2 border-maroon text-maroon font-semibold rounded-full hover:bg-maroon hover:text-beige transition-colors"
+                                        >
+                                            Load More ({filteredSarees.length - visibleCount} remaining)
+                                        </button>
+                                    </div>
+                                )}
+                            </>
                         ) : (
                             <div className="text-center py-20">
                                 <p className="text-gray-400 text-6xl mb-4">🔍</p>

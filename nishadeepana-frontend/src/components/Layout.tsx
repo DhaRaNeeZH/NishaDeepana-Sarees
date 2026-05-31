@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
+import { MobileBottomNav } from './MobileBottomNav';
 
 // ── WhatsApp Floating Button ──────────────────────────────────────
 const WHATSAPP_NUMBER = '919500384237'; // +91 95003 84237
@@ -14,7 +15,7 @@ const WhatsAppButton: React.FC = () => (
         rel="noopener noreferrer"
         aria-label="Chat with us on WhatsApp"
         title="Chat with us on WhatsApp"
-        className="fixed bottom-6 right-6 z-50 group"
+        className="fixed bottom-20 right-4 z-50 group md:bottom-6 md:right-6"
     >
         <div className="relative flex items-center justify-center w-14 h-14 rounded-full shadow-lg bg-[#25D366] hover:bg-[#1ebe5d] transition-colors">
             {/* Pulse ring */}
@@ -35,11 +36,12 @@ export const Layout: React.FC = () => {
     return (
         <div className="min-h-screen flex flex-col">
             <Navbar />
-            <main className="flex-grow">
+            <main className="flex-grow pb-16 md:pb-0">
                 <Outlet />
             </main>
             <Footer />
             <WhatsAppButton />
+            <MobileBottomNav />
         </div>
     );
 };

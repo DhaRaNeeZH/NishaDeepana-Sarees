@@ -32,132 +32,22 @@ export const Navbar: React.FC = () => {
         setIsMenuOpen(false);
     };
 
-
-
     return (
-        <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b shadow-sm">
-            <div className="w-full px-8 xl:px-16">
-                <div className="flex justify-between items-center h-16">
-                    {/* Logo */}
-                    <Link to="/" className="flex items-center space-x-2">
-                        <div className="text-xl md:text-2xl font-serif font-bold">
-                            <span className="text-maroon">NishaDeepana</span>
-                            {' '}
-                            <span className="text-gold">Sarees</span>
-                        </div>
-                    </Link>
-
-                    {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center space-x-8">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.path}
-                                to={link.path}
-                                className={`text-sm font-medium transition-colors hover:text-maroon ${isActive(link.path)
-                                    ? 'text-maroon'
-                                    : 'text-gray-700'
-                                    }`}
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
-                    </div>
-
-
-                    {/* Right side actions */}
-                    <div className="flex items-center space-x-2 md:space-x-4">
-                        {/* User authentication */}
-                        {isAuthenticated ? (
-                            <div className="hidden md:flex items-center space-x-2">
-                                <span className="text-sm text-gray-700">
-                                    {user?.name}
-                                </span>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={handleLogout}
-                                    className="border-maroon text-maroon hover:bg-maroon hover:text-beige"
-                                >
-                                    <LogOut className="h-4 w-4 mr-1" />
-                                    Logout
-                                </Button>
+        <>
+            <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b shadow-sm">
+                <div className="w-full px-4 sm:px-8 xl:px-16">
+                    <div className="flex justify-between items-center h-16">
+                        {/* Logo */}
+                        <Link to="/" className="flex items-center space-x-2">
+                            <div className="text-xl md:text-2xl font-serif font-bold">
+                                <span className="text-maroon">NishaDeepana</span>
+                                {' '}
+                                <span className="text-gold">Sarees</span>
                             </div>
-                        ) : (
-                            <Link to="/login" className="hidden md:block">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="border-maroon text-maroon hover:bg-maroon hover:text-beige"
-                                >
-                                    <LogIn className="h-4 w-4 mr-1" />
-                                    Login
-                                </Button>
-                            </Link>
-                        )}
-
-                        {/* Admin Panel button — only for admins */}
-                        {isAdmin && (
-                            <Link to="/admin" className="hidden md:block">
-                                <Button
-                                    size="sm"
-                                    className="bg-gold hover:bg-gold-dark text-maroon font-semibold"
-                                >
-                                    <LayoutDashboard className="h-4 w-4 mr-1" />
-                                    Admin Panel
-                                </Button>
-                            </Link>
-                        )}
-
-
-                        {/* Profile link */}
-                        <Link to="/profile" className="hidden md:block">
-                            <Button variant="ghost" size="icon" className="hover:bg-maroon-light/10" title="My Profile">
-                                <UserIcon className="h-5 w-5 text-maroon" />
-                            </Button>
                         </Link>
 
-                        {/* Wishlist */}
-                        <Link to="/wishlist" className="relative hidden md:block">
-                            <Button variant="ghost" size="icon" className="hover:bg-red-50">
-                                <Heart className={`h-5 w-5 ${wishlistCount > 0 ? 'fill-red-500 text-red-500' : 'text-maroon'}`} />
-                                {wishlistCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
-                                        {wishlistCount}
-                                    </span>
-                                )}
-                            </Button>
-                        </Link>
-
-                        {/* Cart */}
-                        <Link to="/cart" className="relative">
-                            <Button variant="ghost" size="icon" className="hover:bg-gold-light/20">
-                                <ShoppingCart className="h-5 w-5 text-maroon" />
-                                {cartItemCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-maroon text-beige text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
-                                        {cartItemCount}
-                                    </span>
-                                )}
-                            </Button>
-                        </Link>
-
-                        {/* Mobile menu button */}
-                        <button
-                            className="md:hidden p-2 text-maroon"
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        >
-                            {isMenuOpen ? (
-                                <X className="h-6 w-6" />
-                            ) : (
-                                <Menu className="h-6 w-6" />
-                            )}
-                        </button>
-                    </div>
-                </div>
-
-                {/* Mobile Navigation */}
-                {isMenuOpen && (
-                    <div className="md:hidden py-4 border-t">
-                        <div className="flex flex-col space-y-4">
+                        {/* Desktop Navigation */}
+                        <div className="hidden md:flex items-center space-x-8">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.path}
@@ -166,44 +56,172 @@ export const Navbar: React.FC = () => {
                                         ? 'text-maroon'
                                         : 'text-gray-700'
                                         }`}
-                                    onClick={() => setIsMenuOpen(false)}
                                 >
                                     {link.label}
                                 </Link>
                             ))}
-                            {isAuthenticated && (
-                                <>
-                                    <Link
-                                        to="/my-orders"
-                                        className="text-sm font-medium text-gray-700 hover:text-maroon"
-                                        onClick={() => setIsMenuOpen(false)}
+                        </div>
+
+                        {/* Right side actions */}
+                        <div className="flex items-center space-x-2 md:space-x-4">
+                            {/* User authentication */}
+                            {isAuthenticated ? (
+                                <div className="hidden md:flex items-center space-x-2">
+                                    <span className="text-sm text-gray-700">
+                                        {user?.name}
+                                    </span>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleLogout}
+                                        className="border-maroon text-maroon hover:bg-maroon hover:text-beige"
                                     >
-                                        My Orders
-                                    </Link>
-                                    <Link
-                                        to="/wishlist"
-                                        className="text-sm font-medium text-gray-700 hover:text-maroon"
-                                        onClick={() => setIsMenuOpen(false)}
+                                        <LogOut className="h-4 w-4 mr-1" />
+                                        Logout
+                                    </Button>
+                                </div>
+                            ) : (
+                                <Link to="/login" className="hidden md:block">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="border-maroon text-maroon hover:bg-maroon hover:text-beige"
                                     >
-                                        Wishlist {wishlistCount > 0 ? `(${wishlistCount})` : ''}
-                                    </Link>
-                                </>
-                            )}
-                            {isAdmin && (
-                                <Link
-                                    to="/admin"
-                                    className="text-sm font-semibold text-gold-dark hover:text-maroon flex items-center gap-1"
-                                    onClick={() => setIsMenuOpen(false)}
-                                >
-                                    <LayoutDashboard className="h-4 w-4" />
-                                    Admin Panel
+                                        <LogIn className="h-4 w-4 mr-1" />
+                                        Login
+                                    </Button>
                                 </Link>
                             )}
+
+                            {/* Admin Panel button — only for admins */}
+                            {isAdmin && (
+                                <Link to="/admin" className="hidden md:block">
+                                    <Button
+                                        size="sm"
+                                        className="bg-gold hover:bg-gold-dark text-maroon font-semibold"
+                                    >
+                                        <LayoutDashboard className="h-4 w-4 mr-1" />
+                                        Admin Panel
+                                    </Button>
+                                </Link>
+                            )}
+
+                            {/* Profile link */}
+                            <Link to="/profile" className="hidden md:block">
+                                <Button variant="ghost" size="icon" className="hover:bg-maroon-light/10" title="My Profile">
+                                    <UserIcon className="h-5 w-5 text-maroon" />
+                                </Button>
+                            </Link>
+
+                            {/* Wishlist */}
+                            <Link to="/wishlist" className="relative hidden md:block">
+                                <Button variant="ghost" size="icon" className="hover:bg-red-50">
+                                    <Heart className={`h-5 w-5 ${wishlistCount > 0 ? 'fill-red-500 text-red-500' : 'text-maroon'}`} />
+                                    {wishlistCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                                            {wishlistCount}
+                                        </span>
+                                    )}
+                                </Button>
+                            </Link>
+
+                            {/* Cart */}
+                            <Link to="/cart" className="relative">
+                                <Button variant="ghost" size="icon" className="hover:bg-gold-light/20">
+                                    <ShoppingCart className="h-5 w-5 text-maroon" />
+                                    {cartItemCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-maroon text-beige text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                                            {cartItemCount}
+                                        </span>
+                                    )}
+                                </Button>
+                            </Link>
+
+                            {/* Mobile menu button */}
+                            <button
+                                className="md:hidden p-2 text-maroon"
+                                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                aria-label="Open menu"
+                            >
+                                <Menu className="h-6 w-6" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            {/* Mobile Left-Slide Drawer Overlay */}
+            {isMenuOpen && (
+                <div className="fixed inset-0 z-[60] flex md:hidden">
+                    {/* Backdrop */}
+                    <div
+                        className="absolute inset-0 bg-black/50"
+                        onClick={() => setIsMenuOpen(false)}
+                    />
+                    {/* Drawer */}
+                    <div className="relative w-72 max-w-[85vw] h-full bg-white shadow-2xl flex flex-col animate-slide-in-left">
+                        {/* Drawer Header */}
+                        <div className="flex items-center justify-between p-5 border-b bg-gradient-to-r from-maroon/5 to-gold/5">
+                            <div className="text-lg font-serif font-bold">
+                                <span className="text-maroon">NishaDeepana</span>{' '}
+                                <span className="text-gold">Sarees</span>
+                            </div>
+                            <button
+                                onClick={() => setIsMenuOpen(false)}
+                                className="p-1 rounded-full hover:bg-gray-100 text-gray-500"
+                                aria-label="Close menu"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        {/* Nav Links */}
+                        <div className="flex-1 overflow-y-auto py-4 px-4">
+                            <div className="space-y-1">
+                                {navLinks.map((link) => (
+                                    <Link
+                                        key={link.path}
+                                        to={link.path}
+                                        className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive(link.path)
+                                            ? 'bg-maroon text-white'
+                                            : 'text-gray-700 hover:bg-maroon/10 hover:text-maroon'
+                                            }`}
+                                        onClick={() => setIsMenuOpen(false)}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ))}
+
+                                {isAuthenticated && (
+                                    <>
+                                        <Link
+                                            to="/my-orders"
+                                            className="flex items-center px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-maroon/10 hover:text-maroon transition-colors"
+                                            onClick={() => setIsMenuOpen(false)}
+                                        >
+                                            My Orders
+                                        </Link>
+                                    </>
+                                )}
+
+                                {isAdmin && (
+                                    <Link
+                                        to="/admin"
+                                        className="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold text-gold-dark hover:bg-gold/10 transition-colors"
+                                        onClick={() => setIsMenuOpen(false)}
+                                    >
+                                        <LayoutDashboard className="h-4 w-4" />
+                                        Admin Panel
+                                    </Link>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Drawer Footer — Login/Logout */}
+                        <div className="p-4 border-t">
                             {isAuthenticated ? (
                                 <>
-                                    <div className="text-sm text-gray-600">
-                                        Logged in as: {user?.name}
-                                    </div>
+                                    <p className="text-xs text-gray-500 mb-3">Logged in as: <span className="font-medium text-gray-700">{user?.name}</span></p>
                                     <Button
                                         variant="outline"
                                         size="sm"
@@ -228,8 +246,8 @@ export const Navbar: React.FC = () => {
                             )}
                         </div>
                     </div>
-                )}
-            </div>
-        </nav>
+                </div>
+            )}
+        </>
     );
 };

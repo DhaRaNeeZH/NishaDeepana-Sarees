@@ -6,7 +6,6 @@ import { Card, CardContent } from '../components/ui/card';
 import { ProductCard } from '../components/ProductCard';
 import { useProducts } from '../contexts/ProductContext';
 import { useCategories } from '../contexts/CategoryContext';
-import { testimonials } from '../data/testimonials';
 import heroImage from '../images/hero-saree.jpg';
 
 export const HomePage: React.FC = () => {
@@ -104,7 +103,7 @@ export const HomePage: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                         {[
                             { icon: Shield, title: 'Authentic Products', desc: '100% genuine handloom & silk sarees' },
-                            { icon: Package, title: 'Fast Delivery', desc: 'Shipped within 2-3 business days' },
+                            { icon: Package, title: 'Reliable Delivery', desc: 'Carefully packed and shipped across India' },
                             { icon: TrendingUp, title: 'Bulk Orders', desc: 'Special wholesale pricing available' },
                             { icon: Star, title: 'Premium Quality', desc: 'Handpicked for excellence' },
                         ].map((feature, idx) => (
@@ -178,40 +177,6 @@ export const HomePage: React.FC = () => {
                                 <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
                         </Link>
-                    </div>
-                </div>
-            </section>
-
-            {/* Testimonials */}
-            <section className="py-16 bg-gradient-to-br from-maroon/5 to-beige-light">
-                <div className="w-full px-8 xl:px-16">
-                    <div className="text-center mb-12">
-                        <h2 className="text-4xl font-bold mb-4">What Our Customers Say</h2>
-                        <p className="text-gray-600">Trusted by thousands of satisfied customers</p>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {testimonials.slice(0, 3).map((testimonial) => (
-                            <Card key={testimonial.id} className="hover:shadow-lg transition-shadow">
-                                <CardContent className="pt-6">
-                                    <div className="flex items-center mb-4">
-                                        <img
-                                            src={testimonial.image}
-                                            alt={testimonial.name}
-                                            className="w-12 h-12 rounded-full mr-4"
-                                        />
-                                        <div>
-                                            <h4 className="font-semibold">{testimonial.name}</h4>
-                                            <div className="flex">
-                                                {[...Array(testimonial.rating)].map((_, i) => (
-                                                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p className="text-gray-600 text-sm italic">"{testimonial.comment}"</p>
-                                </CardContent>
-                            </Card>
-                        ))}
                     </div>
                 </div>
             </section>

@@ -11,7 +11,6 @@ import { ProductCard } from '../components/ProductCard';
 import { BlouseBadge } from '../components/BlouseBadge';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
-import { Input } from '../components/ui/input';
 
 export const ProductDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -179,13 +178,25 @@ export const ProductDetailPage: React.FC = () => {
                         <div className="mb-6">
                             <label className="block text-sm font-medium mb-2">Quantity</label>
                             <div className="flex items-center gap-4">
-                                <Input
-                                    type="number"
-                                    min="1"
-                                    value={quantity}
-                                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                                    className="w-32 h-12 border-maroon/30 focus:border-maroon text-center font-semibold"
-                                />
+                                <div className="flex items-center border border-maroon/30 rounded-lg overflow-hidden">
+                                    <button
+                                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                        className="px-4 py-3 text-maroon hover:bg-maroon hover:text-beige transition-colors font-bold text-lg select-none"
+                                        aria-label="Decrease quantity"
+                                    >
+                                        −
+                                    </button>
+                                    <span className="px-5 py-3 font-semibold text-lg min-w-[3rem] text-center border-x border-maroon/30">
+                                        {quantity}
+                                    </span>
+                                    <button
+                                        onClick={() => setQuantity(quantity + 1)}
+                                        className="px-4 py-3 text-maroon hover:bg-maroon hover:text-beige transition-colors font-bold text-lg select-none"
+                                        aria-label="Increase quantity"
+                                    >
+                                        +
+                                    </button>
+                                </div>
                                 {discountPercentage > 0 && (
                                     <Badge className="bg-green-100 text-green-800 border-green-300">
                                         {discountPercentage}% Bulk Discount Applied!
@@ -279,10 +290,10 @@ export const ProductDetailPage: React.FC = () => {
                         <div className="grid grid-cols-1 gap-4">
                             <Card className="border-maroon-light/30">
                                 <CardContent className="flex items-center p-4">
-                                    <Package className="h-8 w-8 text-maroon mr-4" />
+                                    <Package className="h-8 w-8 text-maroon mr-4 flex-shrink-0" />
                                     <div>
-                                        <h4 className="font-semibold">Easy Returns</h4>
-                                        <p className="text-sm text-gray-600">7-day return policy</p>
+                                        <h4 className="font-semibold">Return Policy</h4>
+                                        <p className="text-sm text-gray-600">Returns accepted only for damaged items with unboxing video proof.</p>
                                     </div>
                                 </CardContent>
                             </Card>

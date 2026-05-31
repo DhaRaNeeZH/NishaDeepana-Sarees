@@ -41,7 +41,9 @@ export const CheckoutPage: React.FC = () => {
     const [errors, setErrors] = useState<Partial<FormData>>({});
     const [isProcessing, setIsProcessing] = useState(false);
     const [apiError, setApiError] = useState('');
-    const [deliveryCharges, setDeliveryCharges] = useState<DeliveryCharges>({ tamilnadu: 50, nearby: 80, others: 100 });
+    const [deliveryCharges, setDeliveryCharges] = useState<DeliveryCharges>({ tamilnadu: 50, nearby: 80, others: 50 });
+    const [returnPolicyAccepted, setReturnPolicyAccepted] = useState(false);
+    const [returnPolicyError, setReturnPolicyError] = useState(false);
     const [freeShipping, setFreeShipping] = useState(false);
 
     // Fetch delivery charges from backend on mount
@@ -121,6 +123,13 @@ export const CheckoutPage: React.FC = () => {
 
     const handleRazorpay = async () => {
         if (!validate()) return;
+        if (!returnPolicyAccepted) {
+            setReturnPolicyError(true);
+            const el = document.getElementById('return-policy-checkbox');
+            el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+        setReturnPolicyError(false);
         setIsProcessing(true);
         setApiError('');
         try {
@@ -397,6 +406,26 @@ export const CheckoutPage: React.FC = () => {
                                         {apiError}
                                     </div>
                                 )}
+
+                                {/* Return Policy — mandatory checkbox */}
+                                <div id="return-policy-checkbox" className={`rounded-xl border p-4 ${returnPolicyError ? 'border-red-400 bg-red-50' : 'border-amber-300 bg-amber-50'}`}>
+                                    <label className="flex items-start gap-3 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={returnPolicyAccepted}
+                                            onChange={e => { setReturnPolicyAccepted(e.target.checked); setReturnPolicyError(false); }}
+                                            className="mt-1 w-4 h-4 accent-maroon flex-shrink-0"
+                                        />
+                                        <span className="text-xs text-gray-700 leading-relaxed">
+                                            <span className="font-semibold text-maroon">I agree to the Return Policy:</span>{' '}
+                                            Returns are accepted <strong>only if the product is damaged</strong>. A{' '}
+                                            <strong>video proof of the package being opened</strong> must be provided to process any return. No other returns will be accepted.
+                                        </span>
+                                    </label>
+                                    {returnPolicyError && (
+                                        <p className="text-red-600 text-xs mt-2 font-medium">⚠️ Please accept the return policy to continue.</p>
+                                    )}
+                                </div>
 
                                 <Button
                                     size="lg"
