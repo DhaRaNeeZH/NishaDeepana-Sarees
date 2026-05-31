@@ -22,11 +22,11 @@ export const BlouseBadge: React.FC<BlouseBadgeProps> = ({ blouseType, className 
                     variant: 'secondary' as const,
                     className: 'bg-gold text-maroon hover:bg-gold-dark',
                 };
-            case 'matching':
+            case 'both':
                 return {
-                    text: '🎨 Matching Kalamkari Blouse',
+                    text: '🧵✨ Running + Contrast Blouse',
                     variant: 'default' as const,
-                    className: 'bg-gold-dark text-white hover:bg-gold',
+                    className: 'bg-gradient-to-r from-maroon to-gold text-white hover:opacity-90 border-0',
                 };
             case 'none':
                 return {

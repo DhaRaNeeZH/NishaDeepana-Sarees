@@ -1,5 +1,5 @@
 // Blouse type enum
-export type BlouseType = 'running' | 'contrast' | 'matching' | 'none';
+export type BlouseType = 'running' | 'contrast' | 'both' | 'none';
 
 export interface Saree {
     id: string;

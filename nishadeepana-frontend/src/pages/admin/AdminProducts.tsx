@@ -201,7 +201,7 @@ const ProductModal: React.FC<{
                                 <option value="none">No Blouse</option>
                                 <option value="running">Running Blouse</option>
                                 <option value="contrast">Contrast Blouse</option>
-                                <option value="matching">Matching Blouse</option>
+                                <option value="both">Both (Running + Contrast)</option>
                             </select>
                         </div>
                     </div>
