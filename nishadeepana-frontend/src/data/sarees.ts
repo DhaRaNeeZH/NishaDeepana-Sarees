@@ -211,7 +211,7 @@ export const sarees: Saree[] = [
         ],
         featured: false,
         madeToOrder: true,
-        blouseIncluded: 'matching',
+        blouseIncluded: 'both',
     },
     {
         id: '13',
