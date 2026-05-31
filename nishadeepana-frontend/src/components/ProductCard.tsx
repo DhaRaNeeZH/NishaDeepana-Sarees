@@ -68,21 +68,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ saree }) => {
                 </div>
             </Link>
 
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
                 <Link to={`/product/${saree.id}`}>
                     <h3 className="font-semibold text-sm sm:text-lg mb-0.5 sm:mb-1 line-clamp-1 hover:text-primary transition-colors">
                         {saree.name}
                     </h3>
                 </Link>
-                <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
+                <div className="hidden sm:flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
                     <span className="font-medium text-maroon">{saree.sareeType}</span>
                     <span>•</span>
                     <span className="truncate">{saree.fabric}</span>
                 </div>
                 <div className="mb-2">
-                    <BlouseBadge blouseType={saree.blouseIncluded} className="text-[9px] sm:text-xs px-1.5 py-0.5" />
+                    <BlouseBadge blouseType={saree.blouseIncluded} compact className="text-[9px] sm:text-xs px-1.5 py-0.5" />
                 </div>
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-2 sm:mb-4">
                     <span className="text-xl font-bold text-maroon">{formatCurrency(saree.price)}</span>
                     {saree.originalPrice && saree.originalPrice > saree.price && (
                         <span className="text-sm text-gray-400 line-through font-medium leading-none mt-1">
@@ -91,16 +91,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ saree }) => {
                     )}
                 </div>
                 <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">{saree.color}</span>
+                    <span className="text-[11px] sm:text-sm text-gray-500">{saree.color}</span>
                 </div>
             </CardContent>
 
-            <CardFooter className="p-4 pt-0">
+            <CardFooter className="p-3 pt-0 sm:p-4 sm:pt-0">
                 <Button
-                    className="w-full group/btn bg-maroon hover:bg-maroon-dark text-beige"
+                    className="w-full group/btn bg-maroon hover:bg-maroon-dark text-beige text-xs sm:text-sm py-1.5 sm:py-2"
                     onClick={handleAddToCart}
                 >
-                    <ShoppingCart className="h-4 w-4 mr-2 group-hover/btn:animate-bounce" />
+                    <ShoppingCart className="h-3.5 w-3.5 mr-1.5 sm:h-4 sm:w-4 sm:mr-2 group-hover/btn:animate-bounce" />
                     Add to Cart
                 </Button>
             </CardFooter>

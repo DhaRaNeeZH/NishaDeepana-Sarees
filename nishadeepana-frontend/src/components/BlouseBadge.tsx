@@ -5,32 +5,33 @@ import { BlouseType } from '../lib/types';
 interface BlouseBadgeProps {
     blouseType: BlouseType;
     className?: string;
+    compact?: boolean;
 }
 
-export const BlouseBadge: React.FC<BlouseBadgeProps> = ({ blouseType, className = '' }) => {
+export const BlouseBadge: React.FC<BlouseBadgeProps> = ({ blouseType, className = '', compact = false }) => {
     const getBadgeConfig = (type: BlouseType) => {
         switch (type) {
             case 'running':
                 return {
-                    text: '🧵 Running Blouse',
+                    text: compact ? '🧵 Running' : '🧵 Running Blouse',
                     variant: 'default' as const,
                     className: 'bg-maroon text-beige hover:bg-maroon-dark',
                 };
             case 'contrast':
                 return {
-                    text: '✨ Contrast Blouse',
+                    text: compact ? '✨ Contrast' : '✨ Contrast Blouse',
                     variant: 'secondary' as const,
                     className: 'bg-gold text-maroon hover:bg-gold-dark',
                 };
             case 'both':
                 return {
-                    text: '🧵✨ Running + Contrast Blouse',
+                    text: compact ? '🧵✨ Both' : '🧵✨ Running + Contrast Blouse',
                     variant: 'default' as const,
                     className: 'bg-gradient-to-r from-maroon to-gold text-white hover:opacity-90 border-0',
                 };
             case 'none':
                 return {
-                    text: '⚠️ No Blouse',
+                    text: compact ? '⚠️ None' : '⚠️ No Blouse',
                     variant: 'outline' as const,
                     className: 'border-gray-400 text-gray-600',
                 };
