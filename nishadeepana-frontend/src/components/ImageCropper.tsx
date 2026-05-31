@@ -146,7 +146,7 @@ export const ImageCropper: React.FC<CropperProps> = ({
                         onTouchEnd={stopDrag}
                         onWheel={(e) => {
                             e.preventDefault();
-                            setScale(s => Math.max(0.2, Math.min(5, s - e.deltaY * 0.0002)));
+                            setScale(s => Math.max(0.01, Math.min(5, s - e.deltaY * 0.0002)));
                         }}
                     >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -169,7 +169,7 @@ export const ImageCropper: React.FC<CropperProps> = ({
                     {/* Zoom controls */}
                     <div className="flex items-center gap-3">
                         <button
-                            onClick={() => setScale(s => Math.max(0.2, s - 0.1))}
+                            onClick={() => setScale(s => Math.max(0.01, s - 0.1))}
                             className="p-2 border rounded-lg hover:bg-gray-50 text-maroon"
                             title="Zoom out"
                         >
@@ -177,7 +177,7 @@ export const ImageCropper: React.FC<CropperProps> = ({
                         </button>
                         <input
                             type="range"
-                            min="0.2"
+                            min="0.01"
                             max="4"
                             step="0.01"
                             value={scale}
