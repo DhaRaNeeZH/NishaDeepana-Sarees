@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, Plus, Edit, Trash2, Filter, X, Save, Upload } from 'lucide-react';
+import { ImageCropper } from '../../components/ImageCropper';
 import { formatCurrency } from '../../lib/utils';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -60,32 +61,42 @@ const ProductModal: React.FC<{
     const [uploading, setUploading] = React.useState(false);
     const [error, setError] = React.useState('');
     const fileInputRef = React.useRef<HTMLInputElement>(null);
+    // Cropper state
+    const [cropperFile, setCropperFile] = React.useState<File | null>(null);
+    const [cropperTarget, setCropperTarget] = React.useState<'main' | 'gallery'>('main');
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        setUploading(true);
-        setError('');
-        try {
-            const result = await api.uploadImage(file);
-            setForm(prev => ({ ...prev, image: result.url }));
-        } catch (err: any) {
-            setError(err.message || 'Image upload failed');
-        } finally {
-            setUploading(false);
-        }
+        // Show cropper first
+        setCropperTarget('main');
+        setCropperFile(file);
+        // Reset input so same file can be selected again
+        e.target.value = '';
     };
 
-    const handleAdditionalImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleAdditionalImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+        setCropperTarget('gallery');
+        setCropperFile(file);
+        e.target.value = '';
+    };
+
+    const handleCropped = async (blob: Blob) => {
+        setCropperFile(null);
         setUploading(true);
         setError('');
         try {
-            const result = await api.uploadImage(file);
-            setForm(prev => ({ ...prev, images: [...prev.images, result.url] }));
+            const croppedFile = new File([blob], 'saree.jpg', { type: 'image/jpeg' });
+            const result = await api.uploadImage(croppedFile);
+            if (cropperTarget === 'main') {
+                setForm(prev => ({ ...prev, image: result.url }));
+            } else {
+                setForm(prev => ({ ...prev, images: [...prev.images, result.url] }));
+            }
         } catch (err: any) {
-            setError(err.message || 'Additional image upload failed');
+            setError(err.message || 'Upload failed after crop');
         } finally {
             setUploading(false);
         }
@@ -144,6 +155,15 @@ const ProductModal: React.FC<{
     );
 
     return (
+        <>
+        {/* Cropper Modal */}
+        {cropperFile && (
+            <ImageCropper
+                imageFile={cropperFile}
+                onCropped={handleCropped}
+                onCancel={() => setCropperFile(null)}
+            />
+        )}
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center p-6 border-b bg-gradient-to-r from-maroon/5 to-gold/5">
@@ -315,6 +335,7 @@ const ProductModal: React.FC<{
                 </div>
             </div>
         </div>
+        </>
     );
 };
 
