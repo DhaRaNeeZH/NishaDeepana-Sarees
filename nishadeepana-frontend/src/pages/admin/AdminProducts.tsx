@@ -24,6 +24,7 @@ interface ProductForm {
     description: string;
     featured: boolean;
     madeToOrder: boolean;
+    blouseIncluded: string;
 }
 
 const EMPTY_FORM: ProductForm = {
@@ -31,6 +32,7 @@ const EMPTY_FORM: ProductForm = {
     color: '', price: '', originalPrice: '', freeDelivery: false,
     image: '', images: [], description: '',
     featured: false, madeToOrder: false,
+    blouseIncluded: 'none',
 };
 
 // ── Edit / Add Modal ────────────────────────────────────────────────
@@ -55,6 +57,7 @@ const ProductModal: React.FC<{
             description: product.description ?? '',
             featured: product.featured ?? false,
             madeToOrder: product.madeToOrder ?? false,
+            blouseIncluded: product.blouseIncluded ?? 'none',
         } : EMPTY_FORM
     );
     const [saving, setSaving] = React.useState(false);
@@ -188,6 +191,19 @@ const ProductModal: React.FC<{
                         {field('Color', 'color', 'text', 'e.g. Red, Gold')}
                         {field('Selling Price (₹)', 'price', 'number', 'e.g. 1500')}
                         {field('Original Price (MRP ₹) - Optional', 'originalPrice', 'number', 'e.g. 1800')}
+                        <div>
+                            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Blouse Type</label>
+                            <select
+                                value={form.blouseIncluded}
+                                onChange={e => handleChange('blouseIncluded', e.target.value)}
+                                className="w-full border border-maroon/30 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-maroon bg-white h-10"
+                            >
+                                <option value="none">No Blouse</option>
+                                <option value="running">Running Blouse</option>
+                                <option value="contrast">Contrast Blouse</option>
+                                <option value="matching">Matching Blouse</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div>
