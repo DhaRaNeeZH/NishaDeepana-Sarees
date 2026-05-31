@@ -38,11 +38,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ saree }) => {
                     />
 
                     {/* Badges */}
-                    <div className="absolute top-1.5 left-1.5 flex flex-col gap-1">
+                    <div className="absolute top-1.5 left-1.5 flex flex-col items-start gap-1">
                         {saree.featured && (
                             <Badge className="bg-primary text-white text-[9px] sm:text-xs px-1.5 py-0.5">Featured</Badge>
                         )}
-                        <BlouseBadge blouseType={saree.blouseIncluded} className="text-[9px] sm:text-xs px-1.5 py-0.5" />
                     </div>
 
                     {/* Like button */}
@@ -79,6 +78,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ saree }) => {
                     <span className="font-medium text-maroon">{saree.sareeType}</span>
                     <span>•</span>
                     <span className="truncate">{saree.fabric}</span>
+                </div>
+                <div className="mb-2">
+                    <BlouseBadge blouseType={saree.blouseIncluded} className="text-[9px] sm:text-xs px-1.5 py-0.5" />
                 </div>
                 <div className="flex items-center gap-2 mb-4">
                     <span className="text-xl font-bold text-maroon">{formatCurrency(saree.price)}</span>
