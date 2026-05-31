@@ -143,7 +143,7 @@ export const ProductDetailPage: React.FC = () => {
                             </div>
                         </div>
 
-                        <p className="text-gray-700 mb-6 leading-relaxed">{saree.description}</p>
+                        <p className="text-gray-700 mb-6 leading-relaxed whitespace-pre-wrap">{saree.description}</p>
 
                         <div className="grid grid-cols-2 gap-4 mb-6">
                             <div>
