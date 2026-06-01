@@ -164,7 +164,12 @@ export const ProductDetailPage: React.FC = () => {
                             </div>
                             <div>
                                 <span className="text-sm text-gray-600">Blouse Included</span>
-                                <p className="font-semibold capitalize">{saree.blouseIncluded === 'none' ? 'No Blouse' : `${saree.blouseIncluded} Blouse`}</p>
+                                <p className="font-semibold">
+                                    {saree.blouseIncluded === 'running' && 'Running Blouse'}
+                                    {saree.blouseIncluded === 'contrast' && 'Contrast Blouse'}
+                                    {saree.blouseIncluded === 'both' && 'Running + Contrast Blouse'}
+                                    {saree.blouseIncluded === 'none' && 'No Blouse'}
+                                </p>
                             </div>
                             <div>
                                 <span className="text-sm text-gray-600">Availability</span>

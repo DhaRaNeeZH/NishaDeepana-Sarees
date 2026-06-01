@@ -83,7 +83,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ saree }) => {
                     <span className="truncate">{saree.fabric}</span>
                 </div>
                 <div className="mb-2">
-                    <BlouseBadge blouseType={saree.blouseIncluded} compact className="text-[9px] sm:text-xs px-1.5 py-0.5" />
+                    <BlouseBadge blouseType={saree.blouseIncluded} className="text-[9px] sm:text-xs px-1.5 py-0.5" />
                 </div>
                 <div className="flex items-center gap-2 mb-2 sm:mb-4">
                     <span className="text-xl font-bold text-maroon">{formatCurrency(saree.price)}</span>
