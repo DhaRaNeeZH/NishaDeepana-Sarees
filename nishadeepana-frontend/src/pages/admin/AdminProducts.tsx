@@ -27,22 +27,10 @@ interface ProductForm {
     blouseIncluded: string;
 }
 
-const DEFAULT_DESCRIPTION = `✨ South Cotton Mix Applique Work Saree ✨
-
-🌸 South Cotton Mix Applique Saree with self-colour blouse and handblock printing.
-
-🌿 Saree comes with an additional contrast-colour printed blouse.
-
-🧵 Material: Cotton Mix
-✂️ Extra Blouse: 80cm
-🧼 Wash Care: Gentle Normal Wash
-
-📸 Note: Due to mobile photography, colors may vary slightly. No exchange for slight color variations.`;
-
 const EMPTY_FORM: ProductForm = {
     name: '', sareeType: '', category: '', fabric: '',
     color: '', price: '', originalPrice: '', freeDelivery: false,
-    image: '', images: [], description: DEFAULT_DESCRIPTION,
+    image: '', images: [], description: '',
     featured: false, madeToOrder: false,
     blouseIncluded: 'none',
 };
