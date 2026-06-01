@@ -28,7 +28,9 @@ export const AdminDashboard: React.FC = () => {
 
     // ── Stats computed from real data
     const totalOrders = orders.length;
-    const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
+    const totalRevenue = orders
+        .filter(o => o.status !== 'cancelled' && o.status !== 'refunded')
+        .reduce((sum, o) => sum + (o.total || 0), 0);
     const pendingOrders = orders.filter(o => o.status === 'pending' || o.status === 'processing').length;
     const totalProducts = products.length;
 
