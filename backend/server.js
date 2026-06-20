@@ -123,6 +123,51 @@ app.use('/api/settings', require('./routes/settings'));
 // Categories (admin-managed, drives home page + collection filter)
 app.use('/api/categories', require('./routes/categories'));
 
+// ── Dynamic Sitemap ───────────────────────────────────────────
+app.get('/sitemap.xml', async (req, res) => {
+    try {
+        const Product = require('./models/Product');
+        const products = await Product.find({}, '_id updatedAt').lean();
+
+        const staticPages = [
+            { url: '/', priority: '1.0', changefreq: 'daily' },
+            { url: '/collections', priority: '0.9', changefreq: 'daily' },
+            { url: '/wholesale', priority: '0.8', changefreq: 'weekly' },
+            { url: '/about', priority: '0.7', changefreq: 'monthly' },
+            { url: '/contact', priority: '0.7', changefreq: 'monthly' },
+            { url: '/track-order', priority: '0.6', changefreq: 'monthly' },
+        ];
+
+        const productUrls = products.map(p => ({
+            url: `/product/${p._id}`,
+            priority: '0.8',
+            changefreq: 'weekly',
+            lastmod: p.updatedAt ? new Date(p.updatedAt).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+        }));
+
+        const today = new Date().toISOString().slice(0, 10);
+        const allUrls = [
+            ...staticPages.map(p => ({ ...p, lastmod: today })),
+            ...productUrls,
+        ];
+
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${allUrls.map(p => `  <url>
+    <loc>https://nishadeepanasarees.in${p.url}</loc>
+    <lastmod>${p.lastmod}</lastmod>
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+
+        res.header('Content-Type', 'application/xml');
+        res.send(xml);
+    } catch (err) {
+        res.status(500).send('Error generating sitemap');
+    }
+});
+
 
 // 404 handler
 app.use('*', (req, res) => {
