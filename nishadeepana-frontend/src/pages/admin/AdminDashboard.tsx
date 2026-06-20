@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import {
     Package, ShoppingCart, TrendingUp, ArrowUpRight, ArrowDownRight,
-    Plus, FileText, Bell, Settings, DollarSign, BarChart3, RefreshCw
+    Plus, FileText, Bell, Settings, DollarSign, BarChart3, RefreshCw, CalendarDays
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
@@ -10,6 +10,9 @@ import { Button } from '../../components/ui/button';
 import { useProducts } from '../../contexts/ProductContext';
 import { api } from '../../lib/api';
 import { formatCurrency } from '../../lib/utils';
+import {
+    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from 'recharts';
 
 export const AdminDashboard: React.FC = () => {
     const { products } = useProducts();
@@ -36,6 +39,37 @@ export const AdminDashboard: React.FC = () => {
 
     // Unique customers
     const uniqueCustomers = new Set(orders.map(o => o.email)).size;
+
+    // ── Daily Revenue — last 30 days (excludes cancelled/refunded)
+    const activeOrders = orders.filter(o => o.status !== 'cancelled' && o.status !== 'refunded');
+
+    const dailyRevenueMap: Record<string, { revenue: number; orders: number }> = {};
+    const today = new Date();
+    for (let i = 29; i >= 0; i--) {
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
+        const key = d.toISOString().slice(0, 10); // YYYY-MM-DD
+        dailyRevenueMap[key] = { revenue: 0, orders: 0 };
+    }
+    activeOrders.forEach(o => {
+        if (!o.createdAt) return;
+        const key = new Date(o.createdAt).toISOString().slice(0, 10);
+        if (dailyRevenueMap[key]) {
+            dailyRevenueMap[key].revenue += o.total || 0;
+            dailyRevenueMap[key].orders += 1;
+        }
+    });
+    const dailyChartData = Object.entries(dailyRevenueMap).map(([date, val]) => ({
+        date,
+        label: new Date(date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
+        revenue: val.revenue,
+        orders: val.orders,
+    }));
+    const todayKey = today.toISOString().slice(0, 10);
+    const todayRevenue = dailyRevenueMap[todayKey]?.revenue || 0;
+    const todayOrders = dailyRevenueMap[todayKey]?.orders || 0;
+    // Table rows — only dates that had at least 1 order, newest first
+    const revenueTableRows = [...dailyChartData].reverse().filter(d => d.orders > 0);
 
     const stats = [
         {
@@ -253,6 +287,105 @@ export const AdminDashboard: React.FC = () => {
                         </Card>
                     </div>
                 </div>
+
+                {/* ── Daily Revenue Analytics ─────────────────────────── */}
+                <Card className="mt-8 border-t-4 border-t-maroon">
+                    <CardHeader className="bg-gradient-to-r from-maroon/5 to-gold/5">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <CardTitle className="flex items-center text-maroon">
+                                <CalendarDays className="h-5 w-5 mr-2" />
+                                Daily Revenue — Last 30 Days
+                            </CardTitle>
+                            <div className="flex items-center gap-4">
+                                <div className="text-center">
+                                    <p className="text-xs text-gray-500">Today's Revenue</p>
+                                    <p className="text-xl font-bold text-maroon">{formatCurrency(todayRevenue)}</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-xs text-gray-500">Today's Orders</p>
+                                    <p className="text-xl font-bold text-yellow-600">{todayOrders}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="pt-4">
+                        {loading ? (
+                            <div className="h-64 flex items-center justify-center">
+                                <p className="text-gray-400">Loading chart...</p>
+                            </div>
+                        ) : (
+                            <>
+                                {/* Bar Chart */}
+                                <div className="w-full h-64 mb-6">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={dailyChartData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#f0e6d3" />
+                                            <XAxis
+                                                dataKey="label"
+                                                tick={{ fontSize: 10, fill: '#6b7280' }}
+                                                interval={4}
+                                                tickLine={false}
+                                            />
+                                            <YAxis
+                                                tick={{ fontSize: 10, fill: '#6b7280' }}
+                                                tickFormatter={(v) => v === 0 ? '₹0' : `₹${(v / 1000).toFixed(0)}k`}
+                                                tickLine={false}
+                                                axisLine={false}
+                                            />
+                                            <Tooltip
+                                                formatter={(value) => [formatCurrency(Number(value) || 0), 'Revenue']}
+                                                labelFormatter={(label) => `Date: ${label}`}
+                                                contentStyle={{
+                                                    background: '#fff',
+                                                    border: '1px solid #800000',
+                                                    borderRadius: '8px',
+                                                    fontSize: '12px',
+                                                }}
+                                            />
+                                            <Bar
+                                                dataKey="revenue"
+                                                fill="#800000"
+                                                radius={[4, 4, 0, 0]}
+                                                maxBarSize={32}
+                                            />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+
+                                {/* Daily History Table */}
+                                {revenueTableRows.length === 0 ? (
+                                    <p className="text-center text-gray-400 text-sm py-4">No revenue recorded in the last 30 days.</p>
+                                ) : (
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr className="border-b-2 border-maroon/20">
+                                                    <th className="text-left py-2 px-3 text-gray-600 font-semibold">Date</th>
+                                                    <th className="text-center py-2 px-3 text-gray-600 font-semibold">Orders</th>
+                                                    <th className="text-right py-2 px-3 text-gray-600 font-semibold">Revenue</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {revenueTableRows.map((row) => (
+                                                    <tr key={row.date} className={`border-b border-gray-100 hover:bg-maroon/5 transition-colors ${row.date === todayKey ? 'bg-gold/10 font-semibold' : ''}`}>
+                                                        <td className="py-2 px-3 text-gray-700">
+                                                            {new Date(row.date).toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}
+                                                            {row.date === todayKey && <span className="ml-2 text-[10px] bg-maroon text-white px-1.5 py-0.5 rounded-full">TODAY</span>}
+                                                        </td>
+                                                        <td className="py-2 px-3 text-center">
+                                                            <Badge variant="secondary" className="bg-gold/20 text-yellow-700">{row.orders}</Badge>
+                                                        </td>
+                                                        <td className="py-2 px-3 text-right font-bold text-maroon">{formatCurrency(row.revenue)}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </>
+                        )}
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );
