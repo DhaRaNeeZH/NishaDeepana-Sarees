@@ -17,6 +17,7 @@ export interface Saree {
     featured: boolean;
     madeToOrder: boolean;
     blouseIncluded: BlouseType; // What blouse comes with the saree
+    createdAt?: string; // Used for Newest/Oldest sort
 }
 
 export interface CartItem extends Saree {
