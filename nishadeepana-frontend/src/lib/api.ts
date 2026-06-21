@@ -37,6 +37,7 @@ export const api = {
     // Products
     getProducts: () => apiFetch<any[]>('/api/products'),
     getProduct: (id: string) => apiFetch<any>(`/api/products/${id}`),
+    getBestSellingIds: () => apiFetch<{ productId: string; count: number }[]>('/api/products/best-selling-ids'),
     createProduct: (data: any) => apiFetch<any>('/api/products', { method: 'POST', body: JSON.stringify(data) }),
     updateProduct: (id: string, data: any) => apiFetch<any>(`/api/products/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     deleteProduct: (id: string) => apiFetch<any>(`/api/products/${id}`, { method: 'DELETE' }),

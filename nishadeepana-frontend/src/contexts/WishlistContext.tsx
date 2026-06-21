@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
+import { useProducts } from './ProductContext';
 import { api } from '../lib/api';
 
 const STORAGE_KEY = 'nd_wishlist_v1';
@@ -22,6 +23,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         return [];
     });
     const { user, isAuthenticated } = useAuth();
+    const { products } = useProducts();
     const prevAuthRef = useRef(isAuthenticated);
 
     // Load wishlist from backend when user logs in, clear when logs out
@@ -41,6 +43,18 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         }
         prevAuthRef.current = isAuthenticated;
     }, [isAuthenticated, user?.email]);
+
+    // Bug fix: Remove wishlist items whose products were deleted from admin
+    useEffect(() => {
+        if (products.length === 0) return; // Don't run until products have loaded
+        const existingIds = new Set(products.map(p => p.id));
+        setWishlist(prev => {
+            const cleaned = prev.filter(id => existingIds.has(id));
+            // Only update if something was actually removed
+            if (cleaned.length !== prev.length) return cleaned;
+            return prev;
+        });
+    }, [products]);
 
     // Save wishlist to localStorage + backend whenever it changes
     useEffect(() => {
