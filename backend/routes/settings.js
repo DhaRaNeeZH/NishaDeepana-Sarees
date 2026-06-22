@@ -22,13 +22,6 @@ async function getDeliveryDoc() {
     let doc = await Settings.findOne({ key: 'deliveryCharge' });
     if (!doc) {
         doc = await Settings.create({ key: 'deliveryCharge', value: DEFAULT_DELIVERY });
-    } else if (doc.value && doc.value.others === 100) {
-        // Migrate old default of 100 → new default of 50
-        doc = await Settings.findOneAndUpdate(
-            { key: 'deliveryCharge' },
-            { value: { ...doc.value, others: 50 } },
-            { new: true }
-        );
     }
     return doc;
 }

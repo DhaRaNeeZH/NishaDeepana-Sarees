@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CreditCard, CheckCircle, ArrowLeft } from 'lucide-react';
+import { CreditCard, CheckCircle, ArrowLeft, ChevronDown } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -45,6 +45,8 @@ export const CheckoutPage: React.FC = () => {
     const [returnPolicyAccepted, setReturnPolicyAccepted] = useState(false);
     const [returnPolicyError, setReturnPolicyError] = useState(false);
     const [freeShipping, setFreeShipping] = useState(false);
+    const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
+    const stateDropdownRef = useRef<HTMLDivElement>(null);
 
     // Fetch delivery charges from backend on mount
     useEffect(() => {
@@ -52,6 +54,17 @@ export const CheckoutPage: React.FC = () => {
             setDeliveryCharges(data);
             setFreeShipping(!!(data as any).freeShipping);
         }).catch(() => { });
+    }, []);
+
+    // Close state dropdown when clicking outside
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (stateDropdownRef.current && !stateDropdownRef.current.contains(e.target as Node)) {
+                setStateDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
     }, []);
 
     const allItemsFreeDelivery = items.length > 0 && items.every(item => item.product.freeDelivery);
@@ -323,64 +336,59 @@ export const CheckoutPage: React.FC = () => {
                                 {field('street', 'Street Address', 'text', '123 MG Road')}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {field('city', 'City', 'text', 'Chennai')}
-                                    <div>
+                                    <div ref={stateDropdownRef} className="relative">
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             State <span className="text-red-500">*</span>
                                         </label>
-                                        <select
-                                            value={form.state}
-                                            onChange={(e) => setForm({ ...form, state: e.target.value })}
-                                            className={`w-full px-3 py-3 border rounded-xl text-sm bg-gray-50 focus:bg-white outline-none transition-all
-                                                ${errors.state
-                                                    ? 'border-red-400 focus:border-red-400 focus:ring-2 focus:ring-red-400/10'
-                                                    : 'border-gray-200 focus:border-maroon focus:ring-2 focus:ring-maroon/10'
-                                                }`}
+                                        {/* Custom State Dropdown — same style as sort, works great on mobile */}
+                                        <button
+                                            type="button"
+                                            onClick={() => setStateDropdownOpen(v => !v)}
+                                            className={`w-full flex items-center justify-between px-3 py-3 border rounded-xl text-sm bg-gray-50 hover:bg-white transition-all outline-none ${
+                                                errors.state
+                                                    ? 'border-red-400'
+                                                    : stateDropdownOpen
+                                                        ? 'border-maroon ring-2 ring-maroon/10 bg-white'
+                                                        : 'border-gray-200'
+                                            }`}
+                                            aria-haspopup="listbox"
+                                            aria-expanded={stateDropdownOpen}
                                         >
-                                            <option value="">-- Select State --</option>
-                                            <optgroup label="Tamil Nadu (₹50)">
-                                                <option value="Tamil Nadu">Tamil Nadu</option>
-                                                <option value="Puducherry">Puducherry</option>
-                                            </optgroup>
-                                            <optgroup label="Neighbouring States (₹80)">
-                                                <option value="Andhra Pradesh">Andhra Pradesh</option>
-                                                <option value="Karnataka">Karnataka</option>
-                                                <option value="Kerala">Kerala</option>
-                                            </optgroup>
-                                            <optgroup label="Other States (₹100)">
-                                                <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
-                                                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
-                                                <option value="Assam">Assam</option>
-                                                <option value="Bihar">Bihar</option>
-                                                <option value="Chandigarh">Chandigarh</option>
-                                                <option value="Chhattisgarh">Chhattisgarh</option>
-                                                <option value="Dadra and Nagar Haveli and Daman and Diu">Dadra and Nagar Haveli and Daman and Diu</option>
-                                                <option value="Delhi">Delhi</option>
-                                                <option value="Goa">Goa</option>
-                                                <option value="Gujarat">Gujarat</option>
-                                                <option value="Haryana">Haryana</option>
-                                                <option value="Himachal Pradesh">Himachal Pradesh</option>
-                                                <option value="Jammu and Kashmir">Jammu and Kashmir</option>
-                                                <option value="Jharkhand">Jharkhand</option>
-                                                <option value="Ladakh">Ladakh</option>
-                                                <option value="Lakshadweep">Lakshadweep</option>
-                                                <option value="Madhya Pradesh">Madhya Pradesh</option>
-                                                <option value="Maharashtra">Maharashtra</option>
-                                                <option value="Manipur">Manipur</option>
-                                                <option value="Meghalaya">Meghalaya</option>
-                                                <option value="Mizoram">Mizoram</option>
-                                                <option value="Nagaland">Nagaland</option>
-                                                <option value="Odisha">Odisha</option>
-                                                <option value="Puducherry">Puducherry</option>
-                                                <option value="Punjab">Punjab</option>
-                                                <option value="Rajasthan">Rajasthan</option>
-                                                <option value="Sikkim">Sikkim</option>
-                                                <option value="Telangana">Telangana</option>
-                                                <option value="Tripura">Tripura</option>
-                                                <option value="Uttar Pradesh">Uttar Pradesh</option>
-                                                <option value="Uttarakhand">Uttarakhand</option>
-                                                <option value="West Bengal">West Bengal</option>
-                                            </optgroup>
-                                        </select>
+                                            <span className={form.state ? 'text-gray-800' : 'text-gray-400'}>
+                                                {form.state || '-- Select State --'}
+                                            </span>
+                                            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform flex-shrink-0 ${stateDropdownOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+
+                                        {stateDropdownOpen && (
+                                            <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden max-h-64 overflow-y-auto">
+                                                {[
+                                                    { group: '🏠 Tamil Nadu Zone', states: ['Tamil Nadu', 'Puducherry'] },
+                                                    { group: '🗺️ Neighbouring States', states: ['Andhra Pradesh', 'Karnataka', 'Kerala'] },
+                                                    { group: '🇮🇳 Other States', states: ['Andaman and Nicobar Islands','Arunachal Pradesh','Assam','Bihar','Chandigarh','Chhattisgarh','Dadra and Nagar Haveli and Daman and Diu','Delhi','Goa','Gujarat','Haryana','Himachal Pradesh','Jammu and Kashmir','Jharkhand','Ladakh','Lakshadweep','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'] },
+                                                ].map(({ group, states }) => (
+                                                    <div key={group}>
+                                                        <div className="px-3 py-1.5 text-xs font-semibold text-gray-400 bg-gray-50 border-b border-gray-100 sticky top-0">{group}</div>
+                                                        {states.map(s => (
+                                                            <button
+                                                                key={s}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setForm(prev => ({ ...prev, state: s }));
+                                                                    setStateDropdownOpen(false);
+                                                                }}
+                                                                className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-maroon/5 border-b border-gray-50 last:border-0 ${
+                                                                    form.state === s ? 'bg-maroon/10 text-maroon font-medium' : 'text-gray-700'
+                                                                }`}
+                                                            >
+                                                                {s}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+
                                         {errors.state && (
                                             <p className="text-red-500 text-xs mt-1">{errors.state}</p>
                                         )}
