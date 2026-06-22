@@ -407,6 +407,12 @@ export const CheckoutPage: React.FC = () => {
                                     </div>
                                 )}
 
+                                {/* T&C Note */}
+                                <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-xs text-gray-700 leading-relaxed">
+                                    <p className="font-semibold text-blue-800 mb-1">📋 Please note before placing your order:</p>
+                                    <p>🎨 Saree colors may appear slightly different due to photography, lighting, and screen settings — this is completely normal. Returns or exchanges are accepted only for damaged or defective products. A video proof of the package being opened must be provided to process any return.</p>
+                                </div>
+
                                 {/* Return Policy — mandatory checkbox */}
                                 <div id="return-policy-checkbox" className={`rounded-xl border p-4 ${returnPolicyError ? 'border-red-400 bg-red-50' : 'border-amber-300 bg-amber-50'}`}>
                                     <label className="flex items-start gap-3 cursor-pointer">
