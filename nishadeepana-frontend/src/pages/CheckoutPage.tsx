@@ -363,9 +363,9 @@ export const CheckoutPage: React.FC = () => {
                                         {stateDropdownOpen && (
                                             <div className="absolute left-0 right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden max-h-64 overflow-y-auto">
                                                 {[
-                                                    { group: '🏠 Tamil Nadu Zone', states: ['Tamil Nadu', 'Puducherry'] },
-                                                    { group: '🗺️ Neighbouring States', states: ['Andhra Pradesh', 'Karnataka', 'Kerala'] },
-                                                    { group: '🇮🇳 Other States', states: ['Andaman and Nicobar Islands','Arunachal Pradesh','Assam','Bihar','Chandigarh','Chhattisgarh','Dadra and Nagar Haveli and Daman and Diu','Delhi','Goa','Gujarat','Haryana','Himachal Pradesh','Jammu and Kashmir','Jharkhand','Ladakh','Lakshadweep','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'] },
+                                                    { group: `🏠 Tamil Nadu Zone — ₹${deliveryCharges.tamilnadu}`, states: ['Tamil Nadu', 'Puducherry'] },
+                                                    { group: `🗺️ Neighbouring States — ₹${deliveryCharges.nearby}`, states: ['Andhra Pradesh', 'Karnataka', 'Kerala'] },
+                                                    { group: `🇮🇳 Other States — ₹${deliveryCharges.others}`, states: ['Andaman and Nicobar Islands','Arunachal Pradesh','Assam','Bihar','Chandigarh','Chhattisgarh','Dadra and Nagar Haveli and Daman and Diu','Delhi','Goa','Gujarat','Haryana','Himachal Pradesh','Jammu and Kashmir','Jharkhand','Ladakh','Lakshadweep','Madhya Pradesh','Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'] },
                                                 ].map(({ group, states }) => (
                                                     <div key={group}>
                                                         <div className="px-3 py-1.5 text-xs font-semibold text-gray-400 bg-gray-50 border-b border-gray-100 sticky top-0">{group}</div>
