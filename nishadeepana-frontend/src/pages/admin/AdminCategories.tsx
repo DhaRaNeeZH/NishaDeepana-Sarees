@@ -240,91 +240,93 @@ export const AdminCategories: React.FC = () => {
                                         {categories.map(cat => (
                                             <div
                                                 key={cat._id}
-                                                className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${cat.visible ? 'border-maroon/20 bg-white' : 'border-gray-100 bg-gray-50 opacity-60'}`}
+                                                className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-4 rounded-xl border-2 transition-all ${cat.visible ? 'border-maroon/20 bg-white' : 'border-gray-100 bg-gray-50 opacity-60'}`}
                                             >
-                                                {/* Drag handle visual */}
-                                                <GripVertical className="h-5 w-5 text-gray-300 flex-shrink-0" />
+                                                <div className="flex items-center gap-3 w-full sm:w-auto flex-1 min-w-0">
+                                                    {/* Drag handle visual */}
+                                                    <GripVertical className="h-5 w-5 text-gray-300 flex-shrink-0 hidden sm:block" />
 
-                                                {/* Image */}
-                                                <div className="flex-shrink-0">
-                                                    {cat.image ? (
-                                                        <img
-                                                            src={cat.image}
-                                                            alt={cat.name}
-                                                            className="w-14 h-14 object-cover rounded-lg border"
-                                                            onError={e => { e.currentTarget.src = ''; e.currentTarget.style.display = 'none'; }}
-                                                        />
-                                                    ) : (
-                                                        <div className="w-14 h-14 bg-maroon/10 rounded-lg flex items-center justify-center">
-                                                            <Image className="h-6 w-6 text-maroon/30" />
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                    {/* Image */}
+                                                    <div className="flex-shrink-0">
+                                                        {cat.image ? (
+                                                            <img
+                                                                src={cat.image}
+                                                                alt={cat.name}
+                                                                className="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-lg border"
+                                                                onError={e => { e.currentTarget.src = ''; e.currentTarget.style.display = 'none'; }}
+                                                            />
+                                                        ) : (
+                                                            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-maroon/10 rounded-lg flex items-center justify-center">
+                                                                <Image className="h-5 w-5 sm:h-6 sm:w-6 text-maroon/30" />
+                                                            </div>
+                                                        )}
+                                                    </div>
 
-                                                {/* Details / Edit */}
-                                                <div className="flex-1 min-w-0">
-                                                    {editId === cat._id ? (
-                                                        <div className="space-y-2">
-                                                            <Input
-                                                                value={editForm.name}
-                                                                onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))}
-                                                                className="h-8 text-sm border-maroon/30"
-                                                                placeholder="Category name"
-                                                            />
-                                                            <Input
-                                                                value={editForm.image}
-                                                                onChange={e => setEditForm(p => ({ ...p, image: e.target.value }))}
-                                                                className="h-8 text-sm border-maroon/30"
-                                                                placeholder="Image URL"
-                                                            />
-                                                            <div className="flex gap-2">
-                                                                <Button
-                                                                    size="sm"
-                                                                    className="bg-maroon hover:bg-maroon-dark text-white text-xs h-7"
-                                                                    onClick={() => handleSaveEdit(cat)}
-                                                                    disabled={savingId === cat._id}
-                                                                >
-                                                                    {savingId === cat._id ? 'Saving...' : 'Save'}
-                                                                </Button>
-                                                                <Button
-                                                                    size="sm"
-                                                                    variant="outline"
-                                                                    className="text-xs h-7"
-                                                                    onClick={() => setEditId(null)}
-                                                                >
-                                                                    Cancel
-                                                                </Button>
+                                                    {/* Details / Edit */}
+                                                    <div className="flex-1 min-w-0">
+                                                        {editId === cat._id ? (
+                                                            <div className="space-y-2">
+                                                                <Input
+                                                                    value={editForm.name}
+                                                                    onChange={e => setEditForm(p => ({ ...p, name: e.target.value }))}
+                                                                    className="h-8 text-sm border-maroon/30"
+                                                                    placeholder="Category name"
+                                                                />
+                                                                <Input
+                                                                    value={editForm.image}
+                                                                    onChange={e => setEditForm(p => ({ ...p, image: e.target.value }))}
+                                                                    className="h-8 text-sm border-maroon/30"
+                                                                    placeholder="Image URL"
+                                                                />
+                                                                <div className="flex gap-2">
+                                                                    <Button
+                                                                        size="sm"
+                                                                        className="bg-maroon hover:bg-maroon-dark text-white text-xs h-7"
+                                                                        onClick={() => handleSaveEdit(cat)}
+                                                                        disabled={savingId === cat._id}
+                                                                    >
+                                                                        {savingId === cat._id ? 'Saving...' : 'Save'}
+                                                                    </Button>
+                                                                    <Button
+                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        className="text-xs h-7"
+                                                                        onClick={() => setEditId(null)}
+                                                                    >
+                                                                        Cancel
+                                                                    </Button>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    ) : (
-                                                        <>
-                                                            <p className="font-semibold text-gray-900 truncate">{cat.name}</p>
-                                                            <div className="flex items-center gap-2 mt-1">
-                                                                <Badge className="bg-maroon/10 text-maroon text-xs px-2 py-0">
-                                                                    {cat.count} products
-                                                                </Badge>
-                                                                {cat.visible ? (
-                                                                    <Badge className="bg-green-100 text-green-700 text-xs px-2 py-0">
-                                                                        Visible on Home
+                                                        ) : (
+                                                            <>
+                                                                <p className="font-semibold text-gray-900 truncate">{cat.name}</p>
+                                                                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1">
+                                                                    <Badge className="bg-maroon/10 text-maroon text-[10px] sm:text-xs px-2 py-0">
+                                                                        {cat.count} products
                                                                     </Badge>
-                                                                ) : (
-                                                                    <Badge className="bg-gray-100 text-gray-500 text-xs px-2 py-0">
-                                                                        Hidden
-                                                                    </Badge>
-                                                                )}
-                                                            </div>
-                                                        </>
-                                                    )}
+                                                                    {cat.visible ? (
+                                                                        <Badge className="bg-green-100 text-green-700 text-[10px] sm:text-xs px-2 py-0">
+                                                                            Visible
+                                                                        </Badge>
+                                                                    ) : (
+                                                                        <Badge className="bg-gray-100 text-gray-500 text-[10px] sm:text-xs px-2 py-0">
+                                                                            Hidden
+                                                                        </Badge>
+                                                                    )}
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </div>
 
                                                 {/* Actions */}
                                                 {editId !== cat._id && (
-                                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                                    <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end border-t sm:border-t-0 border-gray-100 pt-2 sm:pt-0 mt-1 sm:mt-0">
                                                         <Button
                                                             size="sm"
                                                             variant="outline"
                                                             onClick={() => startEdit(cat)}
-                                                            className="border-maroon/30 text-maroon hover:bg-maroon/10 h-8 px-2 text-xs"
+                                                            className="border-maroon/30 text-maroon hover:bg-maroon/10 h-8 px-3 text-xs flex-1 sm:flex-none"
                                                             title="Edit"
                                                         >
                                                             Edit
@@ -334,20 +336,20 @@ export const AdminCategories: React.FC = () => {
                                                             variant="outline"
                                                             onClick={() => handleToggleVisible(cat)}
                                                             disabled={savingId === cat._id}
-                                                            className={`h-8 px-2 border ${cat.visible ? 'border-orange-300 text-orange-600 hover:bg-orange-50' : 'border-green-300 text-green-600 hover:bg-green-50'}`}
+                                                            className={`h-8 px-3 border flex-1 sm:flex-none ${cat.visible ? 'border-orange-300 text-orange-600 hover:bg-orange-50' : 'border-green-300 text-green-600 hover:bg-green-50'}`}
                                                             title={cat.visible ? 'Hide from homepage' : 'Show on homepage'}
                                                         >
-                                                            {cat.visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                            {cat.visible ? <EyeOff className="h-4 w-4 mx-auto sm:mx-0" /> : <Eye className="h-4 w-4 mx-auto sm:mx-0" />}
                                                         </Button>
                                                         <Button
                                                             size="sm"
                                                             variant="outline"
                                                             onClick={() => handleDelete(cat)}
                                                             disabled={savingId === cat._id}
-                                                            className="h-8 px-2 border-red-200 text-red-500 hover:bg-red-50"
+                                                            className="h-8 px-3 border-red-200 text-red-500 hover:bg-red-50 flex-1 sm:flex-none"
                                                             title="Delete category"
                                                         >
-                                                            <Trash2 className="h-4 w-4" />
+                                                            <Trash2 className="h-4 w-4 mx-auto sm:mx-0" />
                                                         </Button>
                                                     </div>
                                                 )}

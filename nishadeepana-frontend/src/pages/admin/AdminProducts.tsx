@@ -401,13 +401,13 @@ export const AdminProducts: React.FC = () => {
             {/* Header */}
             <div className="bg-gradient-to-r from-maroon via-maroon-light to-maroon-dark text-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
-                            <h1 className="text-4xl font-bold mb-2">Product Management</h1>
-                            <p className="text-beige">{products.length} total products • {filteredSarees.length} showing</p>
+                            <h1 className="text-3xl sm:text-4xl font-bold mb-1 sm:mb-2">Product Management</h1>
+                            <p className="text-beige text-sm sm:text-base">{products.length} total products • {filteredSarees.length} showing</p>
                         </div>
                         <Button
-                            className="bg-gold hover:bg-gold-dark text-maroon font-semibold"
+                            className="bg-gold hover:bg-gold-dark text-maroon font-semibold w-full sm:w-auto"
                             onClick={() => setShowAddModal(true)}
                         >
                             <Plus className="h-4 w-4 mr-2" />
@@ -460,7 +460,7 @@ export const AdminProducts: React.FC = () => {
                 <Card className="border-t-4 border-t-maroon">
                     <CardContent className="p-0">
                         <div className="overflow-x-auto">
-                            <table className="w-full">
+                            <table className="w-full min-w-[800px]">
                                 <thead className="bg-gradient-to-r from-maroon/10 to-gold/10 border-b-2 border-maroon/20">
                                     <tr>
                                         {['Product', 'Category', 'Price', 'Status', 'Actions'].map(h => (

@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useCallback, useEffect, useState, useRef } from 'react';
+import React, { useMemo, useCallback, useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Filter, SlidersHorizontal, X, LayoutGrid, Grid3X3, ChevronDown, ChevronRight } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
@@ -28,6 +28,9 @@ const SORT_OPTIONS = [
     { label: 'Oldest', value: 'oldest', desc: 'Earliest added sarees first' },
 ];
 
+const SCROLL_KEY = 'nd_collections_scroll';
+const VISIBLE_KEY = 'nd_collections_visible';
+
 export const CollectionsPage: React.FC = () => {
     const { products } = useProducts();
     const { categories: adminCategories } = useCategories();
@@ -37,6 +40,8 @@ export const CollectionsPage: React.FC = () => {
     const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
     const sortDropdownRef = useRef<HTMLDivElement>(null);
     const [expandedCats, setExpandedCats] = useState<Set<string>>(new Set());
+    // Floating filter button visibility
+    const [showFloatingFilter, setShowFloatingFilter] = useState(false);
 
     useEffect(() => {
         api.getPriceRanges().then(ranges => {
@@ -60,6 +65,13 @@ export const CollectionsPage: React.FC = () => {
         return () => document.removeEventListener('mousedown', handler);
     }, []);
 
+    // Show floating filter button when scrolled past 300px
+    useEffect(() => {
+        const onScroll = () => setShowFloatingFilter(window.scrollY > 300);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+
     const selectedCategory = searchParams.get('category') ?? 'all';
     const selectedSubType = searchParams.get('subtype') ?? 'all';
     const priceRange = searchParams.get('price') ?? 'all';
@@ -67,7 +79,12 @@ export const CollectionsPage: React.FC = () => {
     const searchText = searchParams.get('search') ?? '';
     const [showFilters, setShowFilters] = React.useState(false);
     const [gridCols, setGridCols] = React.useState<1 | 2>(2);
-    const [visibleCount, setVisibleCount] = React.useState(24);
+
+    // Restore visibleCount from sessionStorage (so back button works)
+    const [visibleCount, setVisibleCount] = React.useState<number>(() => {
+        const saved = sessionStorage.getItem(VISIBLE_KEY);
+        return saved ? parseInt(saved, 10) : 24;
+    });
 
     const productCategories = useMemo(() =>
         Array.from(new Set(products.map(p => p.category))).sort(),
@@ -200,9 +217,30 @@ export const CollectionsPage: React.FC = () => {
 
     const hasActiveFilters = selectedCategory !== 'all' || selectedSubType !== 'all' || priceRange !== 'all' || searchText !== '';
 
+    // Reset visible count when filters change
     React.useEffect(() => {
         setVisibleCount(24);
+        sessionStorage.removeItem(VISIBLE_KEY);
     }, [selectedCategory, selectedSubType, priceRange, sortBy, searchText]);
+
+    // Save visibleCount to sessionStorage whenever it changes
+    React.useEffect(() => {
+        sessionStorage.setItem(VISIBLE_KEY, String(visibleCount));
+    }, [visibleCount]);
+
+    // Restore scroll position when coming back from product page
+    React.useEffect(() => {
+        const savedScroll = sessionStorage.getItem(SCROLL_KEY);
+        if (savedScroll) {
+            setTimeout(() => window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' }), 50);
+            sessionStorage.removeItem(SCROLL_KEY);
+        }
+    }, []);
+
+    // Save scroll position before leaving to product page
+    const handleProductClick = React.useCallback(() => {
+        sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
+    }, []);
 
     const visibleSarees = filteredSarees.slice(0, visibleCount);
     const hasMore = visibleCount < filteredSarees.length;
@@ -489,11 +527,11 @@ export const CollectionsPage: React.FC = () => {
                             <>
                                 <div className={`grid gap-4 ${gridCols === 1 ? 'grid-cols-1' : 'grid-cols-2 sm:grid-cols-2 xl:grid-cols-2'}`}>
                                     {visibleSarees.map(saree => (
-                                        <ProductCard key={saree.id} saree={saree} />
+                                        <ProductCard key={saree.id} saree={saree} onClick={handleProductClick} />
                                     ))}
                                 </div>
                                 {hasMore && (
-                                    <div className="text-center mt-10">
+                                    <div className="text-center mt-10 mb-24 lg:mb-10">
                                         <button
                                             onClick={() => setVisibleCount(v => v + 24)}
                                             className="px-8 py-3 border-2 border-maroon text-maroon font-semibold rounded-full hover:bg-maroon hover:text-beige transition-colors"
@@ -516,6 +554,28 @@ export const CollectionsPage: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Floating Filter + Sort bar — mobile only, visible when scrolled down */}
+            {showFloatingFilter && (
+                <div className="fixed bottom-20 left-0 right-0 z-50 flex justify-center lg:hidden pointer-events-none">
+                    <div className="flex gap-2 pointer-events-auto">
+                        <button
+                            onClick={() => setShowFilters(true)}
+                            className="flex items-center gap-2 bg-maroon text-white px-4 py-2.5 rounded-full shadow-lg text-sm font-semibold active:scale-95 transition-transform"
+                        >
+                            <SlidersHorizontal className="h-4 w-4" />
+                            Filter {hasActiveFilters && <span className="bg-white text-maroon text-xs px-1.5 py-0.5 rounded-full font-bold">✓</span>}
+                        </button>
+                        <button
+                            onClick={() => setSortDropdownOpen(v => !v)}
+                            className="flex items-center gap-2 bg-white border border-maroon text-maroon px-4 py-2.5 rounded-full shadow-lg text-sm font-semibold active:scale-95 transition-transform"
+                        >
+                            <ChevronDown className="h-4 w-4" />
+                            {currentSortLabel}
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

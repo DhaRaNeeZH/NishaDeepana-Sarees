@@ -12,9 +12,10 @@ import { useWishlist } from '../contexts/WishlistContext';
 
 interface ProductCardProps {
     saree: Saree;
+    onClick?: () => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ saree }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ saree, onClick }) => {
     const [imageLoaded, setImageLoaded] = React.useState(false);
     const { addItem } = useCart();
     const { isWishlisted, toggleWishlist } = useWishlist();
@@ -26,7 +27,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ saree }) => {
 
     return (
         <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300">
-            <Link to={`/product/${saree.id}`}>
+            <Link to={`/product/${saree.id}`} onClick={onClick}>
                 <div className="relative aspect-[3/4] overflow-hidden bg-gray-100">
                     <img
                         src={saree.image}
@@ -69,7 +70,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ saree }) => {
             </Link>
 
             <CardContent className="p-3 sm:p-4">
-                <Link to={`/product/${saree.id}`}>
+                <Link to={`/product/${saree.id}`} onClick={onClick}>
                     <h3 className="font-semibold text-sm sm:text-lg mb-0.5 sm:mb-1 line-clamp-2 hover:text-primary transition-colors">
                         {saree.name}
                     </h3>
