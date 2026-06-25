@@ -29,7 +29,6 @@ const SORT_OPTIONS = [
 ];
 
 const SCROLL_KEY = 'nd_collections_scroll';
-const VISIBLE_KEY = 'nd_collections_visible';
 
 export const CollectionsPage: React.FC = () => {
     const { products } = useProducts();
