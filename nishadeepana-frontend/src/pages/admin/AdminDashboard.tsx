@@ -134,12 +134,12 @@ export const AdminDashboard: React.FC = () => {
             {/* Header */}
             <div className="bg-gradient-to-r from-maroon via-maroon-light to-maroon-dark text-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
-                            <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-                            <p className="text-beige">Welcome back! Here's your store overview.</p>
+                            <h1 className="text-3xl sm:text-4xl font-bold mb-1 sm:mb-2">Admin Dashboard</h1>
+                            <p className="text-beige text-sm sm:text-base">Welcome back! Here's your store overview.</p>
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
                             <Button
                                 onClick={fetchOrders}
                                 disabled={loading}

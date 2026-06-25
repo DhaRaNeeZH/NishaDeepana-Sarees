@@ -77,14 +77,10 @@ export const CollectionsPage: React.FC = () => {
     const priceRange = searchParams.get('price') ?? 'all';
     const sortBy = searchParams.get('sort') ?? 'featured';
     const searchText = searchParams.get('search') ?? '';
+    const currentPage = parseInt(searchParams.get('page') ?? '1', 10);
     const [showFilters, setShowFilters] = React.useState(false);
+    const [showMobileSort, setShowMobileSort] = React.useState(false);
     const [gridCols, setGridCols] = React.useState<1 | 2>(2);
-
-    // Restore visibleCount from sessionStorage (so back button works)
-    const [visibleCount, setVisibleCount] = React.useState<number>(() => {
-        const saved = sessionStorage.getItem(VISIBLE_KEY);
-        return saved ? parseInt(saved, 10) : 24;
-    });
 
     const productCategories = useMemo(() =>
         Array.from(new Set(products.map(p => p.category))).sort(),
@@ -116,6 +112,10 @@ export const CollectionsPage: React.FC = () => {
         return counts;
     }, [products]);
 
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const setFilter = useCallback((key: string, value: string) => {
         setSearchParams(prev => {
             const next = new URLSearchParams(prev);
@@ -125,13 +125,15 @@ export const CollectionsPage: React.FC = () => {
                 next.set(key, value);
             }
             if (key === 'category') next.delete('subtype');
+            next.set('page', '1');
             return next;
         }, { replace: true });
+        scrollToTop();
     }, [setSearchParams]);
 
     const clearAllFilters = useCallback(() => {
         setSearchParams({}, { replace: true });
-        setVisibleCount(24);
+        scrollToTop();
     }, [setSearchParams]);
 
     const toggleCatExpand = useCallback((cat: string) => {
@@ -217,22 +219,7 @@ export const CollectionsPage: React.FC = () => {
 
     const hasActiveFilters = selectedCategory !== 'all' || selectedSubType !== 'all' || priceRange !== 'all' || searchText !== '';
 
-    // Track filter changes to reset visible count (but NOT on initial mount/back navigation)
-    const filterKey = `${selectedCategory}-${selectedSubType}-${priceRange}-${sortBy}-${searchText}`;
-    const prevFilterKey = React.useRef(filterKey);
-
-    React.useEffect(() => {
-        if (prevFilterKey.current !== filterKey) {
-            setVisibleCount(24);
-            sessionStorage.removeItem(VISIBLE_KEY);
-            prevFilterKey.current = filterKey;
-        }
-    }, [filterKey]);
-
-    // Save visibleCount to sessionStorage whenever it changes
-    React.useEffect(() => {
-        sessionStorage.setItem(VISIBLE_KEY, String(visibleCount));
-    }, [visibleCount]);
+    // Remove legacy visibility logic. Pagination relies on URL state, which is preserved automatically on back!
 
     // Restore scroll position when coming back from product page
     React.useEffect(() => {
@@ -258,8 +245,19 @@ export const CollectionsPage: React.FC = () => {
         sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
     }, []);
 
-    const visibleSarees = filteredSarees.slice(0, visibleCount);
-    const hasMore = visibleCount < filteredSarees.length;
+    const ITEMS_PER_PAGE = 24;
+    const totalPages = Math.ceil(filteredSarees.length / ITEMS_PER_PAGE);
+    const safePage = Math.max(1, Math.min(currentPage, Math.max(1, totalPages)));
+    const paginatedSarees = filteredSarees.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
+
+    const setPage = (p: number) => {
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev);
+            next.set('page', String(p));
+            return next;
+        });
+        scrollToTop();
+    };
 
     const filterBtnCls = (active: boolean) =>
         `flex items-center justify-between w-full text-left px-3 py-2 rounded-md text-sm transition-colors font-medium ${active
@@ -330,8 +328,10 @@ export const CollectionsPage: React.FC = () => {
                                                     const next = new URLSearchParams(prev);
                                                     next.set('category', cat);
                                                     next.set('subtype', sub);
+                                                    next.set('page', '1');
                                                     return next;
                                                 }, { replace: true });
+                                                scrollToTop();
                                                 onSelect();
                                             }}
                                             className={subFilterBtnCls(selectedCategory === cat && selectedSubType === sub)}
@@ -519,7 +519,7 @@ export const CollectionsPage: React.FC = () => {
                                 {selectedSubType !== 'all' && (
                                     <Badge
                                         className="bg-maroon/10 text-maroon border border-maroon/20 px-3 py-1 flex items-center gap-1.5 cursor-pointer hover:bg-maroon/20"
-                                        onClick={() => { setSearchParams(prev => { const next = new URLSearchParams(prev); next.delete('subtype'); return next; }, { replace: true }); }}
+                                        onClick={() => { setSearchParams(prev => { const next = new URLSearchParams(prev); next.delete('subtype'); next.set('page', '1'); return next; }, { replace: true }); scrollToTop(); }}
                                         role="listitem"
                                     >
                                         {selectedSubType}
@@ -542,18 +542,57 @@ export const CollectionsPage: React.FC = () => {
                         {filteredSarees.length > 0 ? (
                             <>
                                 <div className={`grid gap-4 ${gridCols === 1 ? 'grid-cols-1' : 'grid-cols-2 sm:grid-cols-2 xl:grid-cols-2'}`}>
-                                    {visibleSarees.map(saree => (
+                                    {paginatedSarees.map(saree => (
                                         <ProductCard key={saree.id} saree={saree} onClick={handleProductClick} />
                                     ))}
                                 </div>
-                                {hasMore && (
-                                    <div className="text-center mt-10 mb-24 lg:mb-10">
-                                        <button
-                                            onClick={() => setVisibleCount(v => v + 24)}
-                                            className="px-8 py-3 border-2 border-maroon text-maroon font-semibold rounded-full hover:bg-maroon hover:text-beige transition-colors"
+                                
+                                {/* Pagination Controls */}
+                                {totalPages > 1 && (
+                                    <div className="flex justify-center items-center gap-2 mt-10 mb-24 lg:mb-10">
+                                        <Button
+                                            variant="outline"
+                                            disabled={safePage === 1}
+                                            onClick={() => setPage(safePage - 1)}
+                                            className="border-maroon/20 text-maroon hover:bg-maroon hover:text-white"
                                         >
-                                            Load More ({filteredSarees.length - visibleCount} remaining)
-                                        </button>
+                                            Prev
+                                        </Button>
+                                        
+                                        <div className="flex items-center gap-1 hidden sm:flex">
+                                            {Array.from({ length: totalPages }).map((_, i) => {
+                                                const p = i + 1;
+                                                // Show first, last, current, and +/- 1 from current
+                                                if (p === 1 || p === totalPages || (p >= safePage - 1 && p <= safePage + 1)) {
+                                                    return (
+                                                        <Button
+                                                            key={p}
+                                                            variant={safePage === p ? 'default' : 'outline'}
+                                                            onClick={() => setPage(p)}
+                                                            className={`w-10 h-10 p-0 ${safePage === p ? 'bg-maroon text-white' : 'border-maroon/20 text-maroon hover:bg-maroon/10'}`}
+                                                        >
+                                                            {p}
+                                                        </Button>
+                                                    );
+                                                }
+                                                if (p === safePage - 2 || p === safePage + 2) {
+                                                    return <span key={p} className="text-gray-400 px-1">...</span>;
+                                                }
+                                                return null;
+                                            })}
+                                        </div>
+                                        <span className="text-sm font-medium text-gray-500 sm:hidden">
+                                            Page {safePage} of {totalPages}
+                                        </span>
+
+                                        <Button
+                                            variant="outline"
+                                            disabled={safePage === totalPages}
+                                            onClick={() => setPage(safePage + 1)}
+                                            className="border-maroon/20 text-maroon hover:bg-maroon hover:text-white"
+                                        >
+                                            Next
+                                        </Button>
                                     </div>
                                 )}
                             </>
@@ -583,12 +622,44 @@ export const CollectionsPage: React.FC = () => {
                             Filter {hasActiveFilters && <span className="bg-white text-maroon text-xs px-1.5 py-0.5 rounded-full font-bold">✓</span>}
                         </button>
                         <button
-                            onClick={() => setSortDropdownOpen(v => !v)}
+                            onClick={() => setShowMobileSort(true)}
                             className="flex items-center gap-2 bg-white border border-maroon text-maroon px-4 py-2.5 rounded-full shadow-lg text-sm font-semibold active:scale-95 transition-transform"
                         >
                             <ChevronDown className="h-4 w-4" />
                             {currentSortLabel}
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Mobile Sort Bottom Sheet */}
+            {showMobileSort && (
+                <div className="fixed inset-0 z-[60] flex items-end justify-center lg:hidden">
+                    <div className="absolute inset-0 bg-black/50" onClick={() => setShowMobileSort(false)} />
+                    <div className="relative w-full bg-white rounded-t-2xl shadow-2xl pb-8 animate-in slide-in-from-bottom-full duration-200">
+                        <div className="flex items-center justify-between p-4 border-b">
+                            <h2 className="text-base font-semibold text-maroon">Sort By</h2>
+                            <button onClick={() => setShowMobileSort(false)} className="p-1 rounded-full hover:bg-gray-100">
+                                <X className="h-5 w-5 text-gray-500" />
+                            </button>
+                        </div>
+                        <div className="max-h-[60vh] overflow-y-auto">
+                            {SORT_OPTIONS.map(opt => (
+                                <button
+                                    key={opt.value}
+                                    onClick={() => {
+                                        setFilter('sort', opt.value);
+                                        setShowMobileSort(false);
+                                    }}
+                                    className={`w-full text-left px-5 py-4 transition-colors border-b border-gray-50 last:border-0 ${sortBy === opt.value ? 'bg-maroon/5' : ''}`}
+                                >
+                                    <div className="flex items-center justify-between gap-3">
+                                        <p className={`text-sm font-medium ${sortBy === opt.value ? 'text-maroon' : 'text-gray-800'}`}>{opt.label}</p>
+                                        {sortBy === opt.value && <span className="h-2.5 w-2.5 rounded-full bg-maroon" />}
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             )}

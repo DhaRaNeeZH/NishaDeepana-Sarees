@@ -107,17 +107,17 @@ export const AdminSettings: React.FC = () => {
             {/* Header */}
             <div className="bg-gradient-to-r from-maroon via-maroon-light to-maroon-dark text-white">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="flex items-center gap-4">
-                        <Link to="/admin">
+                    <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+                        <Link to="/admin" className="mt-1 sm:mt-0 flex-shrink-0">
                             <Button variant="outline" size="sm" className="bg-white/10 hover:bg-white/20 text-white border-white/30">
                                 <ArrowLeft className="h-4 w-4 mr-2" /> Back
                             </Button>
                         </Link>
                         <div>
-                            <h1 className="text-3xl font-bold flex items-center gap-2">
-                                <Truck className="h-8 w-8" /> Delivery Settings
+                            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+                                <Truck className="h-6 w-6 sm:h-8 sm:w-8" /> Delivery Settings
                             </h1>
-                            <p className="text-beige mt-1">Manage delivery charges and offers</p>
+                            <p className="text-beige mt-1 text-sm sm:text-base">Manage delivery charges and offers</p>
                         </div>
                     </div>
                 </div>
