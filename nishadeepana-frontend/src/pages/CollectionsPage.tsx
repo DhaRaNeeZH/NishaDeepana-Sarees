@@ -217,11 +217,17 @@ export const CollectionsPage: React.FC = () => {
 
     const hasActiveFilters = selectedCategory !== 'all' || selectedSubType !== 'all' || priceRange !== 'all' || searchText !== '';
 
-    // Reset visible count when filters change
+    // Track filter changes to reset visible count (but NOT on initial mount/back navigation)
+    const filterKey = `${selectedCategory}-${selectedSubType}-${priceRange}-${sortBy}-${searchText}`;
+    const prevFilterKey = React.useRef(filterKey);
+
     React.useEffect(() => {
-        setVisibleCount(24);
-        sessionStorage.removeItem(VISIBLE_KEY);
-    }, [selectedCategory, selectedSubType, priceRange, sortBy, searchText]);
+        if (prevFilterKey.current !== filterKey) {
+            setVisibleCount(24);
+            sessionStorage.removeItem(VISIBLE_KEY);
+            prevFilterKey.current = filterKey;
+        }
+    }, [filterKey]);
 
     // Save visibleCount to sessionStorage whenever it changes
     React.useEffect(() => {
@@ -230,11 +236,21 @@ export const CollectionsPage: React.FC = () => {
 
     // Restore scroll position when coming back from product page
     React.useEffect(() => {
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
         const savedScroll = sessionStorage.getItem(SCROLL_KEY);
         if (savedScroll) {
-            setTimeout(() => window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' }), 50);
+            setTimeout(() => window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' }), 100);
             sessionStorage.removeItem(SCROLL_KEY);
         }
+
+        return () => {
+            if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'auto';
+            }
+        };
     }, []);
 
     // Save scroll position before leaving to product page
