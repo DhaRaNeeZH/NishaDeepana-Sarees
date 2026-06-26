@@ -290,7 +290,7 @@ export const CollectionsPage: React.FC = () => {
                     const subTypes = getSubTypes(cat);
                     const subCounts = getSubTypeCounts(cat);
                     const isExpanded = expandedCats.has(cat) || selectedCategory === cat;
-                    const hasSubTypes = subTypes.length > 1;
+                    const hasSubTypes = subTypes.length > 0;
 
                     return (
                         <div key={cat}>
