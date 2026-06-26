@@ -259,15 +259,15 @@ export const CollectionsPage: React.FC = () => {
     };
 
     const filterBtnCls = (active: boolean) =>
-        `flex items-center justify-between w-full text-left px-3 py-2 rounded-md text-sm transition-colors font-medium ${active
+        `flex items-center justify-between w-full text-left rounded-md text-sm transition-colors font-medium ${active
             ? 'bg-maroon text-beige'
             : 'hover:bg-gold/10 text-gray-700'
         }`;
 
     const subFilterBtnCls = (active: boolean) =>
-        `flex items-center justify-between w-full text-left pl-6 pr-3 py-1.5 rounded-md text-sm transition-colors ${active
-            ? 'bg-maroon/80 text-beige font-medium'
-            : 'hover:bg-gold/10 text-gray-600'
+        `flex items-center justify-between w-full text-left pl-8 pr-3 py-1.5 rounded-md text-[13px] transition-colors border-l-2 ${active
+            ? 'bg-maroon/5 text-maroon font-bold border-l-maroon'
+            : 'hover:bg-gray-50 text-gray-500 border-l-transparent hover:border-l-gray-200'
         }`;
 
     const currentSortLabel = SORT_OPTIONS.find(o => o.value === sortBy)?.label ?? 'Featured';
@@ -278,7 +278,7 @@ export const CollectionsPage: React.FC = () => {
             <div className="space-y-1">
                 <button
                     onClick={() => { setFilter('category', 'all'); onSelect(); }}
-                    className={filterBtnCls(selectedCategory === 'all' && selectedSubType === 'all')}
+                    className={filterBtnCls(selectedCategory === 'all' && selectedSubType === 'all') + " px-3 py-2"}
                 >
                     <span>All Sarees</span>
                     <span className={`text-xs px-1.5 py-0.5 rounded-full font-normal ${selectedCategory === 'all' ? 'bg-white/20 text-beige' : 'bg-gray-100 text-gray-500'}`}>
@@ -294,31 +294,40 @@ export const CollectionsPage: React.FC = () => {
 
                     return (
                         <div key={cat}>
-                            <button
-                                onClick={() => {
-                                    setFilter('category', cat);
-                                    if (hasSubTypes) toggleCatExpand(cat);
-                                    onSelect();
-                                }}
-                                className={filterBtnCls(selectedCategory === cat && selectedSubType === 'all')}
-                            >
-                                <span className="flex items-center gap-1">
-                                    {hasSubTypes && (
-                                        <span className="text-current opacity-60">
+                            <div className={filterBtnCls(selectedCategory === cat && selectedSubType === 'all') + " flex overflow-hidden"}>
+                                <button
+                                    onClick={() => {
+                                        setFilter('category', cat);
+                                        onSelect();
+                                    }}
+                                    className="flex-1 flex items-center justify-between px-3 py-2 text-left"
+                                >
+                                    <span>{cat}</span>
+                                    <span className={`text-xs px-1.5 py-0.5 rounded-full font-normal flex-shrink-0 ${selectedCategory === cat && selectedSubType === 'all' ? 'bg-white/20 text-beige' : 'bg-gray-100 text-gray-500'}`}>
+                                        {categoryCounts[cat] ?? 0}
+                                    </span>
+                                </button>
+                                
+                                {hasSubTypes && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleCatExpand(cat);
+                                        }}
+                                        className="px-3 py-2 flex items-center justify-center border-l border-white/10 hover:bg-black/5"
+                                        aria-label="Toggle Subcategories"
+                                    >
+                                        <span className="text-current opacity-80">
                                             {isExpanded
-                                                ? <ChevronDown className="h-3 w-3 inline" />
-                                                : <ChevronRight className="h-3 w-3 inline" />}
+                                                ? <ChevronDown className="h-4 w-4" />
+                                                : <ChevronRight className="h-4 w-4" />}
                                         </span>
-                                    )}
-                                    {cat}
-                                </span>
-                                <span className={`text-xs px-1.5 py-0.5 rounded-full font-normal flex-shrink-0 ${selectedCategory === cat && selectedSubType === 'all' ? 'bg-white/20 text-beige' : 'bg-gray-100 text-gray-500'}`}>
-                                    {categoryCounts[cat] ?? 0}
-                                </span>
-                            </button>
+                                    </button>
+                                )}
+                            </div>
 
                             {hasSubTypes && isExpanded && (
-                                <div className="mt-1 space-y-0.5 mb-1">
+                                <div className="mt-1 mb-2 space-y-1">
                                     {subTypes.map(sub => (
                                         <button
                                             key={sub}
@@ -335,8 +344,11 @@ export const CollectionsPage: React.FC = () => {
                                             }}
                                             className={subFilterBtnCls(selectedCategory === cat && selectedSubType === sub)}
                                         >
-                                            <span>{sub}</span>
-                                            <span className={`text-xs px-1.5 py-0.5 rounded-full font-normal flex-shrink-0 ${selectedCategory === cat && selectedSubType === sub ? 'bg-white/20 text-beige' : 'bg-gray-100 text-gray-500'}`}>
+                                            <span className="flex items-center gap-2">
+                                                <span className="w-1 h-1 rounded-full bg-current opacity-40 flex-shrink-0" />
+                                                {sub}
+                                            </span>
+                                            <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-normal flex-shrink-0 ${selectedCategory === cat && selectedSubType === sub ? 'bg-maroon/10 text-maroon' : 'bg-gray-100 text-gray-500'}`}>
                                                 {subCounts[sub] ?? 0}
                                             </span>
                                         </button>
@@ -354,12 +366,15 @@ export const CollectionsPage: React.FC = () => {
         <div className="mb-4">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Price Range</h3>
             <div className="space-y-1">
-                <button onClick={() => { setFilter('price', 'all'); onSelect(); }} className={filterBtnCls(priceRange === 'all')}>
+                <button onClick={() => { setFilter('price', 'all'); onSelect(); }} className={filterBtnCls(priceRange === 'all') + " px-3 py-2"}>
                     <span>All Prices</span>
                 </button>
                 {priceRanges.map((range, idx) => (
-                    <button key={idx} onClick={() => { setFilter('price', String(idx)); onSelect(); }} className={filterBtnCls(priceRange === String(idx))}>
-                        <span>{range.label}</span>
+                    <button
+                        key={idx}
+                        onClick={() => { setFilter('price', String(idx)); onSelect(); }}
+                        className={filterBtnCls(priceRange === String(idx)) + " px-3 py-2"}
+                    >    <span>{range.label}</span>
                     </button>
                 ))}
             </div>
