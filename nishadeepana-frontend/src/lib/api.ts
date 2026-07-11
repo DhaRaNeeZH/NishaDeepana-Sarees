@@ -60,10 +60,10 @@ export const api = {
     saveWishlist: (email: string, wishlist: string[]) => apiFetch<any>(`/api/userdata/${encodeURIComponent(email)}/wishlist`, { method: 'PUT', body: JSON.stringify({ wishlist }) }),
 
     // Payments (Razorpay)
-    createPaymentOrder: (amount: number) =>
-        apiFetch<{ orderId: string; amount: number; currency: string; key: string }>(
+    createPaymentOrder: (items: { productId: string; quantity: number }[], deliveryCharge: number) =>
+        apiFetch<{ orderId: string; amount: number; amountRupees: number; currency: string; key: string }>(
             '/api/payments/create-order',
-            { method: 'POST', body: JSON.stringify({ amount }) }
+            { method: 'POST', body: JSON.stringify({ items, deliveryCharge }) }
         ),
     verifyPayment: (data: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) =>
         apiFetch<{ verified: boolean; paymentId: string }>('/api/payments/verify', {

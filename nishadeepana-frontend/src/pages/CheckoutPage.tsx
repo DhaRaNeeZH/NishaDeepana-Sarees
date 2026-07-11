@@ -156,9 +156,12 @@ export const CheckoutPage: React.FC = () => {
                 document.body.appendChild(script);
             });
 
-            // Create Razorpay order on backend
-            const amountPaise = Math.round(totalWithShipping * 100);
-            const orderData = await api.createPaymentOrder(amountPaise);
+            // Create Razorpay order on backend (server calculates real price from DB)
+            const paymentItems = items.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity,
+            }));
+            const orderData = await api.createPaymentOrder(paymentItems, shipping);
 
             // Open Razorpay checkout popup
             await new Promise<void>((resolve, reject) => {

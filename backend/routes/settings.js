@@ -7,7 +7,7 @@
 const express = require('express');
 const router = express.Router();
 const Settings = require('../models/Settings');
-const jwt = require('jsonwebtoken');
+const adminOnly = require('../middleware/adminOnly');
 
 // Default delivery charges
 const DEFAULT_DELIVERY = {
@@ -26,19 +26,6 @@ async function getDeliveryDoc() {
     return doc;
 }
 
-// Admin middleware — verify JWT + role
-function adminOnly(req, res, next) {
-    try {
-        const token = req.headers.authorization?.split(' ')[1];
-        if (!token) return res.status(401).json({ error: 'No token provided' });
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        if (decoded.role !== 'admin') return res.status(403).json({ error: 'Admin access required' });
-        req.user = decoded;
-        next();
-    } catch {
-        res.status(401).json({ error: 'Invalid token' });
-    }
-}
 
 // GET /api/settings/delivery — public
 router.get('/delivery', async (req, res) => {

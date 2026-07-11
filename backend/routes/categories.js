@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 const Category = require('../models/Category');
 const Product = require('../models/Product');
+const adminOnly = require('../middleware/adminOnly');
 
-// GET /api/categories — all categories with live product count
+// GET /api/categories — public (used on home page + collections filter)
 router.get('/', async (req, res) => {
     try {
         const categories = await Category.find().sort({ order: 1, createdAt: 1 });
 
-        // Auto-calculate product count for each category
         const withCounts = await Promise.all(
             categories.map(async (cat) => {
                 const count = await Product.countDocuments({ category: cat.name });
@@ -22,8 +22,8 @@ router.get('/', async (req, res) => {
     }
 });
 
-// POST /api/categories — create (admin)
-router.post('/', async (req, res) => {
+// POST /api/categories — admin only
+router.post('/', adminOnly, async (req, res) => {
     try {
         const cat = new Category(req.body);
         const saved = await cat.save();
@@ -33,8 +33,8 @@ router.post('/', async (req, res) => {
     }
 });
 
-// PUT /api/categories/:id — update (admin)
-router.put('/:id', async (req, res) => {
+// PUT /api/categories/:id — admin only
+router.put('/:id', adminOnly, async (req, res) => {
     try {
         const cat = await Category.findByIdAndUpdate(
             req.params.id,
@@ -48,8 +48,8 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// DELETE /api/categories/:id — delete (admin)
-router.delete('/:id', async (req, res) => {
+// DELETE /api/categories/:id — admin only
+router.delete('/:id', adminOnly, async (req, res) => {
     try {
         const cat = await Category.findByIdAndDelete(req.params.id);
         if (!cat) return res.status(404).json({ error: 'Category not found' });

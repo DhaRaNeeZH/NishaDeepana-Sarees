@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const Order = require('../models/Order');
+const adminOnly = require('../middleware/adminOnly');
 
-// GET /api/products/best-selling-ids — Returns product IDs sorted by total units sold
+// GET /api/products/best-selling-ids — public (used on home page)
 router.get('/best-selling-ids', async (req, res) => {
     try {
         const orders = await Order.find(
@@ -11,7 +12,6 @@ router.get('/best-selling-ids', async (req, res) => {
             'items'
         ).lean();
 
-        // Count total quantity sold per product
         const salesMap = {};
         for (const order of orders) {
             for (const item of order.items) {
@@ -19,7 +19,6 @@ router.get('/best-selling-ids', async (req, res) => {
             }
         }
 
-        // Sort by sales descending
         const sorted = Object.entries(salesMap)
             .sort((a, b) => b[1] - a[1])
             .map(([productId, count]) => ({ productId, count }));
@@ -30,7 +29,7 @@ router.get('/best-selling-ids', async (req, res) => {
     }
 });
 
-// GET /api/products — Get all products
+// GET /api/products — public (customers browse)
 router.get('/', async (req, res) => {
     try {
         const products = await Product.find().sort({ createdAt: -1 });
@@ -40,7 +39,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// GET /api/products/:id — Get single product
+// GET /api/products/:id — public (product detail page)
 router.get('/:id', async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
@@ -51,8 +50,8 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// POST /api/products — Create product (admin)
-router.post('/', async (req, res) => {
+// POST /api/products — admin only
+router.post('/', adminOnly, async (req, res) => {
     try {
         const product = new Product(req.body);
         const saved = await product.save();
@@ -62,8 +61,8 @@ router.post('/', async (req, res) => {
     }
 });
 
-// PUT /api/products/:id — Update product (admin)
-router.put('/:id', async (req, res) => {
+// PUT /api/products/:id — admin only
+router.put('/:id', adminOnly, async (req, res) => {
     try {
         const product = await Product.findByIdAndUpdate(
             req.params.id, req.body, { new: true, runValidators: true }
@@ -75,8 +74,8 @@ router.put('/:id', async (req, res) => {
     }
 });
 
-// DELETE /api/products/:id — Delete product (admin)
-router.delete('/:id', async (req, res) => {
+// DELETE /api/products/:id — admin only
+router.delete('/:id', adminOnly, async (req, res) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.id);
         if (!product) return res.status(404).json({ error: 'Product not found' });

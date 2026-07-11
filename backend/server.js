@@ -19,6 +19,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const app = express();
@@ -73,7 +74,7 @@ app.get('/api/webhook', (req, res) => {
     const token = req.query['hub.verify_token'];
     const challenge = req.query['hub.challenge'];
 
-    if (mode === 'subscribe' && token === 'nishadeepana123') {
+    if (mode === 'subscribe' && token === process.env.WHATSAPP_VERIFY_TOKEN) {
         console.log('[Webhook] Verified by Meta');
         res.status(200).send(challenge);
     } else {
@@ -81,8 +82,21 @@ app.get('/api/webhook', (req, res) => {
     }
 });
 
-// WhatsApp Webhook - Incoming events
+// WhatsApp Webhook - Incoming events (with Meta signature verification)
 app.post('/api/webhook', (req, res) => {
+    // Verify the request is genuinely from Meta
+    const signature = req.headers['x-hub-signature-256'];
+    if (process.env.WHATSAPP_APP_SECRET && signature) {
+        const expectedSig = 'sha256=' + crypto
+            .createHmac('sha256', process.env.WHATSAPP_APP_SECRET)
+            .update(JSON.stringify(req.body))
+            .digest('hex');
+        if (signature !== expectedSig) {
+            console.warn('[Webhook] Signature mismatch — possible spoofed request');
+            return res.sendStatus(403);
+        }
+    }
+
     const body = req.body;
     if (body.object) {
         if (body.entry && body.entry[0].changes && body.entry[0].changes[0].value.statuses) {

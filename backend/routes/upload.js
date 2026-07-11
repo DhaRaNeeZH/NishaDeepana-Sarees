@@ -1,5 +1,5 @@
 // ================================================================
-// Upload Route — Image upload to Cloudinary
+// Upload Route — Image upload to Cloudinary (admin only)
 // POST /api/upload → returns { url: "https://res.cloudinary.com/..." }
 // ================================================================
 
@@ -7,6 +7,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const cloudinary = require('cloudinary').v2;
+const adminOnly = require('../middleware/adminOnly');
 
 // Configure Cloudinary using env vars
 cloudinary.config({
@@ -26,8 +27,8 @@ const upload = multer({
     },
 });
 
-// POST /api/upload
-router.post('/', upload.single('image'), async (req, res) => {
+// POST /api/upload — admin only
+router.post('/', adminOnly, upload.single('image'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No image file provided' });
@@ -36,9 +37,7 @@ router.post('/', upload.single('image'), async (req, res) => {
         // Upload buffer to Cloudinary
         const result = await new Promise((resolve, reject) => {
             const stream = cloudinary.uploader.upload_stream(
-                {
-                    folder: 'nishadeepana-sarees',
-                },
+                { folder: 'nishadeepana-sarees' },
                 (error, result) => {
                     if (error) reject(error);
                     else resolve(result);

@@ -3,9 +3,10 @@ const router = express.Router();
 const Order = require('../models/Order');
 const { sendMomAlert, sendCustomerSMS } = require('../utils/sms');
 const { sendMomOrderEmail } = require('../utils/email');
+const adminOnly = require('../middleware/adminOnly');
 
-// GET /api/orders — All orders (admin)
-router.get('/', async (req, res) => {
+// GET /api/orders — admin only (returns all orders or filtered by email)
+router.get('/', adminOnly, async (req, res) => {
     try {
         const { email } = req.query;
         const filter = email ? { email } : {};
@@ -16,7 +17,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// GET /api/orders/track/:id — Public tracking (Limited fields)
+// GET /api/orders/track/:id — public (limited fields, for customer tracking)
 router.get('/track/:id', async (req, res) => {
     try {
         const order = await Order.findById(req.params.id)
@@ -29,7 +30,7 @@ router.get('/track/:id', async (req, res) => {
     }
 });
 
-// POST /api/orders — Create order (checkout)
+// POST /api/orders — public (checkout creates an order)
 router.post('/', async (req, res) => {
     console.log('[ORDER] POST /api/orders called');
     try {
@@ -37,7 +38,6 @@ router.post('/', async (req, res) => {
         const saved = await order.save();
         console.log(`[ORDER] Saved to DB: ${saved._id}`);
 
-        // Send notifications (Email to mom + SMS to customer) IN BACKGROUND
         const baseUrl = process.env.FRONTEND_URL || 'https://nishadeepanasarees.in';
         const trackingUrl = `${baseUrl}/track-order?orderId=${saved._id}`;
 
@@ -67,8 +67,8 @@ router.post('/', async (req, res) => {
     }
 });
 
-// PATCH /api/orders/:id/status — Update status (admin)
-router.patch('/:id/status', async (req, res) => {
+// PATCH /api/orders/:id/status — admin only
+router.patch('/:id/status', adminOnly, async (req, res) => {
     try {
         const { status } = req.body;
         const order = await Order.findByIdAndUpdate(
@@ -81,8 +81,8 @@ router.patch('/:id/status', async (req, res) => {
     }
 });
 
-// POST /api/orders/:id/cancel — Cancel order
-router.post('/:id/cancel', async (req, res) => {
+// POST /api/orders/:id/cancel — admin only
+router.post('/:id/cancel', adminOnly, async (req, res) => {
     try {
         const order = await Order.findByIdAndUpdate(
             req.params.id,
@@ -96,13 +96,10 @@ router.post('/:id/cancel', async (req, res) => {
     }
 });
 
-// POST /api/orders/:id/refund — Mark refunded
-router.post('/:id/refund', async (req, res) => {
+// POST /api/orders/:id/refund — admin only
+router.post('/:id/refund', adminOnly, async (req, res) => {
     try {
         // TODO: Trigger Razorpay refund API here
-        // const razorpay = new Razorpay({ key_id, key_secret });
-        // await razorpay.payments.refund(paymentId, { amount });
-
         const order = await Order.findByIdAndUpdate(
             req.params.id,
             { status: 'refunded', 'payment.status': 'refunded' },
@@ -115,11 +112,11 @@ router.post('/:id/refund', async (req, res) => {
     }
 });
 
-// POST /api/orders/:id/notes — Add admin note
-router.patch('/:id/notes', async (req, res) => {
+// PATCH /api/orders/:id/notes — admin only
+router.patch('/:id/notes', adminOnly, async (req, res) => {
     try {
         const { notes } = req.body;
-        const order = await Order.findByIdAndUpdate(
+        const order = await Order.findOneAndUpdate(
             req.params.id, { notes }, { new: true }
         );
         res.json(order);
@@ -128,15 +125,4 @@ router.patch('/:id/notes', async (req, res) => {
     }
 });
 
-// GET /api/orders/debug-latest — Check last order notification status
-router.get('/debug-latest', async (req, res) => {
-    try {
-        const latest = await Order.findOne().sort({ createdAt: -1 }).select('customerName phone createdAt notificationLog');
-        res.json(latest || { message: 'No orders found' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
 module.exports = router;
-
