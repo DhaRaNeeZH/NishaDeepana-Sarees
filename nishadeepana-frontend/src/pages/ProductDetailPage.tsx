@@ -59,8 +59,10 @@ export const ProductDetailPage: React.FC = () => {
     useEffect(() => {
         if (saree?.colorGroup) {
             api.getColorVariants(saree.colorGroup)
-                .then(variants => setColorVariants(variants.filter(v => v.id !== saree.id)))
-                .catch(console.error);
+                .then(variants => {
+                    setColorVariants(variants ? variants.filter((v: any) => v._id !== saree.id && v.id !== saree.id) : []);
+                })
+                .catch(err => console.error(err));
         } else {
             setColorVariants([]);
         }
