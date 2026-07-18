@@ -243,10 +243,10 @@ export const ProductDetailPage: React.FC = () => {
                                             style={getColorStyle(saree.colorTag)} 
                                         />
                                     </div>
-                                    {colorVariants.map(variant => (
+                                    {colorVariants.map((variant: any) => (
                                         <Link 
-                                            key={variant.id} 
-                                            to={`/product/${variant.id}`} 
+                                            key={variant.id || variant._id} 
+                                            to={`/product/${variant.id || variant._id}`} 
                                             className="border-2 border-transparent hover:border-gray-300 rounded-full p-0.5 transition-colors"
                                             title={variant.colorTag || variant.color}
                                         >
