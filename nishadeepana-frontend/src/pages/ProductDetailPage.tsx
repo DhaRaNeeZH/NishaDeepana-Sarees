@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Heart, Share2, Package, Shield, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { useProducts } from '../contexts/ProductContext';
@@ -21,7 +21,18 @@ export const ProductDetailPage: React.FC = () => {
     const saree = products.find(s => s.id === id);
     const [selectedImage, setSelectedImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
-    const [colorVariants, setColorVariants] = useState<Saree[]>([]);
+    const [colorVariants, setColorVariants] = useState<any[]>([]);
+    const carouselRef = useRef<HTMLDivElement>(null);
+
+    const scrollCarousel = (direction: 'left' | 'right') => {
+        if (carouselRef.current) {
+            const scrollAmount = 300;
+            carouselRef.current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
     const { addItem } = useCart();
     const { isWishlisted, toggleWishlist } = useWishlist();
     const isLiked = id ? isWishlisted(id) : false;
@@ -424,8 +435,29 @@ export const ProductDetailPage: React.FC = () => {
                 {/* Related Products */}
                 {relatedSarees.length > 0 && (
                     <div className="mb-12 overflow-hidden">
-                        <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">You May Also Like</h2>
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">You May Also Like</h2>
+                            <div className="hidden md:flex gap-2">
+                                <Button 
+                                    variant="outline" 
+                                    size="icon" 
+                                    className="rounded-full border-gray-300 hover:bg-gray-100"
+                                    onClick={() => scrollCarousel('left')}
+                                >
+                                    <ChevronLeft className="h-5 w-5" />
+                                </Button>
+                                <Button 
+                                    variant="outline" 
+                                    size="icon" 
+                                    className="rounded-full border-gray-300 hover:bg-gray-100"
+                                    onClick={() => scrollCarousel('right')}
+                                >
+                                    <ChevronRight className="h-5 w-5" />
+                                </Button>
+                            </div>
+                        </div>
                         <div 
+                            ref={carouselRef}
                             className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:gap-6 pb-6 -mx-4 px-4 sm:mx-0 sm:px-0"
                             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                         >
