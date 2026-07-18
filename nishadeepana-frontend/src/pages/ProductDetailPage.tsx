@@ -37,8 +37,18 @@ export const ProductDetailPage: React.FC = () => {
         );
     }
 
+    const getRelatedScore = (s: Saree) => {
+        let score = 0;
+        if (s.category === saree.category) score += 2;
+        if (s.sareeType === saree.sareeType) score += 2;
+        if (s.colorTag && saree.colorTag && s.colorTag === saree.colorTag) score += 1;
+        if (s.color && saree.color && s.color === saree.color) score += 1;
+        return score;
+    };
+
     const relatedSarees = products
-        .filter(s => s.category === saree.category && s.id !== saree.id)
+        .filter(s => s.id !== saree.id)
+        .sort((a, b) => getRelatedScore(b) - getRelatedScore(a))
         .slice(0, 4);
 
     const images = saree.images && saree.images.length > 0 ? [saree.image, ...saree.images] : [saree.image];
@@ -223,7 +233,7 @@ export const ProductDetailPage: React.FC = () => {
 
 
                         {/* Color Variants */}
-                        {(saree.colorTag || colorVariants.length > 0) && (
+                        {colorVariants.length > 0 && (
                             <div className="mb-6">
                                 <span className="text-sm font-medium mb-2 block">Also available in:</span>
                                 <div className="flex flex-wrap gap-3">
