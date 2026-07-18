@@ -269,7 +269,7 @@ export const ProductDetailPage: React.FC = () => {
                                 <div className="flex flex-wrap gap-3">
                                     {allVariants.map((variant: any) => {
                                         const vId = variant.id || variant._id;
-                                        const sId = saree.id || saree._id;
+                                        const sId = saree.id || (saree as any)._id;
                                         const isSelected = vId === sId;
                                         if (isSelected) {
                                             return (

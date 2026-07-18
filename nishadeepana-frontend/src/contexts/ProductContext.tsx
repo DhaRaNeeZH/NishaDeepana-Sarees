@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { sarees as defaultSarees } from '../data/sarees';
 import { Saree } from '../lib/types';
 import { api } from '../lib/api';
 
@@ -30,7 +29,7 @@ export function ProductProvider({ children }: { children: ReactNode }) {
                     // Map MongoDB _id to id for frontend compatibility
                     const mapped = data.map((p: any) => ({
                         ...p,
-                        id: p._id || p.id,
+                        id: p.id || (p as any)._id,
                     }));
                     setProducts(mapped);
                 }
