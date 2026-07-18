@@ -37,16 +37,6 @@ const videoUpload = multer({
     },
 });
 
-// Helper to stream a chunked buffer to Cloudinary (for videos)
-function uploadChunkedToCloudinary(buffer, options) {
-    return new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_chunked_stream(options, (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-        });
-        stream.end(buffer);
-    });
-}
 
 // Helper to stream a buffer to Cloudinary (for images)
 function uploadToCloudinary(buffer, options) {
@@ -88,7 +78,7 @@ router.post('/video', adminOnly, videoUpload.single('video'), async (req, res) =
         }
         
         console.log('Streaming to Cloudinary...');
-        const result = await uploadChunkedToCloudinary(req.file.buffer, options);
+        const result = await uploadToCloudinary(req.file.buffer, options);
         
         console.log('Cloudinary upload success:', result.secure_url);
         res.json({ url: result.secure_url });
