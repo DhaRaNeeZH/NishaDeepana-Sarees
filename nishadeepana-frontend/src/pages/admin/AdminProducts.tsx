@@ -78,7 +78,13 @@ const ProductModal: React.FC<{
     const getColorStyle = (tag?: string) => {
         if (!tag) return { backgroundColor: '#f3f4f6' };
         if (tag === 'Multicolor') return { background: 'linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet)' };
-        return { backgroundColor: tag.toLowerCase() };
+        const customColors: Record<string, string> = {
+            'Mint': '#98FF98',
+            'Mustard': '#FFDB58',
+            'Rust': '#B7410E',
+            'Peach': '#FFCBA4'
+        };
+        return { backgroundColor: customColors[tag] || tag.toLowerCase() };
     };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
