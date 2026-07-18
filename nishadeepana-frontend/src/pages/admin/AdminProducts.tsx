@@ -85,6 +85,7 @@ const ProductModal: React.FC<{
             'Peach': '#FFCBA4',
             'Dark Pink': '#FF1493',
             'Light Green': '#90EE90',
+            'Yellow Green': '#9ACD32',
             'Light Brown': '#C4A484',
             'Dark Brown': '#5C4033'
         };
@@ -377,7 +378,7 @@ const ProductModal: React.FC<{
                             <div className="flex flex-wrap gap-2 mt-1">
                                 {[
                                     'Red', 'Maroon', 'Pink', 'Dark Pink', 'Purple', 'Violet', 'Lavender',
-                                    'Blue', 'Navy', 'Cyan', 'Teal', 'Green', 'Light Green', 'Olive', 'Mint',
+                                    'Blue', 'Navy', 'Cyan', 'Teal', 'Green', 'Light Green', 'Yellow Green', 'Olive', 'Mint',
                                     'Yellow', 'Mustard', 'Orange', 'Rust', 'Peach', 'Coral',
                                     'Brown', 'Light Brown', 'Dark Brown', 'Beige', 'White', 'Black', 'Gray', 'Gold', 'Silver', 'Multicolor'
                                 ].map(colorOption => (

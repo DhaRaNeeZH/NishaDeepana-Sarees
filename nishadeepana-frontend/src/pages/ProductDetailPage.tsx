@@ -116,6 +116,7 @@ export const ProductDetailPage: React.FC = () => {
             'Peach': '#FFCBA4',
             'Dark Pink': '#FF1493',
             'Light Green': '#90EE90',
+            'Yellow Green': '#9ACD32',
             'Light Brown': '#C4A484',
             'Dark Brown': '#5C4033'
         };
