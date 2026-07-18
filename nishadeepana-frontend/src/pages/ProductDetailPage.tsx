@@ -253,7 +253,7 @@ export const ProductDetailPage: React.FC = () => {
                         {(saree.colorTag || colorVariants.length > 0) && (
                             <div className="mb-6">
                                 <span className="text-sm font-medium mb-2 block">
-                                    {colorVariants.length > 0 ? "Also available in:" : "Available in:"}
+                                    {allVariants.length > 1 ? "Also available in:" : `Available in: ${saree.colorTag || saree.color || ''}`}
                                 </span>
                                 <div className="flex flex-wrap gap-3">
                                     {allVariants.map((variant: any) => {

@@ -17,13 +17,7 @@ interface ProductContextType {
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 export function ProductProvider({ children }: { children: ReactNode }) {
-    const [products, setProducts] = useState<Saree[]>(() => {
-        try {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) return JSON.parse(stored);
-        } catch { /* ignore */ }
-        return defaultSarees;
-    });
+    const [products, setProducts] = useState<Saree[]>([]);
     const [loading, setLoading] = useState(false);
 
     // Try to fetch from backend API; fall back to localStorage if unavailable
@@ -39,11 +33,10 @@ export function ProductProvider({ children }: { children: ReactNode }) {
                         id: p._id || p.id,
                     }));
                     setProducts(mapped);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(mapped));
                 }
             })
-            .catch(() => {
-                // Backend unavailable — use localStorage (already loaded in useState)
+            .catch(err => {
+                console.error("Failed to fetch products:", err);
             })
             .finally(() => {
                 if (!cancelled) setLoading(false);
