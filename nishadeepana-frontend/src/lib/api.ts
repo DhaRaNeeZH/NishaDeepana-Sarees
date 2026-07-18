@@ -90,13 +90,13 @@ export const api = {
     },
 
     // Video Upload
-    uploadVideo: async (file: File, onProgress?: (pct: number) => void): Promise<{ url: string }> => {
+    uploadVideo: async (file: File, mute: boolean = true, onProgress?: (pct: number) => void): Promise<{ url: string }> => {
         const token = localStorage.getItem('nd_token');
         return new Promise((resolve, reject) => {
             const formData = new FormData();
             formData.append('video', file);
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', `${API_BASE}/api/upload/video`);
+            xhr.open('POST', `${API_BASE}/api/upload/video?mute=${mute}`);
             if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
             xhr.upload.onprogress = (e) => {
                 if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));

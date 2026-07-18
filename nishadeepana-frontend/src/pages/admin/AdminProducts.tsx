@@ -73,6 +73,7 @@ const ProductModal: React.FC<{
     // Cropper state
     const [cropperFile, setCropperFile] = React.useState<File | null>(null);
     const [cropperTarget, setCropperTarget] = React.useState<'main' | 'gallery'>('main');
+    const [muteVideo, setMuteVideo] = React.useState(true);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -117,7 +118,7 @@ const ProductModal: React.FC<{
         setUploading(true);
         setError('');
         try {
-            const result = await api.uploadVideo(file);
+            const result = await api.uploadVideo(file, muteVideo);
             setForm(prev => ({ ...prev, video: result.url }));
         } catch (err: any) {
             setError(err.message || 'Video upload failed');
@@ -311,7 +312,18 @@ const ProductModal: React.FC<{
 
                     {/* Video Upload */}
                     <div>
-                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Product Video (Optional)</label>
+                        <div className="flex justify-between items-center mb-1">
+                            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block">Product Video (Optional)</label>
+                            <label className="flex items-center gap-1.5 cursor-pointer text-xs text-gray-600">
+                                <input
+                                    type="checkbox"
+                                    checked={muteVideo}
+                                    onChange={e => setMuteVideo(e.target.checked)}
+                                    className="w-3.5 h-3.5 accent-maroon"
+                                />
+                                Strip Audio
+                            </label>
+                        </div>
                         <div className="flex gap-2 mb-2">
                             <input
                                 id="video-upload"

@@ -78,11 +78,17 @@ router.post('/video', adminOnly, videoUpload.single('video'), async (req, res) =
     try {
         if (!req.file) return res.status(400).json({ error: 'No video file provided' });
         
-        console.log('Streaming to Cloudinary...');
-        const result = await uploadChunkedToCloudinary(req.file.buffer, {
+        const options = {
             folder: 'nishadeepana-sarees-videos',
             resource_type: 'video',
-        });
+        };
+        
+        if (req.query.mute === 'true') {
+            options.transformation = [{ audio_codec: "none" }];
+        }
+        
+        console.log('Streaming to Cloudinary...');
+        const result = await uploadChunkedToCloudinary(req.file.buffer, options);
         
         console.log('Cloudinary upload success:', result.secure_url);
         res.json({ url: result.secure_url });

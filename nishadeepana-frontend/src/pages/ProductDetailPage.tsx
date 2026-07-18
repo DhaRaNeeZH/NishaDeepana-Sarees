@@ -43,7 +43,7 @@ export const ProductDetailPage: React.FC = () => {
 
     const images = saree.images && saree.images.length > 0 ? [saree.image, ...saree.images] : [saree.image];
     const media = saree.video 
-        ? [{ type: 'video', url: saree.video }, ...images.map(url => ({ type: 'image', url }))]
+        ? [...images.map(url => ({ type: 'image', url })), { type: 'video', url: saree.video }]
         : images.map(url => ({ type: 'image', url }));
 
     useEffect(() => {
