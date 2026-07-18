@@ -74,14 +74,26 @@ router.post('/video', adminOnly, videoUpload.single('video'), async (req, res) =
         };
         
         if (req.query.mute === 'true') {
-            options.transformation = [{ audio_codec: "none" }];
+            options.eager = [{ audio_codec: "none" }];
+            options.eager_async = true;
         }
         
         console.log('Streaming to Cloudinary...');
         const result = await uploadToCloudinary(req.file.buffer, options);
         
-        console.log('Cloudinary upload success:', result.secure_url);
-        res.json({ url: result.secure_url });
+        console.log('Cloudinary upload success');
+        
+        let finalUrl = result.secure_url;
+        // If eager transformation was requested, use its URL instead of the original
+        if (req.query.mute === 'true') {
+            if (result.eager && result.eager.length > 0) {
+                finalUrl = result.eager[0].secure_url;
+            } else {
+                finalUrl = finalUrl.replace('/upload/', '/upload/ac_none/');
+            }
+        }
+        
+        res.json({ url: finalUrl });
     } catch (err) {
         console.error('Cloudinary upload error:', err);
         res.status(500).json({ error: err.message || 'Video upload failed' });
