@@ -82,7 +82,11 @@ const ProductModal: React.FC<{
             'Mint': '#98FF98',
             'Mustard': '#FFDB58',
             'Rust': '#B7410E',
-            'Peach': '#FFCBA4'
+            'Peach': '#FFCBA4',
+            'Dark Pink': '#FF1493',
+            'Light Green': '#90EE90',
+            'Light Brown': '#C4A484',
+            'Dark Brown': '#5C4033'
         };
         return { backgroundColor: customColors[tag] || tag.toLowerCase() };
     };
@@ -372,10 +376,10 @@ const ProductModal: React.FC<{
                             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Color Tag (For Swatches)</label>
                             <div className="flex flex-wrap gap-2 mt-1">
                                 {[
-                                    'Red', 'Maroon', 'Pink', 'Magenta', 'Purple', 'Lavender',
-                                    'Blue', 'Navy', 'Cyan', 'Teal', 'Green', 'Olive', 'Mint',
+                                    'Red', 'Maroon', 'Pink', 'Dark Pink', 'Purple', 'Violet', 'Lavender',
+                                    'Blue', 'Navy', 'Cyan', 'Teal', 'Green', 'Light Green', 'Olive', 'Mint',
                                     'Yellow', 'Mustard', 'Orange', 'Rust', 'Peach', 'Coral',
-                                    'Brown', 'Beige', 'White', 'Black', 'Gray', 'Gold', 'Silver', 'Multicolor'
+                                    'Brown', 'Light Brown', 'Dark Brown', 'Beige', 'White', 'Black', 'Gray', 'Gold', 'Silver', 'Multicolor'
                                 ].map(colorOption => (
                                     <button
                                         key={colorOption}

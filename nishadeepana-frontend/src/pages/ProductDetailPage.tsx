@@ -113,7 +113,11 @@ export const ProductDetailPage: React.FC = () => {
             'Mint': '#98FF98',
             'Mustard': '#FFDB58',
             'Rust': '#B7410E',
-            'Peach': '#FFCBA4'
+            'Peach': '#FFCBA4',
+            'Dark Pink': '#FF1493',
+            'Light Green': '#90EE90',
+            'Light Brown': '#C4A484',
+            'Dark Brown': '#5C4033'
         };
         return { backgroundColor: customColors[tag] || tag.toLowerCase() };
     };
