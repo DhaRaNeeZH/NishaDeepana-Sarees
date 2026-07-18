@@ -51,7 +51,16 @@ export const ProductDetailPage: React.FC = () => {
         .filter(s => getRelatedScore(s) > 0)
         .sort((a, b) => getRelatedScore(b) - getRelatedScore(a));
 
-    const allVariants = [saree, ...colorVariants].sort((a: any, b: any) => {
+    // Combine and deduplicate variants to ensure no duplicates
+    const rawVariants = [saree, ...colorVariants];
+    const uniqueVariantsMap = new Map();
+    rawVariants.forEach((v: any) => {
+        const vId = v.id || v._id;
+        if (vId && !uniqueVariantsMap.has(vId)) {
+            uniqueVariantsMap.set(vId, v);
+        }
+    });
+    const allVariants = Array.from(uniqueVariantsMap.values()).sort((a: any, b: any) => {
         const idA = a.id || a._id || '';
         const idB = b.id || b._id || '';
         return idA.localeCompare(idB);
@@ -248,19 +257,21 @@ export const ProductDetailPage: React.FC = () => {
                                 </span>
                                 <div className="flex flex-wrap gap-3">
                                     {allVariants.map((variant: any) => {
-                                        const isSelected = (variant.id || variant._id) === saree.id;
+                                        const vId = variant.id || variant._id;
+                                        const sId = saree.id || saree._id;
+                                        const isSelected = vId === sId;
                                         if (isSelected) {
                                             return (
-                                                <div key={saree.id} className="relative cursor-default border-2 border-maroon rounded-full p-0.5" title={`${saree.colorTag || saree.color} (Selected)`}>
+                                                <div key={vId} className="relative cursor-default ring-2 ring-maroon rounded-full p-0.5" title={`${saree.colorTag || saree.color} (Selected)`}>
                                                     <div className="w-8 h-8 rounded-full border border-gray-200" style={getColorStyle(saree.colorTag)} />
                                                 </div>
                                             );
                                         }
                                         return (
                                             <Link 
-                                                key={variant.id || variant._id} 
-                                                to={`/product/${variant.id || variant._id}`} 
-                                                className="border-2 border-transparent hover:border-gray-300 rounded-full p-0.5 transition-colors"
+                                                key={vId} 
+                                                to={`/product/${vId}`} 
+                                                className="ring-2 ring-transparent hover:ring-gray-300 rounded-full p-0.5 transition-colors"
                                                 title={variant.colorTag || variant.color}
                                             >
                                                 <div 
