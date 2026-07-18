@@ -75,6 +75,12 @@ const ProductModal: React.FC<{
     const [cropperTarget, setCropperTarget] = React.useState<'main' | 'gallery'>('main');
     const [muteVideo, setMuteVideo] = React.useState(true);
 
+    const getColorStyle = (tag?: string) => {
+        if (!tag) return { backgroundColor: '#f3f4f6' };
+        if (tag === 'Multicolor') return { background: 'linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet)' };
+        return { backgroundColor: tag.toLowerCase() };
+    };
+
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -358,40 +364,38 @@ const ProductModal: React.FC<{
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Color Tag (For Swatches)</label>
-                            <select
-                                value={form.colorTag}
-                                onChange={e => handleChange('colorTag', e.target.value)}
-                                className="w-full border border-maroon/30 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-maroon bg-white h-10"
-                            >
-                                <option value="">None</option>
-                                <option value="Red">Red</option>
-                                <option value="Maroon">Maroon</option>
-                                <option value="Pink">Pink</option>
-                                <option value="Magenta">Magenta</option>
-                                <option value="Purple">Purple</option>
-                                <option value="Lavender">Lavender</option>
-                                <option value="Blue">Blue</option>
-                                <option value="Navy">Navy</option>
-                                <option value="Cyan">Cyan</option>
-                                <option value="Teal">Teal</option>
-                                <option value="Green">Green</option>
-                                <option value="Olive">Olive</option>
-                                <option value="Mint">Mint</option>
-                                <option value="Yellow">Yellow</option>
-                                <option value="Mustard">Mustard</option>
-                                <option value="Orange">Orange</option>
-                                <option value="Rust">Rust</option>
-                                <option value="Peach">Peach</option>
-                                <option value="Coral">Coral</option>
-                                <option value="Brown">Brown</option>
-                                <option value="Beige">Beige</option>
-                                <option value="White">White</option>
-                                <option value="Black">Black</option>
-                                <option value="Gray">Gray</option>
-                                <option value="Gold">Gold</option>
-                                <option value="Silver">Silver</option>
-                                <option value="Multicolor">Multicolor</option>
-                            </select>
+                            <div className="flex flex-wrap gap-2 mt-1">
+                                {[
+                                    'Red', 'Maroon', 'Pink', 'Magenta', 'Purple', 'Lavender',
+                                    'Blue', 'Navy', 'Cyan', 'Teal', 'Green', 'Olive', 'Mint',
+                                    'Yellow', 'Mustard', 'Orange', 'Rust', 'Peach', 'Coral',
+                                    'Brown', 'Beige', 'White', 'Black', 'Gray', 'Gold', 'Silver', 'Multicolor'
+                                ].map(colorOption => (
+                                    <button
+                                        key={colorOption}
+                                        type="button"
+                                        onClick={() => handleChange('colorTag', colorOption)}
+                                        className={`w-7 h-7 rounded-full border shadow-sm transition-all focus:outline-none ${
+                                            form.colorTag === colorOption 
+                                                ? 'ring-2 ring-maroon ring-offset-2 scale-110' 
+                                                : 'hover:scale-110'
+                                        }`}
+                                        style={getColorStyle(colorOption)}
+                                        title={colorOption}
+                                    />
+                                ))}
+                                <button
+                                    type="button"
+                                    onClick={() => handleChange('colorTag', '')}
+                                    className={`px-3 py-1 text-xs rounded-full border shadow-sm transition-all focus:outline-none ${
+                                        !form.colorTag 
+                                            ? 'bg-gray-800 text-white ring-2 ring-gray-800 ring-offset-1' 
+                                            : 'bg-white text-gray-600 hover:bg-gray-100'
+                                    }`}
+                                >
+                                    None
+                                </button>
+                            </div>
                         </div>
                         {field('Color Group ID', 'colorGroup', 'text', 'e.g. banarasi-1')}
                     </div>
