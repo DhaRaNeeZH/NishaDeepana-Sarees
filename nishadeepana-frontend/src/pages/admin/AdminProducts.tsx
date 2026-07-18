@@ -365,16 +365,31 @@ const ProductModal: React.FC<{
                             >
                                 <option value="">None</option>
                                 <option value="Red">Red</option>
-                                <option value="Blue">Blue</option>
-                                <option value="Green">Green</option>
-                                <option value="Yellow">Yellow</option>
+                                <option value="Maroon">Maroon</option>
                                 <option value="Pink">Pink</option>
+                                <option value="Magenta">Magenta</option>
                                 <option value="Purple">Purple</option>
+                                <option value="Lavender">Lavender</option>
+                                <option value="Blue">Blue</option>
+                                <option value="Navy">Navy</option>
+                                <option value="Cyan">Cyan</option>
+                                <option value="Teal">Teal</option>
+                                <option value="Green">Green</option>
+                                <option value="Olive">Olive</option>
+                                <option value="Mint">Mint</option>
+                                <option value="Yellow">Yellow</option>
+                                <option value="Mustard">Mustard</option>
                                 <option value="Orange">Orange</option>
+                                <option value="Rust">Rust</option>
+                                <option value="Peach">Peach</option>
+                                <option value="Coral">Coral</option>
                                 <option value="Brown">Brown</option>
+                                <option value="Beige">Beige</option>
                                 <option value="White">White</option>
                                 <option value="Black">Black</option>
                                 <option value="Gray">Gray</option>
+                                <option value="Gold">Gold</option>
+                                <option value="Silver">Silver</option>
                                 <option value="Multicolor">Multicolor</option>
                             </select>
                         </div>
