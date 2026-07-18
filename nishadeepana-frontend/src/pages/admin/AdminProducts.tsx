@@ -371,9 +371,10 @@ const ProductModal: React.FC<{
                                 <option value="Pink">Pink</option>
                                 <option value="Purple">Purple</option>
                                 <option value="Orange">Orange</option>
+                                <option value="Brown">Brown</option>
                                 <option value="White">White</option>
                                 <option value="Black">Black</option>
-                                <option value="Gold">Gold</option>
+                                <option value="Gray">Gray</option>
                                 <option value="Multicolor">Multicolor</option>
                             </select>
                         </div>
