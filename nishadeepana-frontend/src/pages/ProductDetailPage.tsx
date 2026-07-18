@@ -39,17 +39,23 @@ export const ProductDetailPage: React.FC = () => {
 
     const getRelatedScore = (s: Saree) => {
         let score = 0;
+        if (s.colorTag && saree.colorTag && s.colorTag === saree.colorTag) score += 10;
+        if (s.color && saree.color && s.color === saree.color) score += 5;
         if (s.category === saree.category) score += 2;
         if (s.sareeType === saree.sareeType) score += 2;
-        if (s.colorTag && saree.colorTag && s.colorTag === saree.colorTag) score += 1;
-        if (s.color && saree.color && s.color === saree.color) score += 1;
         return score;
     };
 
     const relatedSarees = products
         .filter(s => s.id !== saree.id)
         .sort((a, b) => getRelatedScore(b) - getRelatedScore(a))
-        .slice(0, 8);
+        .slice(0, 12);
+
+    const allVariants = [saree, ...colorVariants].sort((a: any, b: any) => {
+        const idA = a.id || a._id || '';
+        const idB = b.id || b._id || '';
+        return idA.localeCompare(idB);
+    });
 
     const images = saree.images && saree.images.length > 0 ? [saree.image, ...saree.images] : [saree.image];
     const media = saree.video 
@@ -241,25 +247,29 @@ export const ProductDetailPage: React.FC = () => {
                                     {colorVariants.length > 0 ? "Also available in:" : "Available in:"}
                                 </span>
                                 <div className="flex flex-wrap gap-3">
-                                    <div className="relative cursor-default border-2 border-maroon rounded-full p-0.5" title={`${saree.colorTag || saree.color} (Selected)`}>
-                                        <div 
-                                            className="w-8 h-8 rounded-full border border-gray-200" 
-                                            style={getColorStyle(saree.colorTag)} 
-                                        />
-                                    </div>
-                                    {colorVariants.map((variant: any) => (
-                                        <Link 
-                                            key={variant.id || variant._id} 
-                                            to={`/product/${variant.id || variant._id}`} 
-                                            className="border-2 border-transparent hover:border-gray-300 rounded-full p-0.5 transition-colors"
-                                            title={variant.colorTag || variant.color}
-                                        >
-                                            <div 
-                                                className="w-8 h-8 rounded-full border border-gray-200" 
-                                                style={getColorStyle(variant.colorTag)} 
-                                            />
-                                        </Link>
-                                    ))}
+                                    {allVariants.map((variant: any) => {
+                                        const isSelected = (variant.id || variant._id) === saree.id;
+                                        if (isSelected) {
+                                            return (
+                                                <div key={saree.id} className="relative cursor-default border-2 border-maroon rounded-full p-0.5" title={`${saree.colorTag || saree.color} (Selected)`}>
+                                                    <div className="w-8 h-8 rounded-full border border-gray-200" style={getColorStyle(saree.colorTag)} />
+                                                </div>
+                                            );
+                                        }
+                                        return (
+                                            <Link 
+                                                key={variant.id || variant._id} 
+                                                to={`/product/${variant.id || variant._id}`} 
+                                                className="border-2 border-transparent hover:border-gray-300 rounded-full p-0.5 transition-colors"
+                                                title={variant.colorTag || variant.color}
+                                            >
+                                                <div 
+                                                    className="w-8 h-8 rounded-full border border-gray-200" 
+                                                    style={getColorStyle(variant.colorTag)} 
+                                                />
+                                            </Link>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         )}
@@ -402,11 +412,16 @@ export const ProductDetailPage: React.FC = () => {
 
                 {/* Related Products */}
                 {relatedSarees.length > 0 && (
-                    <div>
-                        <h2 className="text-3xl font-bold mb-8 text-gray-900">You May Also Like</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="mb-12 overflow-hidden">
+                        <h2 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">You May Also Like</h2>
+                        <div 
+                            className="flex overflow-x-auto snap-x snap-mandatory gap-4 md:gap-6 pb-6 -mx-4 px-4 sm:mx-0 sm:px-0"
+                            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                        >
                             {relatedSarees.map((s) => (
-                                <ProductCard key={s.id} saree={s} />
+                                <div key={s.id} className="w-[75vw] sm:w-[280px] lg:w-[280px] flex-shrink-0 snap-start">
+                                    <ProductCard saree={s} />
+                                </div>
                             ))}
                         </div>
                     </div>
