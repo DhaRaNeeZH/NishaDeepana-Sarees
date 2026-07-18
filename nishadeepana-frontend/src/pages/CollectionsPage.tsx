@@ -34,7 +34,8 @@ export const CollectionsPage: React.FC = () => {
     const { products } = useProducts();
     const { categories: adminCategories } = useCategories();
     const [searchParams, setSearchParams] = useSearchParams();
-    const [priceRanges, setPriceRanges] = useState(DEFAULT_PRICE_RANGES);
+    const [priceRanges, setPriceRanges] = useState<{label: string, min: number, max: number}[]>([]);
+    const [priceLoaded, setPriceLoaded] = useState(false);
     const [bestSellingIds, setBestSellingIds] = useState<string[]>([]);
     const [sortDropdownOpen, setSortDropdownOpen] = useState(false);
     const sortDropdownRef = useRef<HTMLDivElement>(null);
@@ -44,8 +45,16 @@ export const CollectionsPage: React.FC = () => {
 
     useEffect(() => {
         api.getPriceRanges().then(ranges => {
-            if (ranges && ranges.length > 0) setPriceRanges(ranges);
-        }).catch(() => {});
+            if (ranges && ranges.length > 0) {
+                setPriceRanges(ranges);
+            } else {
+                setPriceRanges(DEFAULT_PRICE_RANGES);
+            }
+        }).catch(() => {
+            setPriceRanges(DEFAULT_PRICE_RANGES);
+        }).finally(() => {
+            setPriceLoaded(true);
+        });
     }, []);
 
     useEffect(() => {
@@ -85,9 +94,10 @@ export const CollectionsPage: React.FC = () => {
         Array.from(new Set(products.map(p => p.category))).sort(),
         [products]
     );
-    const categories = adminCategories.length > 0
-        ? adminCategories.map(c => c.name).sort()
-        : productCategories;
+    const categories = Array.from(new Set([
+        ...productCategories,
+        ...adminCategories.map(c => c.name)
+    ])).sort();
 
     const categoryCounts = useMemo(() => {
         const counts: Record<string, number> = { all: products.length };
@@ -362,7 +372,9 @@ export const CollectionsPage: React.FC = () => {
         </div>
     );
 
-    const renderPriceFilter = (onSelect: () => void) => (
+    const renderPriceFilter = (onSelect: () => void) => {
+        if (!priceLoaded) return null;
+        return (
         <div className="mb-4">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Price Range</h3>
             <div className="space-y-1">
@@ -379,7 +391,8 @@ export const CollectionsPage: React.FC = () => {
                 ))}
             </div>
         </div>
-    );
+        );
+    };
 
     return (
         <div className="min-h-screen bg-gray-50">

@@ -49,7 +49,7 @@ export const ProductDetailPage: React.FC = () => {
     const relatedSarees = products
         .filter(s => s.id !== saree.id)
         .sort((a, b) => getRelatedScore(b) - getRelatedScore(a))
-        .slice(0, 4);
+        .slice(0, 8);
 
     const images = saree.images && saree.images.length > 0 ? [saree.image, ...saree.images] : [saree.image];
     const media = saree.video 
@@ -235,9 +235,11 @@ export const ProductDetailPage: React.FC = () => {
 
 
                         {/* Color Variants */}
-                        {colorVariants.length > 0 && (
+                        {(saree.colorTag || colorVariants.length > 0) && (
                             <div className="mb-6">
-                                <span className="text-sm font-medium mb-2 block">Also available in:</span>
+                                <span className="text-sm font-medium mb-2 block">
+                                    {colorVariants.length > 0 ? "Also available in:" : "Available in:"}
+                                </span>
                                 <div className="flex flex-wrap gap-3">
                                     <div className="relative cursor-default border-2 border-maroon rounded-full p-0.5" title={`${saree.colorTag || saree.color} (Selected)`}>
                                         <div 
