@@ -17,7 +17,7 @@ import { Saree } from '../lib/types';
 export const ProductDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { products } = useProducts();
+    const { products, loading } = useProducts();
     const saree = products.find(s => s.id === id);
     const [selectedImage, setSelectedImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
@@ -36,6 +36,29 @@ export const ProductDetailPage: React.FC = () => {
     const { addItem } = useCart();
     const { isWishlisted, toggleWishlist } = useWishlist();
     const isLiked = id ? isWishlisted(id) : false;
+
+    useEffect(() => {
+        if (saree?.colorGroup) {
+            api.getColorVariants(saree.colorGroup)
+                .then(variants => {
+                    setColorVariants(variants ? variants.filter((v: any) => v._id !== saree.id && v.id !== saree.id) : []);
+                })
+                .catch(err => console.error(err));
+        } else {
+            setColorVariants([]);
+        }
+        // Reset state on navigation
+        setSelectedImage(0);
+        setQuantity(1);
+    }, [saree?.colorGroup, saree?.id]);
+
+    if (loading && !saree) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-maroon"></div>
+            </div>
+        );
+    }
 
     if (!saree) {
         return (
@@ -82,20 +105,6 @@ export const ProductDetailPage: React.FC = () => {
         ? [...images.map(url => ({ type: 'image', url })), { type: 'video', url: saree.video }]
         : images.map(url => ({ type: 'image', url }));
 
-    useEffect(() => {
-        if (saree?.colorGroup) {
-            api.getColorVariants(saree.colorGroup)
-                .then(variants => {
-                    setColorVariants(variants ? variants.filter((v: any) => v._id !== saree.id && v.id !== saree.id) : []);
-                })
-                .catch(err => console.error(err));
-        } else {
-            setColorVariants([]);
-        }
-        // Reset state on navigation
-        setSelectedImage(0);
-        setQuantity(1);
-    }, [saree?.colorGroup, saree?.id]);
 
     const getColorStyle = (tag?: string) => {
         if (!tag) return { backgroundColor: '#f3f4f6' };
