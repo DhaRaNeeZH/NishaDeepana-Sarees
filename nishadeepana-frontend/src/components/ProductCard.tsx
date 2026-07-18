@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Heart } from 'lucide-react';
+import { ShoppingCart, Heart, Play } from 'lucide-react';
 import { Saree } from '../lib/types';
 import { formatCurrency } from '../lib/utils';
 import { Card, CardContent, CardFooter } from './ui/card';
@@ -42,6 +42,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ saree, onClick }) => {
                     <div className="absolute top-1.5 left-1.5 flex flex-col items-start gap-1">
                         {saree.featured && (
                             <Badge className="bg-primary text-white text-[9px] sm:text-xs px-1.5 py-0.5">Featured</Badge>
+                        )}
+                        {saree.video && (
+                            <div className="bg-black/60 text-white p-1 rounded-full backdrop-blur-sm" title="Has Video">
+                                <Play className="h-3 w-3 sm:h-4 sm:w-4" fill="currentColor" />
+                            </div>
                         )}
                     </div>
 

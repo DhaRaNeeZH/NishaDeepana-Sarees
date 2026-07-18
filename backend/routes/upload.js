@@ -1,6 +1,7 @@
 // ================================================================
-// Upload Route — Image upload to Cloudinary (admin only)
-// POST /api/upload → returns { url: "https://res.cloudinary.com/..." }
+// Upload Route — Image + Video upload to Cloudinary (admin only)
+// POST /api/upload        → image upload, returns { url }
+// POST /api/upload/video  → video upload, returns { url }
 // ================================================================
 
 const express = require('express');
@@ -16,39 +17,78 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Use memory storage — send buffer directly to Cloudinary
-const storage = multer.memoryStorage();
-const upload = multer({
-    storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+// Image upload multer (5MB, images only)
+const imageUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
         if (file.mimetype.startsWith('image/')) cb(null, true);
         else cb(new Error('Only image files are allowed'));
     },
 });
 
-// POST /api/upload — admin only
-router.post('/', adminOnly, upload.single('image'), async (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ error: 'No image file provided' });
-        }
+// Video upload multer (100MB, videos only)
+const videoUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 100 * 1024 * 1024 }, // 100MB max
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('video/')) cb(null, true);
+        else cb(new Error('Only video files are allowed'));
+    },
+});
 
-        // Upload buffer to Cloudinary
-        const result = await new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream(
-                { folder: 'nishadeepana-sarees' },
-                (error, result) => {
-                    if (error) reject(error);
-                    else resolve(result);
-                }
-            );
-            stream.end(req.file.buffer);
+// Helper to stream a chunked buffer to Cloudinary (for videos)
+function uploadChunkedToCloudinary(buffer, options) {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_chunked_stream(options, (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
         });
+        stream.end(buffer);
+    });
+}
 
+// Helper to stream a buffer to Cloudinary (for images)
+function uploadToCloudinary(buffer, options) {
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(options, (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+        });
+        stream.end(buffer);
+    });
+}
+
+// POST /api/upload — image upload (admin only)
+router.post('/', adminOnly, imageUpload.single('image'), async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ error: 'No image file provided' });
+        const result = await uploadToCloudinary(req.file.buffer, {
+            folder: 'nishadeepana-sarees',
+        });
         res.json({ url: result.secure_url });
     } catch (err) {
-        res.status(500).json({ error: err.message || 'Upload failed' });
+        res.status(500).json({ error: err.message || 'Image upload failed' });
+    }
+});
+
+// POST /api/upload/video — video upload (admin only)
+router.post('/video', adminOnly, videoUpload.single('video'), async (req, res) => {
+    console.log('Video upload started, size:', req.file ? req.file.size : 0);
+    try {
+        if (!req.file) return res.status(400).json({ error: 'No video file provided' });
+        
+        console.log('Streaming to Cloudinary...');
+        const result = await uploadChunkedToCloudinary(req.file.buffer, {
+            folder: 'nishadeepana-sarees-videos',
+            resource_type: 'video',
+        });
+        
+        console.log('Cloudinary upload success:', result.secure_url);
+        res.json({ url: result.secure_url });
+    } catch (err) {
+        console.error('Cloudinary upload error:', err);
+        res.status(500).json({ error: err.message || 'Video upload failed' });
     }
 });
 

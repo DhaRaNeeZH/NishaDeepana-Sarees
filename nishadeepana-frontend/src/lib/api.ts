@@ -38,6 +38,8 @@ export const api = {
     getProducts: () => apiFetch<any[]>('/api/products'),
     getProduct: (id: string) => apiFetch<any>(`/api/products/${id}`),
     getBestSellingIds: () => apiFetch<{ productId: string; count: number }[]>('/api/products/best-selling-ids'),
+    // Fetch all products in the same colorGroup (for color variant swatches)
+    getColorVariants: (colorGroup: string) => apiFetch<any[]>(`/api/products?colorGroup=${encodeURIComponent(colorGroup)}`),
     createProduct: (data: any) => apiFetch<any>('/api/products', { method: 'POST', body: JSON.stringify(data) }),
     updateProduct: (id: string, data: any) => apiFetch<any>(`/api/products/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     deleteProduct: (id: string) => apiFetch<any>(`/api/products/${id}`, { method: 'DELETE' }),
@@ -85,6 +87,31 @@ export const api = {
             throw new Error(err.error || 'Upload failed');
         }
         return res.json();
+    },
+
+    // Video Upload
+    uploadVideo: async (file: File, onProgress?: (pct: number) => void): Promise<{ url: string }> => {
+        const token = localStorage.getItem('nd_token');
+        return new Promise((resolve, reject) => {
+            const formData = new FormData();
+            formData.append('video', file);
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', `${API_BASE}/api/upload/video`);
+            if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+            xhr.upload.onprogress = (e) => {
+                if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
+            };
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(JSON.parse(xhr.responseText));
+                } else {
+                    try { reject(new Error(JSON.parse(xhr.responseText).error || 'Video upload failed')); }
+                    catch { reject(new Error('Video upload failed')); }
+                }
+            };
+            xhr.onerror = () => reject(new Error('Network error during video upload'));
+            xhr.send(formData);
+        });
     },
 
     // Delivery Charge Settings

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Heart, Share2, Package, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShoppingCart, Heart, Share2, Package, Shield, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { useProducts } from '../contexts/ProductContext';
 import { formatCurrency } from '../lib/utils';
 import { calculateBulkUnitPrice, getBulkDiscountPercentage } from '../utils/pricing';
@@ -11,14 +11,17 @@ import { ProductCard } from '../components/ProductCard';
 import { BlouseBadge } from '../components/BlouseBadge';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
+import { api } from '../lib/api';
+import { Saree } from '../lib/types';
 
 export const ProductDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { products } = useProducts();
     const saree = products.find(s => s.id === id);
-    const [selectedImage, setSelectedImage] = React.useState(0);
-    const [quantity, setQuantity] = React.useState(1);
+    const [selectedImage, setSelectedImage] = useState(0);
+    const [quantity, setQuantity] = useState(1);
+    const [colorVariants, setColorVariants] = useState<Saree[]>([]);
     const { addItem } = useCart();
     const { isWishlisted, toggleWishlist } = useWishlist();
     const isLiked = id ? isWishlisted(id) : false;
@@ -39,6 +42,28 @@ export const ProductDetailPage: React.FC = () => {
         .slice(0, 4);
 
     const images = saree.images && saree.images.length > 0 ? [saree.image, ...saree.images] : [saree.image];
+    const media = saree.video 
+        ? [{ type: 'video', url: saree.video }, ...images.map(url => ({ type: 'image', url }))]
+        : images.map(url => ({ type: 'image', url }));
+
+    useEffect(() => {
+        if (saree?.colorGroup) {
+            api.getColorVariants(saree.colorGroup)
+                .then(variants => setColorVariants(variants.filter(v => v.id !== saree.id)))
+                .catch(console.error);
+        } else {
+            setColorVariants([]);
+        }
+        // Reset state on navigation
+        setSelectedImage(0);
+        setQuantity(1);
+    }, [saree?.colorGroup, saree?.id]);
+
+    const getColorStyle = (tag?: string) => {
+        if (!tag) return { backgroundColor: '#f3f4f6' };
+        if (tag === 'Multicolor') return { background: 'linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet)' };
+        return { backgroundColor: tag.toLowerCase() };
+    };
 
     // Calculate pricing using new pricing engine
     const basePrice = saree.price;
@@ -73,38 +98,57 @@ export const ProductDetailPage: React.FC = () => {
                     {/* Image Gallery */}
                     <div>
                         <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-gray-100 mb-4 group">
-                            <img
-                                src={images[selectedImage]}
-                                alt={saree.name}
-                                className="w-full h-full object-contain bg-gray-50"
-                            />
-                            {images.length > 1 && (
+                            {media[selectedImage].type === 'video' ? (
+                                <video
+                                    src={media[selectedImage].url}
+                                    controls
+                                    autoPlay
+                                    muted
+                                    loop
+                                    className="w-full h-full object-contain bg-black"
+                                />
+                            ) : (
+                                <img
+                                    src={media[selectedImage].url}
+                                    alt={saree.name}
+                                    className="w-full h-full object-contain bg-gray-50"
+                                />
+                            )}
+                            {media.length > 1 && (
                                 <>
                                     <button
-                                        onClick={() => setSelectedImage((selectedImage - 1 + images.length) % images.length)}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
+                                        onClick={() => setSelectedImage((selectedImage - 1 + media.length) % media.length)}
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white z-10"
                                     >
                                         <ChevronLeft className="h-6 w-6 text-maroon" />
                                     </button>
                                     <button
-                                        onClick={() => setSelectedImage((selectedImage + 1) % images.length)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
+                                        onClick={() => setSelectedImage((selectedImage + 1) % media.length)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white z-10"
                                     >
                                         <ChevronRight className="h-6 w-6 text-maroon" />
                                     </button>
                                 </>
                             )}
                         </div>
-                        {images.length > 1 && (
+                        {media.length > 1 && (
                             <div className="grid grid-cols-4 gap-2">
-                                {images.map((img, idx) => (
+                                {media.map((item, idx) => (
                                     <button
                                         key={idx}
                                         onClick={() => setSelectedImage(idx)}
-                                        className={`aspect-square rounded-md overflow-hidden border-2 ${selectedImage === idx ? 'border-maroon' : 'border-transparent'
-                                            }`}
+                                        className={`relative aspect-square rounded-md overflow-hidden border-2 ${selectedImage === idx ? 'border-maroon' : 'border-transparent'}`}
                                     >
-                                        <img src={img} alt={`${saree.name} ${idx + 1}`} className="w-full h-full object-contain bg-gray-50" />
+                                        {item.type === 'video' ? (
+                                            <>
+                                                <video src={item.url} className="w-full h-full object-cover opacity-70" />
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <Play className="h-6 w-6 text-white drop-shadow-md" fill="currentColor" />
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <img src={item.url} alt={`${saree.name} ${idx + 1}`} className="w-full h-full object-cover bg-gray-50" />
+                                        )}
                                     </button>
                                 ))}
                             </div>
@@ -178,6 +222,33 @@ export const ProductDetailPage: React.FC = () => {
                         </div>
 
 
+                        {/* Color Variants */}
+                        {(saree.colorTag || colorVariants.length > 0) && (
+                            <div className="mb-6">
+                                <span className="text-sm font-medium mb-2 block">Also available in:</span>
+                                <div className="flex flex-wrap gap-3">
+                                    <div className="relative cursor-default border-2 border-maroon rounded-full p-0.5" title={`${saree.colorTag || saree.color} (Selected)`}>
+                                        <div 
+                                            className="w-8 h-8 rounded-full border border-gray-200" 
+                                            style={getColorStyle(saree.colorTag)} 
+                                        />
+                                    </div>
+                                    {colorVariants.map(variant => (
+                                        <Link 
+                                            key={variant.id} 
+                                            to={`/product/${variant.id}`} 
+                                            className="border-2 border-transparent hover:border-gray-300 rounded-full p-0.5 transition-colors"
+                                            title={variant.colorTag || variant.color}
+                                        >
+                                            <div 
+                                                className="w-8 h-8 rounded-full border border-gray-200" 
+                                                style={getColorStyle(variant.colorTag)} 
+                                            />
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Quantity Selector */}
                         <div className="mb-6">

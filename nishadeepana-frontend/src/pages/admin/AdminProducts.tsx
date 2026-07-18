@@ -16,11 +16,14 @@ interface ProductForm {
     category: string;
     fabric: string;
     color: string;
+    colorTag: string;
+    colorGroup: string;
     price: string;
     originalPrice: string;
     freeDelivery: boolean;
     image: string;
     images: string[];
+    video: string;
     description: string;
     featured: boolean;
     madeToOrder: boolean;
@@ -29,8 +32,8 @@ interface ProductForm {
 
 const EMPTY_FORM: ProductForm = {
     name: '', sareeType: '', category: '', fabric: '',
-    color: '', price: '', originalPrice: '', freeDelivery: false,
-    image: '', images: [], description: '',
+    color: '', colorTag: '', colorGroup: '', price: '', originalPrice: '', freeDelivery: false,
+    image: '', images: [], video: '', description: '',
     featured: false, madeToOrder: false,
     blouseIncluded: 'none',
 };
@@ -49,11 +52,14 @@ const ProductModal: React.FC<{
             category: product.category ?? '',
             fabric: product.fabric ?? '',
             color: product.color ?? '',
+            colorTag: product.colorTag ?? '',
+            colorGroup: product.colorGroup ?? '',
             price: String(product.price ?? ''),
             originalPrice: String(product.originalPrice ?? ''),
             freeDelivery: product.freeDelivery ?? false,
             image: product.image ?? '',
             images: product.images ?? [],
+            video: product.video ?? '',
             description: product.description ?? '',
             featured: product.featured ?? false,
             madeToOrder: product.madeToOrder ?? false,
@@ -102,6 +108,22 @@ const ProductModal: React.FC<{
             setError(err.message || 'Upload failed after crop');
         } finally {
             setUploading(false);
+        }
+    };
+
+    const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploading(true);
+        setError('');
+        try {
+            const result = await api.uploadVideo(file);
+            setForm(prev => ({ ...prev, video: result.url }));
+        } catch (err: any) {
+            setError(err.message || 'Video upload failed');
+        } finally {
+            setUploading(false);
+            e.target.value = '';
         }
     };
 
@@ -285,6 +307,65 @@ const ProductModal: React.FC<{
                                 ))}
                             </div>
                         )}
+                    </div>
+
+                    {/* Video Upload */}
+                    <div>
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Product Video (Optional)</label>
+                        <div className="flex gap-2 mb-2">
+                            <input
+                                id="video-upload"
+                                type="file"
+                                accept="video/*"
+                                onChange={handleVideoUpload}
+                                className="hidden"
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="flex items-center gap-2 border-maroon/40 text-maroon hover:bg-maroon/5"
+                                onClick={() => document.getElementById('video-upload')?.click()}
+                                disabled={uploading}
+                            >
+                                <Upload className="h-4 w-4" /> Upload Video
+                            </Button>
+                            <span className="text-xs text-gray-400 flex items-center">or paste URL below</span>
+                        </div>
+                        <Input
+                            placeholder="https://example.com/video.mp4"
+                            value={form.video}
+                            onChange={e => handleChange('video', e.target.value)}
+                            className="border-maroon/30 focus:border-maroon mb-2"
+                        />
+                        {form.video && (
+                            <video src={form.video} controls className="h-32 w-auto border rounded-lg bg-gray-50" />
+                        )}
+                    </div>
+
+                    {/* Color Variants */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Color Tag (For Swatches)</label>
+                            <select
+                                value={form.colorTag}
+                                onChange={e => handleChange('colorTag', e.target.value)}
+                                className="w-full border border-maroon/30 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-maroon bg-white h-10"
+                            >
+                                <option value="">None</option>
+                                <option value="Red">Red</option>
+                                <option value="Blue">Blue</option>
+                                <option value="Green">Green</option>
+                                <option value="Yellow">Yellow</option>
+                                <option value="Pink">Pink</option>
+                                <option value="Purple">Purple</option>
+                                <option value="Orange">Orange</option>
+                                <option value="White">White</option>
+                                <option value="Black">Black</option>
+                                <option value="Gold">Gold</option>
+                                <option value="Multicolor">Multicolor</option>
+                            </select>
+                        </div>
+                        {field('Color Group ID', 'colorGroup', 'text', 'e.g. banarasi-1')}
                     </div>
 
                     <div>

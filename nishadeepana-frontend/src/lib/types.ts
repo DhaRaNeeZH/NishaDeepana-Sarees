@@ -9,15 +9,19 @@ export interface Saree {
     originalPrice?: number;
     freeDelivery?: boolean;
     category: string;
-    sareeType: string; // Specific type: South cotton, Soft silk, etc.
+    sareeType: string;
     fabric: string;
     color: string;
+    colorTag?: string;      // one of 11 basic color names e.g. 'Red', 'Blue'
+    colorGroup?: string;    // shared ID linking color variants e.g. 'banarasi-katan-001'
     image: string;
     images: string[];
+    video?: string;         // Cloudinary video URL
     featured: boolean;
     madeToOrder: boolean;
-    blouseIncluded: BlouseType; // What blouse comes with the saree
-    createdAt?: string; // Used for Newest/Oldest sort
+    inStock?: boolean;
+    blouseIncluded: BlouseType;
+    createdAt?: string;
 }
 
 export interface CartItem extends Saree {

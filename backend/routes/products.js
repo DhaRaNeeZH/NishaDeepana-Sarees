@@ -30,9 +30,14 @@ router.get('/best-selling-ids', async (req, res) => {
 });
 
 // GET /api/products — public (customers browse)
+// Supports ?colorGroup=<group> to fetch all color variants of a product family
 router.get('/', async (req, res) => {
     try {
-        const products = await Product.find().sort({ createdAt: -1 });
+        const filter = {};
+        if (req.query.colorGroup) {
+            filter.colorGroup = req.query.colorGroup;
+        }
+        const products = await Product.find(filter).sort({ createdAt: -1 });
         res.json(products);
     } catch (err) {
         res.status(500).json({ error: err.message });
