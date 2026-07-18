@@ -48,8 +48,8 @@ export const ProductDetailPage: React.FC = () => {
 
     const relatedSarees = products
         .filter(s => s.id !== saree.id)
-        .sort((a, b) => getRelatedScore(b) - getRelatedScore(a))
-        .slice(0, 12);
+        .filter(s => getRelatedScore(s) > 0)
+        .sort((a, b) => getRelatedScore(b) - getRelatedScore(a));
 
     const allVariants = [saree, ...colorVariants].sort((a: any, b: any) => {
         const idA = a.id || a._id || '';
